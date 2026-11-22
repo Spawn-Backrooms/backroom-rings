@@ -1,0 +1,33 @@
+{
+  "manifestVersion": 0,
+  "protocolVersion": "backrooms.v0",
+  "artifactVersion": "backrooms.localnet.v0",
+  "source": {
+    "upstreamCommit": "42de575202f07adf6cfe9194ae9227445797bd8e",
+    "forkCommit": null
+  },
+  "schemaSha256": null,
+  "client": { "version": "0.1.0-dev.0", "packageIntegrity": null },
+  "circuits": {
+    "createRoom": { "circuitSha256": null, "provingKeySha256": null, "verifyingKeySha256": null },
+    "advanceRoom": { "circuitSha256": null, "provingKeySha256": null, "verifyingKeySha256": null }
+  },
+  "setup": { "kind": "insecure_test", "provenance": null },
+  "network": {
+    "cluster": "localnet",
+    "genesisHash": null,
+    "applicationProgramId": null,
+    "shieldedPoolProgramId": null
+  },
+  "services": {
+    "prover": { "version": null, "sourceCommit": null, "binarySha256": null, "imageDigest": null },
+    "indexer": { "version": null, "sourceCommit": null, "binarySha256": null, "imageDigest": null }
+  },
+  "evidence": {
+    "circuitReview": null,
+    "programReview": null,
+    "publicDemo": null,
+    "nativeInference": null,
+    "runtimePrivacy": null
+  }
+}

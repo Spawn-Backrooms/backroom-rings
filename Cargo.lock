@@ -1455,6 +1455,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "backroom-rings-program"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "borsh",
+ "hex",
+ "pinocchio 0.11.2",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "solana-address 2.7.0",
+ "solana-commitment-config",
+ "solana-instruction 3.5.1",
+ "solana-instruction-error",
+ "solana-keypair",
+ "solana-loader-v3-interface 8.1.1",
+ "solana-loader-v4-interface",
+ "solana-message",
+ "solana-sdk-ids",
+ "solana-signature",
+ "solana-signer",
+ "solana-transaction",
+ "solana-transaction-error",
+ "spr-account-checks",
+ "spr-client",
+ "spr-hasher",
+ "spr-interface",
+ "spr-keypair",
+ "spr-program",
+ "spr-program-test",
+ "spr-transaction",
+ "thiserror 2.0.21",
+ "url",
+ "wincode",
+ "xark",
+]
+
+[[package]]
 name = "base16ct"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

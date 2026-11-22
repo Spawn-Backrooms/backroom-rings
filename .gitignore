@@ -49,3 +49,8 @@ sdk-tests/timelock-escrow/program/tests/arkworks_prepare_inputs.rs
 
 !cli/src/zk/build/
 !cli/src/zk/build/**
+
+!/docs/
+/docs/*
+!/docs/backrooms/
+!/docs/backrooms/**

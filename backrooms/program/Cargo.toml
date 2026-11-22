@@ -1,0 +1,116 @@
+[package]
+name = "backroom-rings-program"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[lib]
+name = "backroom_rings_program"
+crate-type = ["cdylib", "lib"]
+
+[target.'cfg(all(not(xark), not(xark_client)))'.dependencies]
+spr-keypair = { workspace = true, optional = true }
+spr-transaction = { workspace = true, optional = true }
+
+[features]
+# The committed verifying keys come from an example setup nobody vouches for,
+# so they are generated as SetupKind::InsecureTest and do not compile without
+# this feature. On by default: this program is a test/example, never a
+# devnet or mainnet deployment.
+default = ["insecure-test-setup"]
+insecure-test-setup = []
+bpf-entrypoint = []
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+circuits = [
+    "dep:borsh",
+    "dep:xark",
+    "dep:solana-instruction",
+    "dep:spr-keypair",
+    "dep:spr-transaction",
+    "spr-program/client",
+]
+wasm = [
+    "dep:borsh",
+    "dep:xark",
+    "dep:spr-keypair",
+    "dep:spr-transaction",
+    "dep:solana-instruction",
+    "spr-program/wasm",
+]
+bridge = ["circuits", "dep:serde", "dep:serde_json", "dep:anyhow", "dep:base64", "dep:hex", "dep:sha2", "dep:url", "dep:solana-address", "dep:solana-commitment-config", "dep:solana-signer", "dep:solana-transaction", "dep:solana-message", "dep:solana-sdk-ids", "dep:solana-loader-v3-interface", "dep:solana-loader-v4-interface", "dep:spr-client"]
+proofs = ["circuits"]
+localnet = ["proofs", "bridge", "dep:spr-program-test"]
+build-circuits = ["spr-program/build"]
+
+[dependencies]
+spr-program-test = { workspace = true, optional = true, features = ["localnet"] }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+anyhow = { workspace = true, optional = true }
+base64 = { workspace = true, optional = true }
+hex = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
+url = { workspace = true, optional = true }
+solana-address = { workspace = true, optional = true }
+solana-commitment-config = { workspace = true, optional = true }
+solana-signer = { workspace = true, optional = true }
+solana-transaction = { workspace = true, optional = true, features = ["verify"] }
+solana-message = { workspace = true, optional = true }
+solana-sdk-ids = { workspace = true, optional = true }
+solana-loader-v3-interface = { workspace = true, optional = true }
+solana-loader-v4-interface = { workspace = true, optional = true }
+spr-client = { workspace = true, optional = true, features = ["solana-rpc"] }
+xark = { workspace = true, optional = true }
+borsh = { workspace = true, optional = true }
+pinocchio = { workspace = true, features = ["cpi", "sha2"] }
+solana-instruction = { workspace = true, optional = true }
+thiserror = { workspace = true }
+wincode = { workspace = true }
+spr-account-checks = { workspace = true }
+spr-hasher = { workspace = true }
+spr-interface = { workspace = true }
+spr-program = { workspace = true, features = ["cpi", "compression", "verifier"] }
+
+[dev-dependencies]
+solana-transaction-error = { workspace = true }
+solana-instruction-error = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+solana-address = { workspace = true }
+solana-instruction = { workspace = true }
+solana-keypair = { workspace = true }
+solana-signature = { workspace = true }
+solana-signer = { workspace = true }
+spr-client = { workspace = true, features = ["solana-rpc"] }
+spr-program-test = { workspace = true, features = ["localnet"] }
+
+[[test]]
+name = "transitions"
+required-features = ["circuits"]
+
+[[test]]
+name = "proofs"
+required-features = ["proofs"]
+
+[[test]]
+name = "localnet"
+required-features = ["localnet"]
+
+[[test]]
+name = "bridge"
+required-features = ["localnet"]
+
+[lints.rust.unexpected_cfgs]
+level = "allow"
+check-cfg = ['cfg(xark)', 'cfg(xark_client)', 'cfg(target_os, values("solana"))']
+
+[[bin]]
+name = "backroom-rings-bridge"
+path = "src/bin/bridge.rs"
+required-features = ["bridge"]
+
+[[bin]]
+name = "backroom-rings-localnet"
+path = "src/bin/localnet.rs"
+required-features = ["localnet"]

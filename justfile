@@ -1523,3 +1523,17 @@ metadata:
 
 clean:
     cargo clean
+
+# Local-only Backrooms example with deterministic test setup.
+build-backrooms:
+    zolana build-zk-program --test -p backroom-rings-program --skip-wasm --sbf-features bpf-entrypoint
+    cargo build -p backroom-rings-program --features localnet --bins
+
+test-backrooms:
+    cargo test -p backroom-rings-program --features circuits --test transitions
+
+test-backrooms-proofs:
+    cargo test -p backroom-rings-program --features proofs --test proofs
+
+test-backrooms-validator:
+    cargo test -p backroom-rings-program --features localnet --test localnet --test bridge -- --nocapture
