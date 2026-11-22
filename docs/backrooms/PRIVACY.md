@@ -47,6 +47,12 @@ new meaning to the same episode. A failed state commit does not authorize a
 second inference call. A lost submission acknowledgment requires recovery of
 the existing intent before another transition is prepared.
 
+An expired blockhash requires new transaction framing. The bridge checks the
+original signature history and blockhash validity before it signs a replacement.
+The replacement preserves the proofs, instructions, account permissions, fee,
+and intended checkpoint. The host records its bytes and parent digest before
+submission. Uncertain transport or status responses do not establish expiry.
+
 The public authorization commitment has its own private random blinding value.
 The host retains it with the authorization and reuses it for retries. This
 protects short lessons and feedback from guessing even when other transition
@@ -90,6 +96,11 @@ profile. Encrypting a checkpoint does not encrypt those surfaces. Default
 diagnostics should contain identifiers, statuses, and usage measurements;
 private lesson, prompt, and tool-result content does not belong in them.
 
+One live reference-host process owns each Flue directory. A dedicated SQLite
+exclusive transaction holds that ownership through shutdown; the operating
+system releases it after a process crash. Shared persistence and dispatch
+idempotency alone do not establish exclusive conversation ownership.
+
 If the privacy backend, keys, proof artifacts, or verified recovery are
 unavailable, the room remains pending or reports a concrete failure. It must
 not copy private memory into a plaintext fallback.
@@ -115,4 +126,5 @@ The implementation builds on these upstream sources, pinned initially to
 - [`ConfidentialTransaction`](../../sdk-libs/circuit/src/protocol/transaction.rs) binds the checked transaction and its private transaction hash.
 - [Program-owner recovery](../../sdk-libs/program/src/client/program_owner.rs) decodes program data and checks it against commitments.
 - [Custom-program instructions](../../sdk-tests/timelock-escrow/program/src/instructions/escrow.rs) demonstrate verification before an authorized SPP CPI.
+- [SPP output constraints](../../prover/server/circuits/spp_transaction/shared/outputs.go) require owner authorization for data-bearing outputs, preventing an unrelated sender from creating accepted program state.
 

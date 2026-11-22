@@ -209,7 +209,6 @@ fn expired_genesis_and_advance_reframe_without_changing_the_authorized_checkpoin
         "invalid_request",
     );
 
-    // A retained fee remains authorized even when its transaction expires.
     let mut with_fee = original.message;
     let VersionedMessage::V1(message) = &mut with_fee else {
         panic!("bridge prepares v1 messages");
