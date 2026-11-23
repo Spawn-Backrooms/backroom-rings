@@ -1,7 +1,19 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { CLIENT_VERSION } from '../client/index.js';
 import { assertProductionEligible, decodeReleaseManifest, productionBlockers } from '../client/release.js';
+
+test('the public client and development release identify the packed package version', async () => {
+  const load = async (relative: string) => JSON.parse(await readFile(new URL(relative, import.meta.url), 'utf8'));
+  const [pkg, lock, development] = await Promise.all([
+    load('../package.json'), load('../package-lock.json'), load('../releases/development.json'),
+  ]);
+  assert.equal(CLIENT_VERSION, pkg.version);
+  assert.equal(lock.version, pkg.version);
+  assert.equal(lock.packages[''].version, pkg.version);
+  assert.equal(decodeReleaseManifest(development).client.version, pkg.version);
+});
 
 test('development setup and incomplete manifest cannot qualify production', async () => {
   const development: unknown = JSON.parse(await readFile(new URL('../releases/development.json', import.meta.url), 'utf8'));
