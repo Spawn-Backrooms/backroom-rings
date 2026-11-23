@@ -82,6 +82,10 @@ export class ProductionBridge {
     }
   }
 
+  get runtimeFailure(): Promise<void> { return this.indexer.unexpectedExit; }
+
+  assertRunning(): void { this.indexer.assertRunning(); }
+
   async request(seedHex: string, request: BridgeRequest): Promise<unknown> {
     assertDigest(seedHex);
     return this.configured(seedHex, configPath => new ProcessRingsTransport(this.artifacts.bridge, configPath, this.options.timeoutMs).request(request));

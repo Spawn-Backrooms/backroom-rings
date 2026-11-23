@@ -1,0 +1,1088 @@
+{
+  "vectorVersion": "backrooms.knowledge.vectors.v1",
+  "evidenceClass": "synthetic_conformance",
+  "warning": "Openings and deterministic blinding are public test data only. Production creates fresh secret blinding.",
+  "baseEnvelope": {
+    "schemaVersion": "backrooms.knowledge.v1",
+    "authority": "context_only",
+    "record": {
+      "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "recordId": "record-001",
+      "revision": "0",
+      "previousRevision": null,
+      "createdAt": "1795435200000",
+      "kind": "observation",
+      "content": {
+        "mediaType": "text/plain",
+        "binding": {
+          "scheme": "sha256-blinded-v1",
+          "context": {
+            "purpose": "content",
+            "id": "content-001"
+          },
+          "digest": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+        }
+      },
+      "sources": [
+        {
+          "kind": "run",
+          "runId": "run-001",
+          "run": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "source_run",
+              "id": "run-001"
+            },
+            "digest": "6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d"
+          },
+          "originalResult": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "artifact",
+              "id": "result-001"
+            },
+            "digest": "5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105"
+          }
+        }
+      ],
+      "provenance": {
+        "producerId": "resident-001",
+        "derivedFrom": []
+      },
+      "lifecycle": {
+        "state": "retained"
+      }
+    },
+    "rights": {
+      "policy": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "policy",
+          "id": "policy-001"
+        },
+        "digest": "b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720"
+      },
+      "audience": [
+        "owner-001",
+        "resident-001"
+      ],
+      "purposes": [
+        "derive",
+        "evaluate",
+        "retrieve",
+        "review"
+      ],
+      "license": null,
+      "expiresAt": "1796000000000",
+      "retainUntil": null
+    },
+    "evaluation": {
+      "ownerAcceptance": {
+        "kind": "owner_acceptance",
+        "subject": {
+          "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "recordId": "record-001",
+          "revision": "0",
+          "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+        },
+        "evaluatorId": "owner-001",
+        "recordedAt": "1795435201000",
+        "receipt": {
+          "scheme": "sha256-blinded-v1",
+          "context": {
+            "purpose": "evidence",
+            "id": "acceptance-001"
+          },
+          "digest": "975d389f464e555bf846b72c149136576f7447c54cf91829a393db2b38d9ab0c"
+        },
+        "decision": "accepted",
+        "authority": {
+          "scheme": "sha256-blinded-v1",
+          "context": {
+            "purpose": "policy",
+            "id": "policy-001"
+          },
+          "digest": "b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720"
+        }
+      },
+      "deterministicChecks": [
+        {
+          "kind": "deterministic_check",
+          "subject": {
+            "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "recordId": "record-001",
+            "revision": "0",
+            "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+          },
+          "evaluatorId": "checker-001",
+          "recordedAt": "1795435200500",
+          "receipt": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "evidence",
+              "id": "check-001"
+            },
+            "digest": "34656d58e88b0e090d81f685e0882c5657af1531fea63b1465317978070cd5b7"
+          },
+          "checker": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "artifact",
+              "id": "checker-001"
+            },
+            "digest": "213c6875c7cb77f9945636805c308bd65ab4a7c8afc9d37211c5519da1fcf680"
+          },
+          "result": "fail"
+        }
+      ],
+      "modelOpinions": [
+        {
+          "kind": "model_opinion",
+          "subject": {
+            "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "recordId": "record-001",
+            "revision": "0",
+            "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+          },
+          "evaluatorId": "resident-001",
+          "recordedAt": "1795435200600",
+          "receipt": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "evidence",
+              "id": "opinion-001"
+            },
+            "digest": "1dfd000e666782e4b803710d5b91137a11db8c1de3f39ddf54a0f6ec9ada45f5"
+          },
+          "modelId": "model-001",
+          "result": "supports"
+        }
+      ],
+      "externalAcceptances": []
+    }
+  },
+  "canonicalEnvelope": "{\"authority\":\"context_only\",\"evaluation\":{\"deterministicChecks\":[{\"checker\":{\"context\":{\"id\":\"checker-001\",\"purpose\":\"artifact\"},\"digest\":\"213c6875c7cb77f9945636805c308bd65ab4a7c8afc9d37211c5519da1fcf680\",\"scheme\":\"sha256-blinded-v1\"},\"evaluatorId\":\"checker-001\",\"kind\":\"deterministic_check\",\"receipt\":{\"context\":{\"id\":\"check-001\",\"purpose\":\"evidence\"},\"digest\":\"34656d58e88b0e090d81f685e0882c5657af1531fea63b1465317978070cd5b7\",\"scheme\":\"sha256-blinded-v1\"},\"recordedAt\":\"1795435200500\",\"result\":\"fail\",\"subject\":{\"contentCommitment\":\"6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac\",\"recordId\":\"record-001\",\"revision\":\"0\",\"roomId\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}}],\"externalAcceptances\":[],\"modelOpinions\":[{\"evaluatorId\":\"resident-001\",\"kind\":\"model_opinion\",\"modelId\":\"model-001\",\"receipt\":{\"context\":{\"id\":\"opinion-001\",\"purpose\":\"evidence\"},\"digest\":\"1dfd000e666782e4b803710d5b91137a11db8c1de3f39ddf54a0f6ec9ada45f5\",\"scheme\":\"sha256-blinded-v1\"},\"recordedAt\":\"1795435200600\",\"result\":\"supports\",\"subject\":{\"contentCommitment\":\"6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac\",\"recordId\":\"record-001\",\"revision\":\"0\",\"roomId\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}}],\"ownerAcceptance\":{\"authority\":{\"context\":{\"id\":\"policy-001\",\"purpose\":\"policy\"},\"digest\":\"b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720\",\"scheme\":\"sha256-blinded-v1\"},\"decision\":\"accepted\",\"evaluatorId\":\"owner-001\",\"kind\":\"owner_acceptance\",\"receipt\":{\"context\":{\"id\":\"acceptance-001\",\"purpose\":\"evidence\"},\"digest\":\"975d389f464e555bf846b72c149136576f7447c54cf91829a393db2b38d9ab0c\",\"scheme\":\"sha256-blinded-v1\"},\"recordedAt\":\"1795435201000\",\"subject\":{\"contentCommitment\":\"6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac\",\"recordId\":\"record-001\",\"revision\":\"0\",\"roomId\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}}},\"record\":{\"content\":{\"binding\":{\"context\":{\"id\":\"content-001\",\"purpose\":\"content\"},\"digest\":\"6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac\",\"scheme\":\"sha256-blinded-v1\"},\"mediaType\":\"text/plain\"},\"createdAt\":\"1795435200000\",\"kind\":\"observation\",\"lifecycle\":{\"state\":\"retained\"},\"previousRevision\":null,\"provenance\":{\"derivedFrom\":[],\"producerId\":\"resident-001\"},\"recordId\":\"record-001\",\"revision\":\"0\",\"roomId\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"sources\":[{\"kind\":\"run\",\"originalResult\":{\"context\":{\"id\":\"result-001\",\"purpose\":\"artifact\"},\"digest\":\"5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105\",\"scheme\":\"sha256-blinded-v1\"},\"run\":{\"context\":{\"id\":\"run-001\",\"purpose\":\"source_run\"},\"digest\":\"6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d\",\"scheme\":\"sha256-blinded-v1\"},\"runId\":\"run-001\"}]},\"rights\":{\"audience\":[\"owner-001\",\"resident-001\"],\"expiresAt\":\"1796000000000\",\"license\":null,\"policy\":{\"context\":{\"id\":\"policy-001\",\"purpose\":\"policy\"},\"digest\":\"b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720\",\"scheme\":\"sha256-blinded-v1\"},\"purposes\":[\"derive\",\"evaluate\",\"retrieve\",\"review\"],\"retainUntil\":null},\"schemaVersion\":\"backrooms.knowledge.v1\"}",
+  "signingSha256": "5585ff07347979a5ea390865b2cdc63fd92293d0a8833d8ed44b907ffe5d880a",
+  "bindings": [
+    {
+      "id": "content-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "content",
+          "id": "content-001"
+        },
+        "digest": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "policy-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "policy",
+          "id": "policy-001"
+        },
+        "digest": "b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "audience": [
+            "owner-001",
+            "resident-001"
+          ],
+          "purpose": "review"
+        }
+      }
+    },
+    {
+      "id": "run-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "source_run",
+          "id": "run-001"
+        },
+        "digest": "6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "original": "result-001"
+        }
+      }
+    },
+    {
+      "id": "result-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "artifact",
+          "id": "result-001"
+        },
+        "digest": "5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "answer": "yes"
+        }
+      }
+    },
+    {
+      "id": "acceptance-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "evidence",
+          "id": "acceptance-001"
+        },
+        "digest": "975d389f464e555bf846b72c149136576f7447c54cf91829a393db2b38d9ab0c"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "decision": "accepted"
+        }
+      }
+    },
+    {
+      "id": "check-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "evidence",
+          "id": "check-001"
+        },
+        "digest": "34656d58e88b0e090d81f685e0882c5657af1531fea63b1465317978070cd5b7"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "result": "fail"
+        }
+      }
+    },
+    {
+      "id": "checker-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "artifact",
+          "id": "checker-001"
+        },
+        "digest": "213c6875c7cb77f9945636805c308bd65ab4a7c8afc9d37211c5519da1fcf680"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "version": "1"
+        }
+      }
+    },
+    {
+      "id": "opinion-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "evidence",
+          "id": "opinion-001"
+        },
+        "digest": "1dfd000e666782e4b803710d5b91137a11db8c1de3f39ddf54a0f6ec9ada45f5"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "result": "supports"
+        }
+      }
+    },
+    {
+      "id": "previous-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "record_revision",
+          "id": "previous-001"
+        },
+        "digest": "8152c8cc306f416599ecd5a4a78178d2beb0e20df81eb2ce686d34f605174277"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "recordId": "record-001",
+          "revision": "0",
+          "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+        }
+      }
+    },
+    {
+      "id": "external-001",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "evidence",
+          "id": "external-001"
+        },
+        "digest": "33e1e3bc47896a2048c0c4376e745a6b592bbceffe959c2db421809c0d9a75eb"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "result": "accepted"
+        }
+      }
+    },
+    {
+      "id": "unicode-order",
+      "binding": {
+        "scheme": "sha256-blinded-v1",
+        "context": {
+          "purpose": "artifact",
+          "id": "unicode-order"
+        },
+        "digest": "d5c66a62c67a03b01909e4079d21b76b1354e9107fc1b19303839a21dbb45e69"
+      },
+      "opening": {
+        "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "value": {
+          "": "private-use",
+          "😀": "astral",
+          "line": "line separator"
+        }
+      }
+    }
+  ],
+  "validEnvelopes": [
+    {
+      "id": "observation",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "observation"
+        }
+      ]
+    },
+    {
+      "id": "hypothesis",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "hypothesis"
+        }
+      ]
+    },
+    {
+      "id": "procedure",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "procedure"
+        }
+      ]
+    },
+    {
+      "id": "failure",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "failure"
+        }
+      ]
+    },
+    {
+      "id": "preference",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "preference"
+        }
+      ]
+    },
+    {
+      "id": "policy-context",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "policy"
+        },
+        {
+          "path": [
+            "record",
+            "enforcement"
+          ],
+          "op": "set",
+          "value": "native_grant_contract"
+        },
+        {
+          "path": [
+            "record",
+            "policy"
+          ],
+          "op": "set",
+          "value": {
+            "scheme": "sha256-blinded-v1",
+            "context": {
+              "purpose": "policy",
+              "id": "policy-001"
+            },
+            "digest": "b2312e1ed6922f5e7f23f24da0cbc3567fa7ea050dbf3d7280aef5986d44a720"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-retraction",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "lifecycle"
+          ],
+          "op": "set",
+          "value": {
+            "state": "retracted",
+            "reason": {
+              "scheme": "sha256-blinded-v1",
+              "context": {
+                "purpose": "evidence",
+                "id": "acceptance-001"
+              },
+              "digest": "975d389f464e555bf846b72c149136576f7447c54cf91829a393db2b38d9ab0c"
+            }
+          }
+        },
+        {
+          "path": [
+            "rights",
+            "expiresAt"
+          ],
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "path": [
+            "rights",
+            "retainUntil"
+          ],
+          "op": "set",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "id": "accepted-revision-one",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "path": [
+            "record",
+            "previousRevision"
+          ],
+          "op": "set",
+          "value": {
+            "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "recordId": "record-001",
+            "revision": "0",
+            "binding": {
+              "scheme": "sha256-blinded-v1",
+              "context": {
+                "purpose": "record_revision",
+                "id": "previous-001"
+              },
+              "digest": "8152c8cc306f416599ecd5a4a78178d2beb0e20df81eb2ce686d34f605174277"
+            }
+          }
+        },
+        {
+          "path": [
+            "evaluation",
+            "ownerAcceptance",
+            "subject",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "path": [
+            "evaluation",
+            "deterministicChecks",
+            0,
+            "subject",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        },
+        {
+          "path": [
+            "evaluation",
+            "modelOpinions",
+            0,
+            "subject",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": "separate-external-acceptance",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "externalAcceptances"
+          ],
+          "op": "set",
+          "value": [
+            {
+              "kind": "external_acceptance",
+              "subject": {
+                "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "recordId": "record-001",
+                "revision": "0",
+                "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+              },
+              "evaluatorId": "external-reviewer-001",
+              "recordedAt": "1795435200700",
+              "receipt": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "evidence",
+                  "id": "external-001"
+                },
+                "digest": "33e1e3bc47896a2048c0c4376e745a6b592bbceffe959c2db421809c0d9a75eb"
+              },
+              "systemId": "external-system-001",
+              "result": "accepted"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "invalidEnvelopes": [
+    {
+      "id": "unknown-tool-grant",
+      "changes": [
+        {
+          "path": [
+            "tools"
+          ],
+          "op": "set",
+          "value": [
+            "shell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unknown-spending-grant",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "spending"
+          ],
+          "op": "set",
+          "value": {
+            "amount": "100"
+          }
+        }
+      ]
+    },
+    {
+      "id": "unknown-publication-grant",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "publication"
+          ],
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "unknown-policy-field",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "policy",
+            "allowAll"
+          ],
+          "op": "set",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "unknown-content-field",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "content",
+            "plaintext"
+          ],
+          "op": "set",
+          "value": "secret"
+        }
+      ]
+    },
+    {
+      "id": "unknown-signature-field",
+      "changes": [
+        {
+          "path": [
+            "signature"
+          ],
+          "op": "set",
+          "value": "evidence-is-not-authority"
+        }
+      ]
+    },
+    {
+      "id": "unsupported-version",
+      "changes": [
+        {
+          "path": [
+            "schemaVersion"
+          ],
+          "op": "set",
+          "value": "backrooms.v0"
+        }
+      ]
+    },
+    {
+      "id": "authority-escalation",
+      "changes": [
+        {
+          "path": [
+            "authority"
+          ],
+          "op": "set",
+          "value": "native_grant"
+        }
+      ]
+    },
+    {
+      "id": "unblinded-content",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "content",
+            "binding",
+            "scheme"
+          ],
+          "op": "set",
+          "value": "sha256"
+        }
+      ]
+    },
+    {
+      "id": "opening-in-public-metadata",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "content",
+            "binding",
+            "opening"
+          ],
+          "op": "set",
+          "value": {
+            "blinding": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+            "value": "yes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wrong-binding-purpose",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "content",
+            "binding",
+            "context",
+            "purpose"
+          ],
+          "op": "set",
+          "value": "policy"
+        }
+      ]
+    },
+    {
+      "id": "owner-opinion-substitution",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "ownerAcceptance",
+            "kind"
+          ],
+          "op": "set",
+          "value": "model_opinion"
+        }
+      ]
+    },
+    {
+      "id": "owner-acceptance-missing",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "ownerAcceptance"
+          ],
+          "op": "set",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "evidence-for-another-revision",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "modelOpinions",
+            0,
+            "subject",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": "evidence-for-another-room",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "ownerAcceptance",
+            "subject",
+            "roomId"
+          ],
+          "op": "set",
+          "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    },
+    {
+      "id": "wrong-content-in-evidence",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "deterministicChecks",
+            0,
+            "subject",
+            "contentCommitment"
+          ],
+          "op": "set",
+          "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      ]
+    },
+    {
+      "id": "noncanonical-revision",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "revision"
+          ],
+          "op": "set",
+          "value": "00"
+        }
+      ]
+    },
+    {
+      "id": "overflow-revision",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "revision"
+          ],
+          "op": "set",
+          "value": "18446744073709551616"
+        }
+      ]
+    },
+    {
+      "id": "missing-predecessor",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "revision"
+          ],
+          "op": "set",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "id": "audience-order",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "audience"
+          ],
+          "op": "set",
+          "value": [
+            "resident-001",
+            "owner-001"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "duplicate-audience",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "audience"
+          ],
+          "op": "set",
+          "value": [
+            "owner-001",
+            "owner-001"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "duplicate-purpose",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "purposes"
+          ],
+          "op": "set",
+          "value": [
+            "review",
+            "review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "publication-purpose",
+      "changes": [
+        {
+          "path": [
+            "rights",
+            "purposes"
+          ],
+          "op": "set",
+          "value": [
+            "publish"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "policy-without-enforcement",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "kind"
+          ],
+          "op": "set",
+          "value": "policy"
+        }
+      ]
+    },
+    {
+      "id": "non-policy-with-enforcement",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "enforcement"
+          ],
+          "op": "set",
+          "value": "native_grant_contract"
+        }
+      ]
+    },
+    {
+      "id": "retraction-without-evidence",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "lifecycle"
+          ],
+          "op": "set",
+          "value": {
+            "state": "retracted"
+          }
+        }
+      ]
+    },
+    {
+      "id": "duplicate-source",
+      "changes": [
+        {
+          "path": [
+            "record",
+            "sources"
+          ],
+          "op": "set",
+          "value": [
+            {
+              "kind": "run",
+              "runId": "run-001",
+              "run": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "source_run",
+                  "id": "run-001"
+                },
+                "digest": "6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d"
+              },
+              "originalResult": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "artifact",
+                  "id": "result-001"
+                },
+                "digest": "5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105"
+              }
+            },
+            {
+              "kind": "run",
+              "runId": "run-001",
+              "run": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "source_run",
+                  "id": "run-001"
+                },
+                "digest": "6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d"
+              },
+              "originalResult": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "artifact",
+                  "id": "result-001"
+                },
+                "digest": "5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "duplicate-evaluation",
+      "changes": [
+        {
+          "path": [
+            "evaluation",
+            "modelOpinions"
+          ],
+          "op": "set",
+          "value": [
+            {
+              "kind": "model_opinion",
+              "subject": {
+                "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "recordId": "record-001",
+                "revision": "0",
+                "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+              },
+              "evaluatorId": "resident-001",
+              "recordedAt": "1795435200600",
+              "receipt": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "evidence",
+                  "id": "opinion-001"
+                },
+                "digest": "1dfd000e666782e4b803710d5b91137a11db8c1de3f39ddf54a0f6ec9ada45f5"
+              },
+              "modelId": "model-001",
+              "result": "supports"
+            },
+            {
+              "kind": "model_opinion",
+              "subject": {
+                "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "recordId": "record-001",
+                "revision": "0",
+                "contentCommitment": "6060569c7256efe38b39a4e56dd0bc2be46d87a5d93ba4d8a66886728e9f1cac"
+              },
+              "evaluatorId": "resident-001",
+              "recordedAt": "1795435200600",
+              "receipt": {
+                "scheme": "sha256-blinded-v1",
+                "context": {
+                  "purpose": "evidence",
+                  "id": "opinion-001"
+                },
+                "digest": "1dfd000e666782e4b803710d5b91137a11db8c1de3f39ddf54a0f6ec9ada45f5"
+              },
+              "modelId": "model-001",
+              "result": "supports"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

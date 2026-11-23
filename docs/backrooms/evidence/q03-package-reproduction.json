@@ -1,0 +1,119 @@
+{
+  "evidenceScope": "development package reproduction, loopback workerd and synthetic local recovery; Q03 partial",
+  "toolchain": {
+    "node": "24.22.3",
+    "npm": "11.19.1",
+    "typescript": "7.0.2",
+    "tsx": "4.20.6",
+    "flue": "2.3.0",
+    "workerd": "2026-11-13",
+    "workerdBinarySha256": "c441a90904a861b60b1b1a4e221a69369c6f4e50c6c2dc4c4dbb1a491f5a53c6"
+  },
+  "git": {
+    "main": "3dc650d532708e36c467481350dd7e80029af0fe",
+    "mainTree": "1327e95a4df1a0b1b898af0f0459fde22dce6685",
+    "mainBackroomsTree": "08746362d22f761e25aa5763c2e20a6b405d1c93",
+    "photonDraft": {
+      "commit": "19edcee0ad75b28fda81b7e80f49255f9804ce8d",
+      "tree": "e8cf8dbcb0029c85065f31227747c63a3caeeb63"
+    },
+    "knowledgeDraft": {
+      "commit": "60faf6515257a95a5f53699cb1e7a1057ff1df54",
+      "tree": "d386924062a8f2afa852725a0af5666935c3e27a"
+    },
+    "candidateBackroomsTree": "69aa968a11333917c01766df293b4bd6181950fe",
+    "mainVerifiedBackroomsBlobs": 85
+  },
+  "bridgeContract": {
+    "path": "backrooms/program/bridge-contract.md",
+    "sha256": "8fb8879184b1105dbb5274b1030f598e41e35b9c2ea817ab5c84853a1dcd4dd3",
+    "wireProtocol": "backrooms.v0",
+    "completeRecoveryWatermark": "contextSlot",
+    "developmentArtifactVersion": "backrooms.localnet.v0",
+    "setup": "insecure_test"
+  },
+  "main": {
+    "version": "0.1.0-dev.2",
+    "publicClientVersion": "0.1.0-dev.1",
+    "lockSha256": "bdc31230367a7b22fe3d6ce16c925956d855d469dce5ec4fffb0a3c9f3c63d3f",
+    "archive": {
+      "bytes": 80939,
+      "sha256": "2d4aa49ddb4cb9e7a327961cac486217e1f33f182f3989451e9b99220a2c7d18",
+      "integrity": "sha512-4GOcWASuQ400ursA0eUE5npLo6vZ7YFhC49ZgGUM2QyMhIYTKsgUc7O4vVCcvj4rQVCBAOYqhBVNdkPx5x3NBA==",
+      "files": 105
+    },
+    "freshChecks": {
+      "typecheck": true,
+      "build": true,
+      "defaultTests": {
+        "passed": 68,
+        "failed": 0,
+        "skipped": [
+          "authenticated gateway creates two actual Rings rooms and advances accepted memory across restart",
+          "actual workerd authenticates enrollment with its default fetch and preserves a custom transport",
+          "actual Photon migrates a fresh supplied database and resumes retained progress across restarts"
+        ]
+      },
+      "workerdSeparate": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "packedClientImport": true,
+      "matchesReferenceDevelopmentArchive": true
+    },
+    "nativeConsumerArchiveComparison": {
+      "publicSourceCommit": "b61f57b1c553d2f39399cc2d1db5d0ade43c67f9",
+      "referenceArchiveGitBlob": "b06bec351a0fd4d26eb224c29622f2e3b7b21c57",
+      "archiveBytesGitBlobSha256AndSha512Agree": true,
+      "matchingFileHashes": 105,
+      "consumerLockIntegrityAgrees": true,
+      "scope": "retained consumer development archive and lockfile; native execution was not tested"
+    }
+  },
+  "candidate": {
+    "version": "0.1.0-dev.3",
+    "publicClientVersion": "0.1.0-dev.3",
+    "lockSha256": "361375f83177647ce8540f0cba9e670951b73306a2089e7ed4622b0dccf849c1",
+    "archive": {
+      "bytes": 95249,
+      "sha256": "7d1a7c4013bfdedbc5503c89790332ea4d7c9ba0ec1a379cb602b370a97b3f16",
+      "integrity": "sha512-KIiQIR0Hdw23MCGfowCcxoWp27+vHP7buwFYpysnjgf82qrCiW74B7S9AZ4rpYoaiV0aHFrz57yEdD4h0AzrLg==",
+      "files": 109
+    },
+    "freshChecks": {
+      "typecheck": true,
+      "build": true,
+      "suiteWithWorkerd": {
+        "passed": 126,
+        "failed": 0,
+        "skipped": [
+          "authenticated gateway creates two actual Rings rooms and advances accepted memory across restart",
+          "actual Photon migrates a fresh supplied database and resumes retained progress across restarts"
+        ]
+      },
+      "focusedKnowledgePassed": 52,
+      "focusedSyntheticRecoveryPassed": 4,
+      "focusedVersionAgreementPassed": 1,
+      "packedCanonicalKnowledgeVectorRoundTrip": true,
+      "secondPackMatches": true,
+      "packedExports": {
+        "baseline": 34,
+        "candidate": 49,
+        "removed": 0
+      },
+      "archiveComparisonControls": {
+        "missingAddedChangedContentChangedMode": "distinct path results",
+        "rejectedBackslashesAndBothFileDirectoryOrders": true,
+        "retainedDev2CrossCheckoutCommandMatches": true
+      }
+    }
+  },
+  "runtimeScope": {
+    "workerd": "actual local executable, built public client, authenticated loopback fixture",
+    "gatewayRecovery": "actual Node CLI, sockets and SQLite; synthetic child exit, SIGTERM and in-flight drain",
+    "localChain": "not run; compatible validator, Photon, prover, bridge and generated artifacts unavailable",
+    "nativeExecution": "not run",
+    "productionActivation": "not run"
+  }
+}

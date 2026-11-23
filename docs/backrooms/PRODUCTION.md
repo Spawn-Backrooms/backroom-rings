@@ -182,6 +182,8 @@ The supervised path explicitly passes `--migrate` to initialize or update its su
 
 Before listening, the bridge checks the real network and programs, attests the prover, and validates its complete key inventory. No witness is sent during this check. Failed startup releases ownership and stops its child processes. SIGTERM/SIGINT abort startup or drain the running listener and journal. The bridge supervisor kills Photon when the gateway's control pipe closes, including gateway process termination. Abandoned private runtime directories are removed on the next exclusively owned startup.
 
+If Photon exits unexpectedly after startup, the gateway rejects new commands, closes its listener and drains active operations before releasing custody and indexer ownership. The CLI logs `gateway_indexer_unavailable` and exits nonzero; an external supervisor should restart the gateway against the same persistent database paths. Give the supervisor a termination grace period that accommodates the configured bridge timeout; a worker already in flight may need to reach that bound. This path never starts a replacement operation or replays a journal entry in-process. An intentional signal still uses normal shutdown without reporting indexer failure.
+
 Enrollment creates a distinct writer and returns its Solana identity. Fund that fee account with real SOL before preparing genesis. Production has no airdrop path and rejects localnet funding options. Retrying the enrollment or preparation retains its original identity and operation. Production deployment, SOL funding and paid prover operation are not performed by these release tools.
 
 ## Verification boundary

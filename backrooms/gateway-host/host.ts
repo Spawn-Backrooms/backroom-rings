@@ -222,7 +222,12 @@ export class RingsGateway {
     throw new Error('gateway_journal_busy');
   }
 
+  get runtimeFailure(): Promise<void> | undefined {
+    return this.bridge instanceof ProductionBridge ? this.bridge.runtimeFailure : undefined;
+  }
+
   private async dispatch(packet: GatewayRequest): Promise<unknown> {
+    if (this.bridge instanceof ProductionBridge) this.bridge.assertRunning();
     if (packet.kind === 'bind') return this.serialized(await this.bindingId(packet.enrollment), () => this.bind(packet.enrollment));
     return this.serialized(packet.binding.bindingId, async () => {
       const enrollment = await this.enrollment(packet.binding);
