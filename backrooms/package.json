@@ -27,7 +27,8 @@
   "exports": {
     "./client": "./dist/client/index.js",
     "./flue": "./dist/flue/index.js",
-    "./reference-host": "./dist/reference-host/index.js"
+    "./reference-host": "./dist/reference-host/index.js",
+    "./gateway-host": "./dist/gateway-host/index.js"
   },
   "files": [
     "dist",
