@@ -18,6 +18,11 @@ const proposalSchema = v.strictObject({
   feedback: v.strictObject({ negative: v.boolean(), magnitude: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(10)) }),
 });
 
+function episodeContextIdentity({ binding, room }: EpisodeContext): string {
+  const { operationId: _operationId, contextSlot: _contextSlot, ...state } = room;
+  return canonicalJson({ binding, room: state });
+}
+
 export class FlueResidents implements ResidentRuntime {
   private readonly activeRuns = new Set<Promise<OriginalResult>>();
   private stopping: Promise<void> | undefined;
@@ -87,7 +92,7 @@ export class FlueResidents implements ResidentRuntime {
     const retainedContext = { binding, room } satisfies EpisodeContext;
     await this.records.create(`context/${binding.episodeId}`, retainedContext);
     const prior = (await this.records.read<EpisodeContext>(`context/${binding.episodeId}`))?.value;
-    if (!prior || canonicalJson(prior) !== canonicalJson(retainedContext)) throw new Error('episode_context_changed');
+    if (!prior || episodeContextIdentity(prior) !== episodeContextIdentity(retainedContext)) throw new Error('episode_context_changed');
     await this.records.create(`blinding/${binding.episodeId}`, randomHex());
     const blinding = (await this.records.read<string>(`blinding/${binding.episodeId}`))!.value;
     const initial = (role: 0 | 1): ResidentInitialData => ({ roomId: binding.roomId, residentId: this.residentIds[role], seedManifestCommitment: this.seedCommitment });
