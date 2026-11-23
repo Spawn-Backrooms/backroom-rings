@@ -1,0 +1,32 @@
+{
+  "description": "Public synthetic K01 base envelope; SHA-256 canonical arrays and Ed25519 independently evaluated with Python hashlib and cryptography.",
+  "config": {
+    "protocol": "backrooms.manifest.experiment.v1",
+    "knowledgeSchema": "backrooms.knowledge.v1",
+    "roomId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "writerKey": "1747de716105f0016fd5ac2e78bba28025026be041c02b91624f4372d1f5e29b",
+    "deployment": "9b81c5e904a756a33111a9ae0d0af6ac3b6639a9ab04cd4fe86b9f8a2e2534f6",
+    "program": "666a778f0eba541a48b1eecb3671ef193f501d2039de9417aead183c187b7de7",
+    "roomOwner": "f675fef9bc68b1d7904ffcb4a5f325a9d94e8c347f0895cf69f2a440ad3423a4",
+    "creationNonce": "c0c53f38d2ccbd58fb620aed3aabfa31d0789ad9f3adeae63c8928eafd54857f",
+    "seedManifest": "22a4125d439861d12dfa51278379e1b1acbf7769c24b4e8f548c4b691c502b67",
+    "fixedMembers": "67308aa6bdcc3eda4a222b67bc8d9fcda547d9c26b5829b15cfe81cd801418c3"
+  },
+  "event": {
+    "nonce": "883a9736ef6b86b5b90e11760cfeb45fe66e7e2faeaa3c38caa526c3265e1e43",
+    "episode": "6f811ee1229449409e89b84a85381deb39f365e9e00c3998aec8df7b3c1c745d",
+    "original": "5a2e0636f2bbf68b7a40f749e4458f335a1c387b3bdcadd7a08de290c2731105",
+    "candidate": "8de18137a88db32debf638f3867fdbc0717f54d65e3df361c8a6937442bbe96c",
+    "selected": 1,
+    "negative": true,
+    "magnitude": 7
+  },
+  "domain": "b1f2905e0298a45340d2ff43f2f826343ba72213b9d9ebabd4f61a8e72a455b8",
+  "emptyRoot": "11ed7e63d7648f36c9ee5ea67c88f33e0c3027864f1e519028a7386610de3a3c",
+  "genesis": "b62579674828dfd616183250491d677e93c9f0655055fefb2bc1eb4ed0a85cb8",
+  "leaf": "2356cd3fb709b9e9a0961e1ab36adf34c6f954f725bd5ea810328987a168e177",
+  "authorization": "efe456cce697b5372cf431a747270456e447774fe670d6a0f8ed3c370fcad4e8",
+  "signature": "9c3d248412100df983c436ca8d0383627dcaf5751b316dbf7b51f26937a963d3ca85c049990931de4db13974d97a248bd20abac9b148aa519d801c0542f91d02",
+  "nextRoot": "03b5e2f3ad4268ed0364fda6348d2826996946fd90d964836962ff6e84cc646a",
+  "nextCheckpoint": "d262a335f38ba344a4f70a7b7dcf718db4919f962675c62635357e4ca08f04bb"
+}
