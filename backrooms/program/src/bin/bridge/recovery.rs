@@ -93,6 +93,8 @@ fn read_request(stream: &mut TcpStream) -> Value {
 fn host(server: &MockRpc, writer: ShieldedKeypair) -> Host {
     Host {
         config: Config {
+            mode: DeploymentMode::SyntheticLocalnet,
+            production: None,
             signer_seed_hex: String::new(),
             rpc_url: server.url.clone(),
             indexer_url: server.url.clone(),

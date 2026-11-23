@@ -2,7 +2,7 @@
 
 The gateway connects a trusted native authority to the Rings process bridge. The native authority owns room membership, funded originals, and permission to accept learning. The gateway owns each room's Rings writer and viewing custody. It also retains the exact transaction frames that its signer prepared.
 
-The current Node host is restricted to loopback localnet services and insecure test artifacts. Its release checks do not qualify a production deployment.
+The Node host has explicit localnet and production modes backed by the same journal. Localnet retains its loopback services and insecure test artifacts. Production requires approved runtime bytes, a generated deployment identity, a supervised indexer and an attested pool prover. See the [production operator workflow](PRODUCTION.md) for actual inputs, executable configuration and trust boundaries.
 
 ## Portable client
 
@@ -24,7 +24,7 @@ Responses authenticate the exact response bytes and HTTP status with a different
 
 ## Custody and storage
 
-`LocalnetRingsGateway` and `listenLocalnetGateway` are exported from `@spawn-backrooms/backroom-rings/gateway-host`. This export requires Node 24 or later. `LocalnetRingsGateway.open()` takes the database path, configured historical storage keys, service authentication key, approved localnet manifest digest, and pinned bridge configuration. The listener binds to `127.0.0.1` and exposes only `POST /v1/backrooms`.
+`RingsGateway`, `LocalnetRingsGateway` and the mode-specific listeners are exported from `@spawn-backrooms/backroom-rings/gateway-host`. This export requires Node 24 or later. `LocalnetRingsGateway.open()` preserves the database path, historical storage keys, service authentication key, approved localnet manifest digest and pinned bridge configuration. Its listener binds to `127.0.0.1` and exposes only `POST /v1/backrooms`. The production CLI uses a strict owner-only file and HTTPS or an explicit trusted TLS proxy boundary.
 
 Each enrollment retains a fresh Ed25519 seed. The upstream Rings keypair derives that room's viewing and nullifier keys from this seed. Different native rooms therefore have different writer and viewing custody. The gateway derives the Solana writer identity from the retained seed and checks it whenever it loads enrollment.
 

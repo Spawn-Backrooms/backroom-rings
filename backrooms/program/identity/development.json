@@ -1,0 +1,12 @@
+{
+  "identityVersion": 1,
+  "mode": "synthetic_localnet",
+  "artifactVersion": "backrooms.localnet.v0",
+  "schema": 0,
+  "deployment": "4778966057907997744",
+  "programId": "7nA1Dh53c8eUZudEj7vDSvoT9rHapHHuF9NvHRLqjNmi",
+  "programDomain": "64b77045c482ffa2cd163792ef15b63c7615510e3890e31f3a8310e56c183b85",
+  "authoritySeed": "backroom_v0",
+  "policy": 1,
+  "lessonCapacity": 96
+}

@@ -4,12 +4,13 @@ import { canonicalJson, digest, digestBytes, randomHex, utf8 } from '../client/c
 import { PROTOCOL_VERSION, type BridgeRequest, type Checkpoint, type PreparedTransaction, type RecoveredRoom, type ReframedTransaction, type RingsTransport, type UnrecoveredRoom } from '../client/contracts.js';
 import { RingsOperationError } from '../client/errors.js';
 import { GATEWAY_MAX_BYTES, GATEWAY_REQUEST_WINDOW_MS, GATEWAY_VERSION, gatewayAuthenticationKey, gatewayJson, gatewayMac, parseGatewayRequest, readGatewayBody, verifyGatewayMac, type GatewayBinding, type GatewayEnrollment, type GatewayRequest, type GatewayResponse } from '../client/gateway-protocol.js';
-import { decodeReleaseManifest } from '../client/release.js';
+import { assertProductionEligible, decodeReleaseManifest } from '../client/release.js';
 import { RingsClient } from '../client/rings-client.js';
 import { protectedDirectory } from '../reference-host/records.js';
 import { RuntimeOwnership } from '../reference-host/runtime-ownership.js';
 import { LocalnetBridge, writerIdentity, type LocalnetBridgeOptions } from './process.js';
 import { GatewayRecords, type GatewayKeyring } from './records.js';
+import { ProductionBridge, type ProductionBridgeOptions } from './production.js';
 
 type Preparation = Extract<BridgeRequest, { op: 'prepare_create' | 'prepare_advance' }>;
 type Creation = { status: 'unprepared' } | { status: 'reserved'; operationId: string } | { status: 'prepared'; operationId: string; checkpoint: Checkpoint };
@@ -17,16 +18,24 @@ interface EnrollmentRecord { enrollment: GatewayEnrollment; binding: GatewayBind
 type Frame = { transactionBase64: string; transactionDigest: string } & ({ kind: 'original' } | { kind: 'replacement'; parentTransactionDigest: string; signature: string });
 type Operation = { status: 'reserved'; request: Preparation } | { status: 'prepared'; request: Preparation; prepared: PreparedTransaction; frames: Frame[] };
 
-export interface LocalnetGatewayOptions {
-  mode: 'synthetic_localnet';
+interface GatewayCommonOptions {
   databasePath: string;
   authenticationKey: Uint8Array;
   storageKeys: GatewayKeyring;
   releaseManifest: unknown;
   releaseManifestSha256: string;
-  bridge: Omit<LocalnetBridgeOptions, 'temporaryDirectory'>;
   now?: () => number;
+  startupSignal?: AbortSignal;
 }
+export interface LocalnetGatewayOptions extends GatewayCommonOptions {
+  mode: 'synthetic_localnet';
+  bridge: Omit<LocalnetBridgeOptions, 'temporaryDirectory'>;
+}
+export interface ProductionGatewayOptions extends GatewayCommonOptions {
+  mode: 'production';
+  bridge: ProductionBridgeOptions;
+}
+export type RingsGatewayOptions = LocalnetGatewayOptions | ProductionGatewayOptions;
 
 const publicErrors = new Set([
   'gateway_invalid_request', 'gateway_request_unauthenticated', 'gateway_request_expired', 'gateway_request_replayed',
@@ -37,34 +46,43 @@ const publicErrors = new Set([
   'gateway_localnet_genesis_mismatch', 'gateway_localnet_funding_unconfirmed', 'gateway_localnet_rpc_failed',
 ]);
 
-export class LocalnetRingsGateway {
+export class RingsGateway {
   private readonly pending = new Map<string, Promise<unknown>>();
 
   private constructor(
     private readonly records: GatewayRecords,
-    private readonly bridge: LocalnetBridge,
+    private readonly bridge: LocalnetBridge | ProductionBridge,
     private readonly authenticationKey: CryptoKey,
     private readonly releaseManifestSha256: string,
     private readonly artifactVersion: string,
     private readonly now: () => number,
     private readonly ownership: RuntimeOwnership,
+    readonly mode: RingsGatewayOptions['mode'],
   ) {}
 
-  static async open(options: LocalnetGatewayOptions): Promise<LocalnetRingsGateway> {
-    if (options.mode !== 'synthetic_localnet') throw new Error('gateway_localnet_only');
+  static async open(options: RingsGatewayOptions): Promise<RingsGateway> {
+    if (options.mode !== 'synthetic_localnet' && options.mode !== 'production') throw new Error('gateway_mode_invalid');
     const manifest = decodeReleaseManifest(options.releaseManifest);
-    if (manifest.network.cluster !== 'localnet' || manifest.setup.kind !== 'insecure_test' || manifest.artifactVersion !== 'backrooms.localnet.v0' || await digest(manifest) !== options.releaseManifestSha256) throw new Error('gateway_unqualified_localnet_release');
+    const production = options.mode === 'production' ? await assertProductionEligible(manifest, options.releaseManifestSha256) : null;
+    if (options.mode === 'synthetic_localnet' && (manifest.network.cluster !== 'localnet' || manifest.setup.kind !== 'insecure_test' || manifest.artifactVersion !== 'backrooms.localnet.v0' || await digest(manifest) !== options.releaseManifestSha256)) throw new Error('gateway_unqualified_localnet_release');
     if (manifest.network.genesisHash !== null && manifest.network.genesisHash !== options.bridge.configuration.genesisHash) throw new Error('gateway_release_genesis_mismatch');
     const authenticationKey = await gatewayAuthenticationKey(options.authenticationKey);
     await protectedDirectory(dirname(options.databasePath));
     const directory = await protectedDirectory(`${options.databasePath}.runtime`);
     const ownership = RuntimeOwnership.acquire(directory);
+    let bridge: LocalnetBridge | ProductionBridge | undefined;
     try {
-      for (const entry of await readdir(directory)) if (entry.startsWith('rings-bridge-')) await rm(join(directory, entry), { recursive: true, force: true });
-      const bridge = await LocalnetBridge.open({ ...options.bridge, temporaryDirectory: directory });
+      for (const entry of await readdir(directory)) if (entry.startsWith('rings-bridge-') || entry.startsWith('rings-runtime-')) await rm(join(directory, entry), { recursive: true, force: true });
+      bridge = options.mode === 'production'
+        ? await ProductionBridge.open(options.bridge, production!, directory, options.startupSignal)
+        : await LocalnetBridge.open({ ...options.bridge, temporaryDirectory: directory });
       const records = await GatewayRecords.open(options.databasePath, options.storageKeys);
-      return new LocalnetRingsGateway(records, bridge, authenticationKey, options.releaseManifestSha256, manifest.artifactVersion, options.now ?? Date.now, ownership);
-    } catch (error) { ownership.release(); throw error; }
+      return new RingsGateway(records, bridge, authenticationKey, options.releaseManifestSha256, manifest.artifactVersion, options.now ?? Date.now, ownership, options.mode);
+    } catch (error) {
+      try { if (bridge instanceof ProductionBridge) await bridge.close(); }
+      finally { ownership.release(); }
+      throw error;
+    }
   }
 
   private async serialized<T>(key: string, operation: () => Promise<T>): Promise<T> {
@@ -249,7 +267,17 @@ export class LocalnetRingsGateway {
 
   async close(): Promise<void> {
     await Promise.allSettled(this.pending.values());
-    this.records.close();
-    this.ownership.release();
+    try {
+      this.records.close();
+      if (this.bridge instanceof ProductionBridge) await this.bridge.close();
+    } finally { this.ownership.release(); }
   }
 }
+
+export type LocalnetRingsGateway = RingsGateway;
+export const LocalnetRingsGateway = {
+  open(options: LocalnetGatewayOptions): Promise<RingsGateway> {
+    if (options.mode !== 'synthetic_localnet') throw new Error('gateway_localnet_only');
+    return RingsGateway.open(options);
+  },
+};

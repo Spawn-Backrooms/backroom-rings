@@ -244,6 +244,31 @@ deficit airdrop below the rent-exempt minimum, so localnet funding now queries
 that minimum before requesting funds. The failing cases and passing reruns
 are retained in the review handoff.
 
+### Default Fetch runtime regression
+
+A later full native Worker check exposed an additional transport defect:
+retaining `globalThis.fetch` as an unbound client property made workerd call it
+with the client as its receiver. Ordinary provisioning failed with `Illegal
+invocation` before sending a gateway request. The default transport is now
+bound to `globalThis`; explicitly supplied transports retain their behavior.
+
+The public regression executes the built client in actual workerd, with no
+injected transport on its first enrollment. A loopback fixture verifies the
+request MAC and signs its response. The same test also performs enrollment
+through an explicit custom transport. Before the fix it received HTTP 500
+with the incorrect-receiver error; afterward both authenticated requests and
+the custom-transport assertion pass. No external service is contacted.
+
+```sh
+cd backrooms
+npm run build
+BACKROOM_WORKERD_EXECUTABLE=/absolute/workerd \
+  node --import tsx --test tests/gateway-workerd.test.ts
+```
+
+This check is skipped unless the actual executable path is supplied. It uses
+the built distributable, so rebuild after source changes before running it.
+
 These checks use explicitly insecure deterministic test setup. The gateway
 host remains localnet-only, with a trusted operator. No production circuit
 setup, complete deployed-artifact attestation, paid inference, or default

@@ -2,19 +2,19 @@ use std::net::SocketAddr;
 
 use hyper::Method;
 use jsonrpsee::{
-    core::TEN_MB_SIZE_BYTES,
-    server::{middleware::http::ProxyGetRequestLayer, ServerBuilder, ServerConfig, ServerHandle},
-    types::ErrorObjectOwned,
     RpcModule,
+    core::TEN_MB_SIZE_BYTES,
+    server::{ServerBuilder, ServerConfig, ServerHandle, middleware::http::ProxyGetRequestLayer},
+    types::ErrorObjectOwned,
 };
 use log::debug;
 use spr_indexer_api::{
+    RpcMethod,
     method::{
         GetEncryptedUtxosByTags, GetMerkleProofs, GetNonInclusionProofs, GetNullifierQueueElements,
         GetShieldedTransactionsByNullifiers, GetShieldedTransactionsBySignature,
         GetShieldedTransactionsByTags, GetUserRecords,
     },
-    RpcMethod,
 };
 use spr_rpc_http::MethodPathLayer;
 use tower_http::cors::{Any, CorsLayer};
@@ -27,6 +27,14 @@ pub async fn run_server(
     max_connections: u32,
 ) -> Result<ServerHandle, anyhow::Error> {
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
+    run_server_on(api, addr, max_connections).await
+}
+
+pub async fn run_server_on(
+    api: PhotonApi,
+    addr: SocketAddr,
+    max_connections: u32,
+) -> Result<ServerHandle, anyhow::Error> {
     Ok(start_server(api, addr, max_connections).await?.1)
 }
 

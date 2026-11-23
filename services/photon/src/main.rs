@@ -1,16 +1,16 @@
 use std::{fs::File, time::Duration};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use async_stream::stream;
 use clap::Parser;
-use futures::{pin_mut, StreamExt};
+use futures::{StreamExt, pin_mut};
 use jsonrpsee::server::ServerHandle;
 use log::{error, info, warn};
 use photon_indexer::api::{self, service::PhotonApi};
 
 use photon_indexer::common::{
-    fetch_block_parent_slot, fetch_current_slot_with_infinite_retry, get_network_start_slot,
-    setup_logging, setup_metrics, setup_pg_pool, LoggingFormat,
+    LoggingFormat, fetch_block_parent_slot, fetch_current_slot_with_infinite_retry,
+    get_network_start_slot, setup_logging, setup_metrics, setup_pg_pool,
 };
 
 use photon_indexer::ingester::fetchers::BlockStreamConfig;
@@ -18,18 +18,18 @@ use photon_indexer::ingester::indexer::{
     fetch_last_indexed_slot_with_infinite_retry, index_block_stream,
 };
 use photon_indexer::migration::{
-    sea_orm::{DatabaseBackend, DatabaseConnection, SqlxPostgresConnector, SqlxSqliteConnector},
     MigratorTrait, RingsMigrator,
+    sea_orm::{DatabaseBackend, DatabaseConnection, SqlxPostgresConnector, SqlxSqliteConnector},
 };
 
 use photon_indexer::monitor::continuously_monitor_photon;
 use photon_indexer::rpc::{BlockHeaders, RpcClient};
 use photon_indexer::snapshot::{
-    get_snapshot_files_with_metadata, load_block_stream_from_directory_adapter, DirectoryAdapter,
+    DirectoryAdapter, get_snapshot_files_with_metadata, load_block_stream_from_directory_adapter,
 };
 use sqlx::{
-    sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous},
     SqlitePool,
+    sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous},
 };
 use std::env::temp_dir;
 use std::sync::Arc;
@@ -45,6 +45,12 @@ struct Args {
     #[arg(short, long, default_value_t = 8784)]
     port: u16,
 
+    #[arg(long, default_value = "0.0.0.0")]
+    bind_address: std::net::IpAddr,
+
+    #[arg(long)]
+    ready_file: Option<std::path::PathBuf>,
+
     /// URL of the RPC server
     #[arg(short, long, default_value = "http://127.0.0.1:8899")]
     rpc_url: String,
@@ -52,6 +58,12 @@ struct Args {
     /// DB URL to store indexing data. By default we use an in-memory SQLite database.
     #[arg(short, long)]
     db_url: Option<String>,
+
+    #[arg(long, requires = "db_url")]
+    migrate: bool,
+
+    #[arg(long, requires = "start_slot")]
+    resume_from_database: bool,
 
     /// The start slot to begin indexing from. Defaults to the last indexed slot in the database plus
     /// one.
@@ -127,6 +139,8 @@ struct Args {
 struct ApiServer {
     api: PhotonApi,
     port: u16,
+    bind_address: std::net::IpAddr,
+    ready_file: Option<std::path::PathBuf>,
     max_http_connections: u32,
 }
 
@@ -135,14 +149,35 @@ impl ApiServer {
         let Self {
             api,
             port,
+            bind_address,
+            ready_file,
             max_http_connections,
         } = self;
         // Before the server accepts anything, so the first proof request finds a
         // populated ring rather than paying for it.
         api.spawn_root_index_refresher();
-        api::rpc_server::run_server(api, port, max_http_connections)
+        let address = std::net::SocketAddr::new(bind_address, port);
+        let server = api::rpc_server::run_server_on(api, address, max_http_connections)
             .await
-            .context("Failed to start API server")
+            .context("Failed to start API server")?;
+        if let Some(path) = ready_file {
+            anyhow::ensure!(
+                bind_address.is_loopback() && path.is_absolute(),
+                "supervised readiness requires a loopback listener and absolute path"
+            );
+            let mut options = std::fs::OpenOptions::new();
+            options.write(true).create_new(true);
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::OpenOptionsExt;
+                options.mode(0o600);
+            }
+            serde_json::to_writer(
+                options.open(path)?,
+                &serde_json::json!({"address":address.to_string(), "pid":std::process::id()}),
+            )?;
+        }
+        Ok(server)
     }
 }
 
@@ -393,7 +428,7 @@ async fn main() -> Result<()> {
     let db_conn = setup_database_connection(args.db_url.clone(), args.max_db_conn).await?;
     info!("Running Photon as a Rings indexer");
 
-    if args.db_url.is_none() {
+    if args.db_url.is_none() || args.migrate {
         info!("Running migrations...");
         RingsMigrator::up(db_conn.as_ref(), None)
             .await
@@ -418,7 +453,17 @@ async fn main() -> Result<()> {
                     let start_slot = start_slot
                         .parse::<u64>()
                         .with_context(|| format!("Invalid start slot '{}'", start_slot))?;
-                    fetch_block_parent_slot(&rpc_client, start_slot).await?
+                    let retained = if args.resume_from_database {
+                        fetch_last_indexed_slot_with_infinite_retry(db_conn.as_ref()).await
+                            .map(u64::try_from).transpose()
+                            .context("Retained indexer slot is negative")?
+                    } else {
+                        None
+                    };
+                    match retained {
+                        Some(slot) if slot >= start_slot => slot,
+                        _ => fetch_block_parent_slot(&rpc_client, start_slot).await?,
+                    }
                 }
             },
             None => match fetch_last_indexed_slot_with_infinite_retry(db_conn.as_ref()).await {
@@ -490,6 +535,8 @@ async fn main() -> Result<()> {
             ApiServer {
                 api,
                 port: args.port,
+                bind_address: args.bind_address,
+                ready_file: args.ready_file,
                 max_http_connections: args.max_http_connections,
             }
             .start()

@@ -11,7 +11,7 @@ test('development setup and incomplete manifest cannot qualify production', asyn
   await assert.rejects(assertProductionEligible(manifest, 'a'.repeat(64)), /production_release_blocked/);
 });
 
-test('syntactically complete evidence still requires the operator-pinned manifest', async () => {
+test('descriptive release metadata cannot qualify a production runtime', async () => {
   const hash = 'a'.repeat(64);
   const manifest = {
     manifestVersion: 0, protocolVersion: 'backrooms.v0', artifactVersion: '1.0.0',
@@ -23,6 +23,6 @@ test('syntactically complete evidence still requires the operator-pinned manifes
     services: { prover: { version: '1.0.0', sourceCommit: 'c'.repeat(40), binarySha256: hash, imageDigest: null }, indexer: { version: '1.0.0', sourceCommit: 'd'.repeat(40), binarySha256: hash, imageDigest: null } },
     evidence: { circuitReview: 'https://audit.invalid/circuit', programReview: 'https://audit.invalid/program', publicDemo: 'https://audit.invalid/demo', nativeInference: 'https://audit.invalid/inference', runtimePrivacy: 'https://audit.invalid/privacy' },
   };
-  assert.deepEqual(productionBlockers(manifest), []);
-  await assert.rejects(assertProductionEligible(manifest, 'b'.repeat(64)), /not_operator_approved/);
+  assert.ok(productionBlockers(manifest).includes('runtime_not_pinned'));
+  await assert.rejects(assertProductionEligible(manifest, 'b'.repeat(64)), /runtime_not_pinned/);
 });

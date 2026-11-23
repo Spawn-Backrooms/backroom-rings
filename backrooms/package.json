@@ -1,6 +1,6 @@
 {
   "name": "@spawn-backrooms/backroom-rings",
-  "version": "0.1.0-dev.1",
+  "version": "0.1.0-dev.2",
   "private": true,
   "type": "module",
   "description": "Public Backrooms client, Flue adapter, and reference host for private room checkpoints",
@@ -28,10 +28,12 @@
     "./client": "./dist/client/index.js",
     "./flue": "./dist/flue/index.js",
     "./reference-host": "./dist/reference-host/index.js",
-    "./gateway-host": "./dist/gateway-host/index.js"
+    "./gateway-host": "./dist/gateway-host/index.js",
+    "./development-manifest": "./releases/development.json"
   },
   "files": [
     "dist",
+    "releases/development.json",
     "examples",
     "README.md",
     "LICENSE"

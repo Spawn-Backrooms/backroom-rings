@@ -8,7 +8,7 @@ export const GATEWAY_REQUEST_WINDOW_MS = 60_000;
 
 const identifier = v.pipe(v.string(), v.regex(/^[A-Za-z0-9._:/-]{1,256}$/));
 const digest = v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/));
-const u64 = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => BigInt(value) <= 18_446_744_073_709_551_615n));
+const u64 = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => /^(0|[1-9][0-9]{0,19})$/.test(value) && BigInt(value) <= 18_446_744_073_709_551_615n));
 const operationId = v.pipe(v.string(), v.regex(/^[A-Za-z0-9._:/-]{1,128}$/));
 const scopeSchema = v.strictObject({ ownerId: identifier, projectId: identifier, roomId: identifier });
 const creation = { creationNonce: digest, seedManifestCommitment: digest, fixedMembersCommitment: digest };

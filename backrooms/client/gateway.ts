@@ -24,7 +24,7 @@ export class AuthenticatedRingsGatewayClient {
     this.endpoint = gatewayEndpoint(options.endpoint, options.mode);
     if (options.authenticationKey.byteLength !== 32) throw new Error('invalid_gateway_authentication_key');
     this.key = gatewayAuthenticationKey(options.authenticationKey);
-    this.fetch = options.fetch ?? globalThis.fetch;
+    this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
     this.timeoutMs = options.timeoutMs ?? 660_000;
     if (!Number.isSafeInteger(this.timeoutMs) || this.timeoutMs < 1 || this.timeoutMs > 3_600_000) throw new Error('invalid_gateway_timeout');
     this.now = options.now ?? Date.now;

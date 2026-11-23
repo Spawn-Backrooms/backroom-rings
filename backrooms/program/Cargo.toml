@@ -13,12 +13,12 @@ spr-keypair = { workspace = true, optional = true }
 spr-transaction = { workspace = true, optional = true }
 
 [features]
-# The committed verifying keys come from an example setup nobody vouches for,
-# so they are generated as SetupKind::InsecureTest and do not compile without
-# this feature. On by default: this program is a test/example, never a
-# devnet or mainnet deployment.
+# The default profile uses committed insecure test keys for localnet only.
+# Production disables defaults and requires approved external setup artifacts.
 default = ["insecure-test-setup"]
 insecure-test-setup = []
+production = []
+release-circuits = ["circuits", "build-circuits"]
 bpf-entrypoint = []
 no-entrypoint = []
 cpi = ["no-entrypoint"]
@@ -38,7 +38,7 @@ wasm = [
     "dep:solana-instruction",
     "spr-program/wasm",
 ]
-bridge = ["circuits", "dep:serde", "dep:serde_json", "dep:anyhow", "dep:base64", "dep:hex", "dep:sha2", "dep:url", "dep:solana-address", "dep:solana-commitment-config", "dep:solana-signer", "dep:solana-transaction", "dep:solana-message", "dep:solana-sdk-ids", "dep:solana-loader-v3-interface", "dep:solana-loader-v4-interface", "dep:spr-client"]
+bridge = ["circuits", "dep:serde", "dep:serde_json", "dep:anyhow", "dep:base64", "dep:hex", "dep:sha2", "dep:url", "dep:solana-address", "dep:solana-commitment-config", "dep:solana-signer", "dep:solana-transaction", "dep:solana-message", "dep:solana-sdk-ids", "dep:solana-loader-v3-interface", "dep:solana-loader-v4-interface", "dep:solana-rpc-client", "dep:reqwest", "dep:spr-client"]
 proofs = ["circuits"]
 localnet = ["proofs", "bridge", "dep:spr-program-test"]
 build-circuits = ["spr-program/build"]
@@ -61,6 +61,8 @@ solana-sdk-ids = { workspace = true, optional = true }
 solana-loader-v3-interface = { workspace = true, optional = true }
 solana-loader-v4-interface = { workspace = true, optional = true }
 spr-client = { workspace = true, optional = true, features = ["solana-rpc"] }
+solana-rpc-client = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true }
 xark = { workspace = true, optional = true }
 borsh = { workspace = true, optional = true }
 pinocchio = { workspace = true, features = ["cpi", "sha2"] }
@@ -84,6 +86,10 @@ solana-signature = { workspace = true }
 solana-signer = { workspace = true }
 spr-client = { workspace = true, features = ["solana-rpc"] }
 spr-program-test = { workspace = true, features = ["localnet"] }
+
+[build-dependencies]
+serde_json = { workspace = true }
+sha2 = { workspace = true }
 
 [[test]]
 name = "transitions"
