@@ -4,5 +4,6 @@ export * from './encryption.js';
 export * from './errors.js';
 export * from './learning.js';
 export * from './release.js';
+export * from './deployment.js';
 export * from './rings-client.js';
 export * from './gateway.js';

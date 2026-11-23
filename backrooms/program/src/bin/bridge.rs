@@ -3,7 +3,7 @@ use backroom_rings_program::{
     circuits::*,
     client::RoomInstruction,
     instructions::{AdvanceArgs, CreateArgs},
-    tag, ID,
+    tag, ARTIFACT_VERSION, ID, PRODUCTION_BUILD,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::Deserialize;
@@ -31,16 +31,23 @@ use std::{
 };
 
 const VERSION: &str = "backrooms.v0";
-const ARTIFACT_VERSION: &str = "backrooms.localnet.v0";
 type Client = SprClient<SolanaRpc>;
 
 #[cfg(test)]
 #[path = "bridge/recovery.rs"]
 mod recovery_tests;
 
+#[cfg(test)]
+#[path = "bridge/production.rs"]
+mod production_tests;
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct Config {
+    #[serde(default)]
+    mode: DeploymentMode,
+    #[serde(default)]
+    production: Option<ProductionRuntime>,
     signer_seed_hex: String,
     rpc_url: String,
     indexer_url: String,
@@ -51,6 +58,244 @@ struct Config {
     genesis_hash: String,
     program_binary_sha256: String,
     shielded_pool_binary_sha256: String,
+}
+
+#[derive(Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum DeploymentMode {
+    #[default]
+    SyntheticLocalnet,
+    Production,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Artifact {
+    path: String,
+    sha256: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct CircuitArtifacts {
+    circuit: Artifact,
+    schema: Artifact,
+    proving_key: Artifact,
+    verifying_key: Artifact,
+    metadata: Artifact,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ApplicationArtifacts {
+    create_room: CircuitArtifacts,
+    advance_room: CircuitArtifacts,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PoolKey {
+    name: String,
+    sha256: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RuntimeTree {
+    address: String,
+    id: u16,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ProductionRuntime {
+    identity: Artifact,
+    schema: Artifact,
+    bridge_sha256: String,
+    application_program_sha256: String,
+    shielded_pool_program_sha256: String,
+    tree: RuntimeTree,
+    circuits: ApplicationArtifacts,
+    prover_policy: Artifact,
+    pool_proving_keys: Vec<PoolKey>,
+    indexer: Value,
+    privacy: Value,
+}
+
+impl ProductionRuntime {
+    fn artifact(&self, directory: &std::path::Path, artifact: &Artifact) -> Result<Vec<u8>> {
+        ensure!(
+            !artifact.path.is_empty()
+                && std::path::Path::new(&artifact.path)
+                    .components()
+                    .all(|part| matches!(part, std::path::Component::Normal(_))),
+            "invalid artifact path"
+        );
+        bytes32(&artifact.sha256)?;
+        let path = directory.join(&artifact.path);
+        let metadata = std::fs::symlink_metadata(&path)?;
+        ensure!(
+            metadata.is_file() && metadata.len() <= 256 * 1024 * 1024,
+            "invalid artifact file"
+        );
+        let bytes = std::fs::read(path)?;
+        ensure!(
+            digest(&bytes) == artifact.sha256,
+            "runtime artifact differs from approved release"
+        );
+        Ok(bytes)
+    }
+
+    fn validate(&self, config: &Config) -> Result<()> {
+        use backroom_rings_program::*;
+        ensure!(
+            PRODUCTION_BUILD,
+            "production needs a qualified production binary"
+        );
+        ensure!(
+            self.identity.sha256 == IDENTITY_SHA256,
+            "compiled identity differs from release"
+        );
+        ensure!(
+            self.schema.sha256 == DEPLOYMENT_SCHEMA_SHA256,
+            "compiled schema differs from release"
+        );
+        self.artifact(&config.artifacts_directory, &self.identity)?;
+        self.artifact(&config.artifacts_directory, &self.schema)?;
+        ensure!(
+            self.tree.address == config.tree_address
+                && self.tree.id == config.tree_id
+                && Address::from_str(&self.tree.address)? == spr_interface::pda::tree(self.tree.id),
+            "tree differs from approved deployment"
+        );
+        ensure!(
+            self.application_program_sha256 == config.program_binary_sha256
+                && self.shielded_pool_program_sha256 == config.shielded_pool_binary_sha256,
+            "program pins differ from release"
+        );
+        ensure!(
+            digest(&std::fs::read(std::env::current_exe()?)?) == self.bridge_sha256,
+            "bridge bytes differ from release"
+        );
+        ensure!(
+            self.indexer["kind"] == "supervised"
+                && self.privacy
+                    == json!({ "applicationProving": "trusted_bridge", "poolProving": "attested", "inference": "native_authority" }),
+            "invalid runtime trust policy"
+        );
+        for (name, files, circuit, pk, vk, compiled_pk, compiled_vk, insecure) in [
+            (
+                "create_room",
+                &self.circuits.create_room,
+                CREATE_ROOM_CIRCUIT_SHA256,
+                CREATE_ROOM_PROVING_KEY_SHA256,
+                CREATE_ROOM_VERIFYING_KEY_SHA256,
+                &verifier::create_room::VERIFYINGKEY_PROVING_KEY_SHA256,
+                verifier::create_room::ZOLANA_VK_SHA256,
+                verifier::create_room::VERIFYINGKEY_INSECURE_TEST_SETUP,
+            ),
+            (
+                "advance_room",
+                &self.circuits.advance_room,
+                ADVANCE_ROOM_CIRCUIT_SHA256,
+                ADVANCE_ROOM_PROVING_KEY_SHA256,
+                ADVANCE_ROOM_VERIFYING_KEY_SHA256,
+                &verifier::advance_room::VERIFYINGKEY_PROVING_KEY_SHA256,
+                verifier::advance_room::ZOLANA_VK_SHA256,
+                verifier::advance_room::VERIFYINGKEY_INSECURE_TEST_SETUP,
+            ),
+        ] {
+            ensure!(
+                !insecure && pk == hex::encode(compiled_pk) && vk == compiled_vk,
+                "compiled verifier key binding differs"
+            );
+            ensure!(
+                files.circuit.sha256 == circuit
+                    && files.proving_key.sha256 == pk
+                    && files.verifying_key.sha256 == vk,
+                "application artifacts differ from compiled release"
+            );
+            for (artifact, filename) in [
+                (&files.circuit, "circuit.xbc"),
+                (&files.schema, "schema.json"),
+                (&files.proving_key, "pk.bin"),
+                (&files.verifying_key, "vk.bin"),
+                (&files.metadata, "metadata.json"),
+            ] {
+                ensure!(
+                    artifact.path == format!("{name}/{filename}"),
+                    "unexpected circuit layout"
+                );
+                self.artifact(&config.artifacts_directory, artifact)?;
+            }
+            let metadata: Value = serde_json::from_slice(
+                &self.artifact(&config.artifacts_directory, &files.metadata)?,
+            )?;
+            let mode = metadata["setup_mode"].as_str().unwrap_or("");
+            let phase2 = mode == "phase2-from-ptau"
+                || mode
+                    .strip_prefix("phase2-from-ptau+mpc[")
+                    .and_then(|tail| tail.strip_suffix(" contributors]"))
+                    .and_then(|count| count.parse::<u64>().ok())
+                    .is_some_and(|count| count > 0);
+            ensure!(
+                metadata["protocol"] == "groth16"
+                    && metadata["curve"] == "bn254"
+                    && metadata["production_safe"] == true
+                    && phase2
+                    && metadata["deterministic_rng_seed"].is_null()
+                    && metadata["circuit_hash"] == circuit
+                    && metadata["verifying_key_sha256"] == vk
+                    && metadata["num_public_inputs"] == 1,
+                "application setup is not qualified"
+            );
+        }
+        Ok(())
+    }
+
+    fn prover(&self, config: &Config) -> Result<ProverClient> {
+        let bytes = self.artifact(&config.artifacts_directory, &self.prover_policy)?;
+        let prover = attested_prover(&config.prover_url, &bytes)?;
+        let keys = prover.fetch_proving_key_set()?;
+        let actual: std::collections::BTreeMap<_, _> = keys
+            .keys()
+            .map(|(key, _)| (key.name, hex::encode(key.sha256)))
+            .collect();
+        let expected: std::collections::BTreeMap<_, _> = self
+            .pool_proving_keys
+            .iter()
+            .map(|key| (key.name.clone(), key.sha256.clone()))
+            .collect();
+        ensure!(
+            !expected.is_empty()
+                && expected.len() == self.pool_proving_keys.len()
+                && actual == expected,
+            "attested pool key inventory differs from approved release"
+        );
+        Ok(prover.with_proving_keys(keys))
+    }
+}
+
+fn attested_prover(endpoint: &str, policy_bytes: &[u8]) -> Result<ProverClient> {
+    use spr_client::prover::tee::TeePolicy;
+    let url = url::Url::parse(endpoint)?;
+    ensure!(
+        url.scheme() == "https"
+            && url.host_str().is_some()
+            && url.username().is_empty()
+            && url.password().is_none()
+            && url.query().is_none()
+            && url.fragment().is_none(),
+        "confidential prover needs an HTTPS endpoint without embedded credentials"
+    );
+    let policy = TeePolicy::from_file_json(std::str::from_utf8(policy_bytes)?)?;
+    ensure!(
+        !policy.max_age().is_zero() && policy.max_age().as_secs() <= 600,
+        "prover attestation freshness must be at most 600 seconds"
+    );
+    let prover = ProverClient::new(endpoint.to_owned()).with_tee(policy);
+    prover.attest()?;
+    Ok(prover)
 }
 
 #[derive(Deserialize)]
@@ -161,7 +406,7 @@ fn digest(bytes: &[u8]) -> String {
     hex::encode(Sha256::digest(bytes))
 }
 
-fn program_bytes(rpc: &SolanaRpc, id: Address) -> Result<Vec<u8>> {
+fn program_bytes(rpc: &SolanaRpc, id: Address, immutable: bool) -> Result<Vec<u8>> {
     use solana_sdk_ids::{bpf_loader, bpf_loader_deprecated, bpf_loader_upgradeable, loader_v4};
     let account = rpc
         .get_account(id)?
@@ -169,12 +414,21 @@ fn program_bytes(rpc: &SolanaRpc, id: Address) -> Result<Vec<u8>> {
     ensure!(account.executable, "program is not executable");
     if account.owner == bpf_loader_upgradeable::ID {
         let data_id = solana_loader_v3_interface::get_program_data_address(&id);
+        ensure!(
+            account.data.get(..4) == Some(&[2, 0, 0, 0])
+                && account.data.get(4..36) == Some(data_id.as_ref()),
+            "invalid program data address"
+        );
         let data = rpc
             .get_account(data_id)?
             .ok_or_else(|| anyhow!("program data absent"))?;
         ensure!(
             data.owner == bpf_loader_upgradeable::ID && data.data.get(..4) == Some(&[3, 0, 0, 0]),
             "invalid program data"
+        );
+        ensure!(
+            !immutable || data.data.get(12) == Some(&0),
+            "production program is still upgradeable"
         );
         let offset =
             solana_loader_v3_interface::state::UpgradeableLoaderState::size_of_programdata_metadata(
@@ -186,6 +440,10 @@ fn program_bytes(rpc: &SolanaRpc, id: Address) -> Result<Vec<u8>> {
             .to_vec());
     }
     let offset = if account.owner == loader_v4::ID {
+        ensure!(
+            !immutable,
+            "production loader v4 requires separately qualified finalization checks"
+        );
         solana_loader_v4_interface::state::LoaderV4State::program_data_offset()
     } else {
         ensure!(
@@ -201,6 +459,31 @@ fn program_bytes(rpc: &SolanaRpc, id: Address) -> Result<Vec<u8>> {
         .to_vec())
 }
 
+fn verify_deployment(rpc: &SolanaRpc, config: &Config) -> Result<()> {
+    ensure!(
+        rpc.client().get_genesis_hash()?.to_string() == config.genesis_hash,
+        "genesis differs from approved deployment"
+    );
+    for (id, expected) in [
+        (ID, &config.program_binary_sha256),
+        (
+            Address::new_from_array(spr_interface::SHIELDED_POOL_PROGRAM_ID),
+            &config.shielded_pool_binary_sha256,
+        ),
+    ] {
+        bytes32(expected)?;
+        ensure!(
+            digest(&program_bytes(
+                rpc,
+                id,
+                config.mode == DeploymentMode::Production
+            )?) == *expected,
+            "program binary differs from approved deployment"
+        );
+    }
+    Ok(())
+}
+
 impl Host {
     fn load() -> Result<Self> {
         let path = PathBuf::from(std::env::var("BACKROOM_RINGS_CONFIG")?);
@@ -213,44 +496,61 @@ impl Host {
             );
         }
         let config: Config = serde_json::from_slice(&std::fs::read(path)?)?;
-        for endpoint in [&config.rpc_url, &config.indexer_url, &config.prover_url] {
+        let production = config.mode == DeploymentMode::Production;
+        ensure!(
+            production == PRODUCTION_BUILD && production == config.production.is_some(),
+            "deployment mode differs from compiled profile"
+        );
+        for (endpoint, remote) in [
+            (&config.rpc_url, true),
+            (&config.indexer_url, false),
+            (&config.prover_url, true),
+        ] {
             let url = url::Url::parse(endpoint)?;
             ensure!(
-                url.scheme() == "http" && matches!(url.host_str(), Some("127.0.0.1" | "[::1]")),
-                "localnet endpoints must use loopback HTTP"
+                if production && remote { url.scheme() == "https" } else { url.scheme() == "http" && matches!(url.host_str(), Some("127.0.0.1" | "[::1]")) },
+                "remote production endpoints need HTTPS and supervised local services need loopback HTTP"
             );
             ensure!(
-                url.username().is_empty() && url.password().is_none(),
+                url.username().is_empty()
+                    && url.password().is_none()
+                    && url.query().is_none()
+                    && url.fragment().is_none(),
                 "endpoint credentials are forbidden"
             );
+        }
+        if let Some(runtime) = &config.production {
+            runtime.validate(&config)?;
         }
         let writer = ShieldedKeypair::from_keypair(SigningKey::from_ed25519_bytes(&bytes32(
             &config.signer_seed_hex,
         )?))?;
-        let rpc = SolanaRpc::new(config.rpc_url.clone());
-        ensure!(
-            rpc.client().get_genesis_hash()?.to_string() == config.genesis_hash,
-            "genesis differs from retained localnet"
-        );
-        for (id, expected) in [
-            (ID, &config.program_binary_sha256),
-            (
-                Address::new_from_array(spr_interface::SHIELDED_POOL_PROGRAM_ID),
-                &config.shielded_pool_binary_sha256,
-            ),
-        ] {
-            bytes32(expected)?;
-            ensure!(
-                digest(&program_bytes(&rpc, id)?) == *expected,
-                "program binary differs from retained localnet"
-            );
-        }
-        let client = SprClient::new(
-            rpc,
-            SprIndexer::new(&config.indexer_url),
-            ProverClient::new(config.prover_url.clone()),
-        )
-        .with_proof_data_source(ProofDataSource::Client);
+        let rpc = if production {
+            use solana_rpc_client::{
+                http_sender::HttpSender,
+                rpc_client::{RpcClient, RpcClientConfig},
+            };
+            let http = reqwest::Client::builder()
+                .https_only(true)
+                .redirect(reqwest::redirect::Policy::none())
+                .no_proxy()
+                .connect_timeout(std::time::Duration::from_secs(10))
+                .timeout(std::time::Duration::from_secs(60))
+                .build()?;
+            SolanaRpc::with_client(RpcClient::new_sender(
+                HttpSender::new_with_client(config.rpc_url.clone(), http),
+                RpcClientConfig::with_commitment(CommitmentConfig::confirmed()),
+            ))
+        } else {
+            SolanaRpc::new(config.rpc_url.clone())
+        };
+        verify_deployment(&rpc, &config)?;
+        let prover = match &config.production {
+            Some(runtime) => runtime.prover(&config)?,
+            None => ProverClient::new(config.prover_url.clone()),
+        };
+        let client = SprClient::new(rpc, SprIndexer::new(&config.indexer_url), prover)
+            .with_proof_data_source(ProofDataSource::Client);
         Ok(Self {
             config,
             client,
@@ -340,6 +640,13 @@ impl Host {
             .context(BridgeFailure::ProofFailed)?;
         let proof =
             spr_program::proof::compressed_proof(&result.proof).map_err(anyhow::Error::msg)?;
+        let verifying_key = match name {
+            "create_room" => &backroom_rings_program::verifier::create_room::VERIFYINGKEY,
+            "advance_room" => &backroom_rings_program::verifier::advance_room::VERIFYINGKEY,
+            _ => return Err(BridgeFailure::InvalidRequest.into()),
+        };
+        spr_program::verifier::verify_groth16(&proof, transaction.public_hash, verifying_key)
+            .map_err(|_| BridgeFailure::ProofFailed)?;
         let proof_digest = digest(&wincode::serialize(&proof)?);
         let note = DataUtxo::<RoomStateV0>::try_from(self.authority().input(
             &transaction.finalized.output_utxos()[0],
@@ -731,8 +1038,112 @@ impl std::fmt::Display for BridgeFailure {
 }
 impl std::error::Error for BridgeFailure {}
 
+fn compiled_identity() -> Value {
+    use backroom_rings_program::*;
+    json!({
+        "production": PRODUCTION_BUILD,
+        "artifactVersion": ARTIFACT_VERSION,
+        "identitySha256": IDENTITY_SHA256,
+        "schemaSha256": DEPLOYMENT_SCHEMA_SHA256,
+        "programId": ID.to_string(),
+        "shieldedPoolProgramId": Address::new_from_array(spr_interface::SHIELDED_POOL_PROGRAM_ID).to_string(),
+        "circuits": {
+            "createRoom": { "circuitSha256": CREATE_ROOM_CIRCUIT_SHA256, "provingKeySha256": CREATE_ROOM_PROVING_KEY_SHA256, "verifyingKeySha256": CREATE_ROOM_VERIFYING_KEY_SHA256, "insecureTestSetup": verifier::create_room::VERIFYINGKEY_INSECURE_TEST_SETUP },
+            "advanceRoom": { "circuitSha256": ADVANCE_ROOM_CIRCUIT_SHA256, "provingKeySha256": ADVANCE_ROOM_PROVING_KEY_SHA256, "verifyingKeySha256": ADVANCE_ROOM_VERIFYING_KEY_SHA256, "insecureTestSetup": verifier::advance_room::VERIFYINGKEY_INSECURE_TEST_SETUP }
+        }
+    })
+}
+
+fn supervise_indexer() -> Result<()> {
+    use std::{
+        process::{Command, Stdio},
+        sync::{
+            atomic::{AtomicBool, Ordering},
+            Arc,
+        },
+        thread,
+        time::Duration,
+    };
+    let mut arguments = std::env::args_os().skip(2);
+    let executable = arguments
+        .next()
+        .ok_or_else(|| anyhow!("indexer executable required"))?;
+    ensure!(
+        std::path::Path::new(&executable).is_absolute(),
+        "indexer executable must be absolute"
+    );
+    let mut child = Command::new(executable)
+        .args(arguments)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+    let disconnected = Arc::new(AtomicBool::new(false));
+    let observe = disconnected.clone();
+    thread::spawn(move || {
+        let mut buffer = [0u8; 1];
+        let _ = io::stdin().read(&mut buffer);
+        observe.store(true, Ordering::Release);
+    });
+    loop {
+        if let Some(status) = child.try_wait()? {
+            ensure!(status.success(), "indexer exited");
+            return Ok(());
+        }
+        if disconnected.load(Ordering::Acquire) {
+            child.kill()?;
+            child.wait()?;
+            return Ok(());
+        }
+        thread::sleep(Duration::from_millis(100));
+    }
+}
+
 fn main() {
     std::panic::set_hook(Box::new(|_| {}));
+    match std::env::args().nth(1).as_deref() {
+        Some("--identity") => {
+            println!("{}", compiled_identity());
+            return;
+        }
+        Some("--check-runtime") => {
+            match Host::load() {
+                Ok(_) => println!("{{\"verified\":true}}"),
+                Err(_) => std::process::exit(1),
+            }
+            return;
+        }
+        Some("--inspect-prover") => {
+            let result = (|| -> Result<Value> {
+                let mut args = std::env::args().skip(2);
+                let endpoint = args.next().ok_or_else(|| anyhow!("prover URL required"))?;
+                let policy_path = args
+                    .next()
+                    .ok_or_else(|| anyhow!("TEE policy path required"))?;
+                ensure!(args.next().is_none(), "unexpected arguments");
+                let prover = attested_prover(&endpoint, &std::fs::read(policy_path)?)?;
+                let keys = prover.fetch_proving_key_set()?;
+                Ok(Value::Array(
+                    keys.keys()
+                        .map(|(key, _)| json!({"name":key.name,"sha256":hex::encode(key.sha256)}))
+                        .collect(),
+                ))
+            })();
+            match result {
+                Ok(value) => println!("{value}"),
+                Err(_) => std::process::exit(1),
+            }
+            return;
+        }
+        Some("--supervise-indexer") => {
+            if supervise_indexer().is_err() {
+                std::process::exit(1);
+            }
+            return;
+        }
+        Some(_) => std::process::exit(2),
+        None => {}
+    }
     let mut operation_id = String::new();
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<Value> {
         let mut input = String::new();
