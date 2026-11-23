@@ -36,9 +36,13 @@ export class AuthenticatedRingsGatewayClient {
     if (body.length > GATEWAY_MAX_BYTES) throw new Error('gateway_body_exceeds_bound');
     const key = await this.key;
     const response = await this.fetch(this.endpoint, {
-      method: 'POST', redirect: 'error', signal: AbortSignal.timeout(this.timeoutMs), body,
+      method: 'POST', redirect: 'manual', signal: AbortSignal.timeout(this.timeoutMs), body,
       headers: { 'content-type': 'application/json', 'x-backrooms-auth': await gatewayMac(key, 'request', body) },
     });
+    if (response.status >= 300 && response.status < 400) {
+      await response.body?.cancel();
+      throw new Error('gateway_redirect_refused');
+    }
     const responseBytes = await readGatewayBody(response.body);
     if (!await verifyGatewayMac(key, response.status, responseBytes, response.headers.get('x-backrooms-auth'))) throw new Error('gateway_response_unauthenticated');
     const reply = parseGatewayResponse(gatewayJson(responseBytes));
