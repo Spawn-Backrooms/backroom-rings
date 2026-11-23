@@ -1,3 +1,9 @@
+import { spawn, type ChildProcess } from 'node:child_process';
+import { once } from 'node:events';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import { setTimeout as delay } from 'node:timers/promises';
+import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { chmod, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -253,4 +259,137 @@ test('malformed decimal fields return validation errors without native BigInt ex
     }
     for (const malformed of [undefined, null, {}, { ...f.manifest, runtime: null }]) assert.deepEqual(productionBlockers(malformed), ['invalid_manifest']);
   } finally { await f.close(); }
+});
+
+test('production CLI closes on unexpected Photon exit, but shuts down normally on SIGTERM', { timeout: 25_000 }, async () => {
+  const f = await syntheticArtifactFixture();
+  let gateway: ChildProcess | undefined;
+  let indexerPid: number | undefined;
+  const reservePort = async () => {
+    const server = createServer();
+    await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+    const { port } = server.address() as AddressInfo;
+    await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+    return port;
+  };
+  const waitExit = async (child: ChildProcess) => {
+    if (child.exitCode !== null || child.signalCode !== null) return [child.exitCode, child.signalCode];
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new Error('gateway did not exit')), 3000);
+    try { return await once(child, 'exit', { signal: controller.signal }); }
+    finally { clearTimeout(timer); }
+  };
+  try {
+    const identity = {
+      production: true, artifactVersion: f.manifest.artifactVersion,
+      identitySha256: f.manifest.runtime.identity.sha256, schemaSha256: f.manifest.runtime.schema.sha256,
+      programId: f.manifest.network.applicationProgramId, shieldedPoolProgramId: f.manifest.network.shieldedPoolProgramId,
+      circuits: Object.fromEntries(Object.entries(f.manifest.circuits).map(([id, pins]) => [id, { ...pins, insecureTestSetup: false }]))
+    };
+    const supervisor = `#!/usr/bin/env node
+const mode = process.argv[2];
+if (mode === '--identity') return console.log(${JSON.stringify(JSON.stringify(identity))});
+if (mode === '--check-runtime') return console.log('{"verified":true}');
+if (mode !== '--supervise-indexer') process.exit(3);
+const arg = name => process.argv[process.argv.indexOf(name) + 1];
+const port = Number(arg('--port'));
+const server = require('node:http').createServer((req, res) => {
+  req.resume();
+  res.end('{"jsonrpc":"2.0","id":1,"result":0}');
+});
+server.listen(port, '127.0.0.1', () => require('node:fs').writeFileSync(arg('--ready-file'), JSON.stringify({address:'127.0.0.1:' + port,pid:process.pid})));
+process.stdin.on('end', () => server.close());
+process.stdin.resume();
+`;
+    await writeFile(f.options.artifacts.bridge, supervisor, { mode: 0o700 });
+    f.manifest.runtime.bridgeSha256 = await digestBytes(new Uint8Array(await readFile(f.options.artifacts.bridge)));
+    const releaseManifestFile = join(f.directory, 'release.json');
+    await writeFile(releaseManifestFile, JSON.stringify(f.manifest));
+    const configPath = join(f.directory, 'gateway.json');
+    const databasePath = join(f.directory, 'gateway.sqlite');
+    const port = await reservePort();
+    let indexerPort = await reservePort();
+    while (indexerPort === port) indexerPort = await reservePort();
+    const origin = `http://127.0.0.1:${port}`;
+    await writeFile(configPath, JSON.stringify({
+      version: 1, mode: 'production', databasePath, releaseManifestFile, approvedManifestSha256: await digest(f.manifest),
+      authenticationKeyEnvironment: 'TEST_GATEWAY_KEY', storageKeys: { currentKeyRef: 'test', keys: { test: 'TEST_CUSTODY_KEY' } },
+      bridge: { ...f.options, indexer: { ...f.options.indexer, port: indexerPort } },
+      listener: { mode: 'trusted_proxy', port, publicOrigin: 'https://gateway.invalid' },
+    }), { mode: 0o600 });
+    const start = async () => {
+      let output = '';
+      gateway = spawn(process.execPath, ['--import', 'tsx', 'gateway-host/serve.ts', configPath], {
+        cwd: fileURLToPath(new URL('../', import.meta.url)),
+        env: { PATH: process.env.PATH, TEST_GATEWAY_KEY: 'a'.repeat(64), TEST_CUSTODY_KEY: 'b'.repeat(64) },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      for (const stream of [gateway.stdout!, gateway.stderr!]) stream.on('data', chunk => { output += String(chunk); });
+      for (let attempt = 0; attempt < 100 && !output.includes('"listening"'); attempt++) {
+        assert.equal(gateway.exitCode, null, output);
+        await delay(50);
+      }
+      assert.match(output, /"listening"/, output);
+      assert.equal((await fetch(`${origin}/v1/backrooms`, { signal: AbortSignal.timeout(1000) })).status, 405);
+      const runtimeDirectory = `${databasePath}.runtime`;
+      const [runtime] = (await readdir(runtimeDirectory)).filter(entry => entry.startsWith('rings-runtime-'));
+      assert.ok(runtime);
+      indexerPid = (JSON.parse(await readFile(join(runtimeDirectory, runtime, 'indexer-ready.json'), 'utf8')) as { pid: number }).pid;
+      assert.ok(Number.isSafeInteger(indexerPid) && indexerPid > 1);
+      return { child: gateway, logs: () => output };
+    };
+    const failed = await start();
+    process.kill(indexerPid!, 'SIGKILL');
+    indexerPid = undefined;
+    assert.deepEqual(await waitExit(failed.child), [1, null]);
+    assert.match(failed.logs(), /gateway_indexer_unavailable/);
+    await assert.rejects(fetch(`${origin}/v1/backrooms`, { signal: AbortSignal.timeout(1000) }));
+    // The same SQLite files and ownership directories are reusable after the failure.
+    const healthy = await start();
+    healthy.child.kill('SIGTERM');
+    assert.deepEqual(await waitExit(healthy.child), [0, null]);
+    indexerPid = undefined;
+    assert.doesNotMatch(healthy.logs(), /gateway_indexer_unavailable/);
+    await assert.rejects(fetch(`${origin}/v1/backrooms`, { signal: AbortSignal.timeout(1000) }));
+  } finally {
+    if (gateway?.exitCode === null && gateway.signalCode === null) {
+      gateway.kill('SIGTERM');
+      await waitExit(gateway);
+    }
+    if (indexerPid) {
+      try { process.kill(indexerPid, 'SIGKILL'); } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error;
+      }
+    }
+    await f.close();
+  }
+});
+
+test('a fatal runtime signal stops admission without dropping the response already being served', { timeout: 5000 }, async () => {
+  const entered = Promise.withResolvers<void>();
+  const response = Promise.withResolvers<void>();
+  const failure = Promise.withResolvers<void>();
+  let closed = 0;
+  const gateway = {
+    mode: 'production', runtimeFailure: failure.promise,
+    async fetch() { entered.resolve(); await response.promise; return new Response('retained'); },
+    async close() { closed++; },
+  } as unknown as RingsGateway;
+  const listener = await listenProductionGateway(gateway, { mode: 'trusted_proxy', publicOrigin: 'https://gateway.invalid', port: 0 });
+  try {
+    const { port } = listener.server.address() as AddressInfo;
+    const inFlight = fetch(`http://127.0.0.1:${port}/v1/backrooms`, { signal: AbortSignal.timeout(3000) });
+    await entered.promise;
+    failure.resolve();
+    await listener.runtimeFailure;
+    assert.equal(listener.server.listening, false);
+    assert.equal(closed, 0);
+    response.resolve();
+    assert.equal(await (await inFlight).text(), 'retained');
+    await Promise.all([listener.close(), listener.close()]);
+    assert.equal(closed, 1);
+  } finally {
+    response.resolve();
+    await listener.close();
+  }
 });

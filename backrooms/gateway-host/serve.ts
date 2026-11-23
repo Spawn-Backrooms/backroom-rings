@@ -28,7 +28,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     if (process.argv.length !== 3) throw new Error('gateway_configuration_path_required');
     listener = await startProductionGateway(resolve(process.argv[2]!), startup.signal);
     if (startup.signal.aborted) await listener.close();
-    else console.log(JSON.stringify({ listening: listener.endpoint, mode: 'production' }));
+    else {
+      void listener.runtimeFailure?.then(() => {
+        console.error('gateway_indexer_unavailable');
+        process.exitCode = 1;
+      });
+      if (listener.server.listening) console.log(JSON.stringify({ listening: listener.endpoint, mode: 'production' }));
+    }
   } catch {
     if (!startup.signal.aborted) { console.error('gateway_start_failed'); process.exitCode = 1; }
   }
