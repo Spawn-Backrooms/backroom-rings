@@ -9,7 +9,7 @@ const fixture = () => ({
   grant: { room: 'room-a', predecessor: 'checkpoint-0', revision: 1n, commitment: 'grant-a',
     original: 'original-a', active: true, alreadyConsumed: false, policyEpoch: 'epoch-a', actor: 'fixture-actor-a' },
   ring: { route: 'hidden-owner', publicOwners: false, delegate: false, enrolledNonzeroKey: true,
-    linkedPublicOwner: false, inputCount: 1, liveOutputCount: 1, ring: 'ring-a', policyRoot: 'policy-a',
+    linkedPublicOwner: false, inputCount: 1, liveInputCount: 1, liveOutputCount: 1, ring: 'ring-a', policyRoot: 'policy-a',
     trackingRoot: 'tracking-a', privateTxHash: 'tx-a', firstNullifier: 'nullifier-a', privateActor: 'fixture-actor-a' },
   spp: { ring: 'ring-a', privateTxHash: 'tx-a', firstNullifier: 'nullifier-a', predecessor: 'checkpoint-0',
     successor: 'checkpoint-1', liveInputCount: 1, liveOutputCount: 1, inputAmount: 0, outputAmount: 0,
@@ -26,6 +26,12 @@ test('matching independently supplied facts yield the expected transition withou
   assert.deepEqual(f, original);
 });
 
+test('one live note is not confused with a padded published input count', () => {
+  const f = fixture();
+  f.ring.inputCount = 2;
+  assert.deepEqual(checkAnonymousAdvance(f), { room: 'room-a', checkpoint: 'checkpoint-1', revision: 1n, original: 'original-a' });
+});
+
 const negatives = [
   ['confidential fallback', 'ring', 'route', 'confidential', 'WRONG_RAIL'],
   ['public owner fallback', 'ring', 'publicOwners', true, 'WRONG_RAIL'],
@@ -34,7 +40,7 @@ const negatives = [
   ['direct base SPP path', 'ring', 'route', 'base-spp', 'WRONG_RAIL'],
   ['zero-key input', 'ring', 'enrolledNonzeroKey', false, 'OWNER_PRIVACY'],
   ['linked public owner', 'ring', 'linkedPublicOwner', true, 'OWNER_PRIVACY'],
-  ['extra input', 'ring', 'inputCount', 2, 'NONFINANCIAL_SHAPE'],
+  ['extra live input', 'ring', 'liveInputCount', 2, 'NONFINANCIAL_SHAPE'],
   ['extra live output', 'spp', 'liveOutputCount', 2, 'NONFINANCIAL_SHAPE'],
   ['nonzero value', 'spp', 'outputAmount', 1, 'NONFINANCIAL_SHAPE'],
   ['public deposit', 'spp', 'publicDepositCount', 1, 'NONFINANCIAL_SHAPE'],

@@ -9,7 +9,9 @@ export function checkAnonymousAdvance({ profile, current, grant, ring, spp, app 
   if (profile.mode !== 'anonymous-policy' || ring.route !== 'hidden-owner' ||
       ring.publicOwners !== false || ring.delegate !== false) refuse('WRONG_RAIL');
   if (ring.enrolledNonzeroKey !== true || ring.linkedPublicOwner !== false) refuse('OWNER_PRIVACY');
-  if (ring.inputCount !== 1 || ring.liveOutputCount !== 1 || spp.liveInputCount !== 1 ||
+  // Live notes are distinct from the published prefix and fixed circuit capacity.
+  // Upstream padding is checked by the real ring/SPP relation, not this oracle.
+  if (ring.liveInputCount !== 1 || ring.liveOutputCount !== 1 || spp.liveInputCount !== 1 ||
       spp.liveOutputCount !== 1 || spp.inputAmount !== 0 || spp.outputAmount !== 0 ||
       spp.publicDepositCount !== 0 || spp.publicWithdrawalCount !== 0 ||
       spp.exitCount !== 0) refuse('NONFINANCIAL_SHAPE');

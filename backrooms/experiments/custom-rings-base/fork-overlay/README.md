@@ -8,7 +8,7 @@ The public fork [Spawn-Backrooms/custom-privacy-rings](https://github.com/Spawn-
 
 The wrapper calls the existing circuit first and reopens the exact same constrained note wires, rather than trusting separate supplied note metadata. This duplicates some constraints; measure the overhead during actual compilation. It assumes the pinned SPP empty-address chain and note semantics; qualify both using the actual submodule.
 
-The standalone Gnark tests exercise the note-pair predicate in isolation: one matching pair and 16 negative cases. They use synthetic field openings. They do not exercise the full transfer proof, state relation, settlement, or Solana.
+The standalone Gnark tests exercise the note-pair predicate in isolation: one matching pair and 16 negative cases. They use synthetic field openings. They do not exercise the full transfer proof, state relation, settlement, or Solana. One live note does not mean one published slot: dummy padding and fixed circuit capacity are separate counts and require full-witness qualification.
 
 ## Run on the isolated build host
 
@@ -22,4 +22,4 @@ Then build an actual zero-value hidden-owner transfer witness using upstream fix
 
 ## Evidence
 
-Local Go 1.23.2 `gofmt -e -l` reported no syntax or formatting errors on the two source files; remote Git blobs matched the formatted local files. The 44 pre-existing JS bootstrap/conformance tests were rerun: 44 passed, zero skipped. Actual Gnark compilation and tests were not run: this host lacks the pinned Go 1.27.3, upstream dependencies, Rust/Solana and GitHub network resolution. The branch has no independent review. Keep CR02 and CR04 open.
+At initial authoring, Go 1.23.2 `gofmt -e -l` reported no syntax or formatting errors on the two source files; remote Git blobs matched the formatted local files. The current Go files are unchanged. Actual Gnark compilation and tests have still not run: the current workspace lacks the pinned Go 1.27.3, upstream dependencies, Rust/Solana and package-download access. An independent source review of the initial overlay found no immediate escape in its narrowly described note-pair predicate, but identified the missing application statement, live native authorization, genesis/dispatch and public-metadata work. That review is not proof verification or integration approval. Keep CR02 and CR04 open.
