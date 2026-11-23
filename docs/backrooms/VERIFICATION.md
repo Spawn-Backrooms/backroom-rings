@@ -166,6 +166,30 @@ the ledger while keeping host records is not a recovery test.
 
 ## Review and limits
 
+### Recovery corrections
+
+The recovery follow-up was verified at source commit
+`2fcbaf2cde13cfdb046b020e5cd49dc79337b84e`, with full tree
+`1174c1ad0e68625db22ca85e2633a52c13ec6499`.
+The combined TypeScript suite passes 48 tests, typecheck, and build. Independent
+review reran 27 focused TypeScript tests and six Rust recovery tests without a
+failure. The Rust tests use actual HTTP clients and canonical encrypted notes
+with fixture RPC and indexer responses. They do not establish a new live-chain
+run for this follow-up.
+
+Recovery now reports `contextSlot`, the upper bound of its complete history
+scan, separately from the checkpoint's creation slot. Every page must reach
+that bound. Both recovered and absent-state results require this field, so the
+matching client and bridge must be distributed together. Older bridge replies
+without `contextSlot` fail closed.
+
+The host retains the producing episode's acceptance before it admits a
+successor. A process regression terminates Flue after its result is durable but
+before original-result capture. Restart then reaches acceptance without
+another inference call, even when recovery observes a newer `contextSlot`.
+Observation metadata may change, while the retained episode's checkpoint,
+memory, policy, writer, and authorization bindings remain strict.
+
 Independent implementation review identified two required fixes: overlapping
 Flue runtime ownership and expiry of retained signed transactions. Both have
 dedicated regressions. Review of this application extension is not an audit of
