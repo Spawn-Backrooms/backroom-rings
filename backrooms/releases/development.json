@@ -7,12 +7,26 @@
     "forkCommit": null
   },
   "schemaSha256": null,
-  "client": { "version": "0.1.0-dev.1", "packageIntegrity": null },
-  "circuits": {
-    "createRoom": { "circuitSha256": null, "provingKeySha256": null, "verifyingKeySha256": null },
-    "advanceRoom": { "circuitSha256": null, "provingKeySha256": null, "verifyingKeySha256": null }
+  "client": {
+    "version": "0.1.0-dev.2",
+    "packageIntegrity": null
   },
-  "setup": { "kind": "insecure_test", "provenance": null },
+  "circuits": {
+    "createRoom": {
+      "circuitSha256": null,
+      "provingKeySha256": null,
+      "verifyingKeySha256": null
+    },
+    "advanceRoom": {
+      "circuitSha256": null,
+      "provingKeySha256": null,
+      "verifyingKeySha256": null
+    }
+  },
+  "setup": {
+    "kind": "insecure_test",
+    "provenance": null
+  },
   "network": {
     "cluster": "localnet",
     "genesisHash": null,
@@ -20,8 +34,18 @@
     "shieldedPoolProgramId": null
   },
   "services": {
-    "prover": { "version": null, "sourceCommit": null, "binarySha256": null, "imageDigest": null },
-    "indexer": { "version": null, "sourceCommit": null, "binarySha256": null, "imageDigest": null }
+    "prover": {
+      "version": null,
+      "sourceCommit": null,
+      "binarySha256": null,
+      "imageDigest": null
+    },
+    "indexer": {
+      "version": null,
+      "sourceCommit": null,
+      "binarySha256": null,
+      "imageDigest": null
+    }
   },
   "evidence": {
     "circuitReview": null,
