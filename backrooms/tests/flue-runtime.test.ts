@@ -36,6 +36,33 @@ test('real Flue residents recover settled submissions and use an injected accept
     const recovered = await runtime.run(binding, room);
     assert.deepEqual(recovered, first);
     assert.equal(runtime.inferenceCalls, 0, 'settled Flue submissions must be recovered without another model call');
+    const changedCheckpoint = { ...room.checkpoint, stateCommitment: randomHex() };
+    const changedContexts: Array<{ name: string; binding: EpisodeBinding; room: RecoveredRoom }> = [
+      { name: 'episode binding', binding: { ...binding, episodeCommitment: randomHex() }, room },
+      { name: 'checkpoint', binding: { ...binding, predecessor: changedCheckpoint }, room: { ...room, checkpoint: changedCheckpoint } },
+      { name: 'memory provenance', binding, room: { ...room, memory: { ...room.memory, candidateCommitment: randomHex() } } },
+      { name: 'lesson', binding, room: { ...room, memory: { ...room.memory, lesson: 'Use a different lesson.' } } },
+      { name: 'policy', binding, room: { ...room, policy: { policyId: '1', scores: [40, 50] } } },
+      { name: 'writer', binding, room: { ...room, writerIdentity: 'another-writer' } },
+      { name: 'checkpoint slot', binding, room: { ...room, slot: '2' } },
+      { name: 'signature', binding, room: { ...room, signature: 'another-signature' } },
+      { name: 'artifact', binding, room: { ...room, artifactVersion: 'another-artifact' } },
+      { name: 'seed manifest', binding, room: { ...room, seedManifestCommitment: randomHex() } },
+      { name: 'membership', binding, room: { ...room, fixedMembersCommitment: randomHex() } },
+    ];
+    for (const changed of changedContexts) {
+      await assert.rejects(runtime.run(changed.binding, changed.room), /episode_context_changed|resident_room_binding_mismatch/, changed.name);
+    }
+    assert.equal(runtime.inferenceCalls, 0);
+    for (const observation of [
+      { ...room, contextSlot: '2' },
+      { ...room, operationId: 'another-recovery' },
+      { ...room, contextSlot: '3', operationId: 'latest-recovery' },
+    ]) {
+      assert.deepEqual(await runtime.run(binding, observation), first);
+    }
+    assert.equal(runtime.inferenceCalls, 0);
+    assert.deepEqual((await records.read(`context/${binding.episodeId}`))?.value, { binding, room });
     const updated: RecoveredRoom = { ...room, checkpoint: { ...room.checkpoint, stateCommitment: randomHex(), revision: '1' }, memory: { ...room.memory, lesson: first.proposal.lesson }, policy: { policyId: '1', scores: [40, 50] } };
     const second = await runtime.run({ ...binding, episodeId: 'second', episodeCommitment: await digest({ episode: 'second' }), predecessor: updated.checkpoint, ordinal: '2' }, updated);
     assert.equal(JSON.parse(second.investigator).selectedProcedure, 1);

@@ -80,3 +80,31 @@ test('startup failure releases ownership before another process starts', { timeo
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('SIGKILL before original capture resumes settled Flue results through a fresher observation and retains acceptance', { timeout: 20_000 }, async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'backrooms-context-replay-'));
+  const owner = worker('hold', directory);
+  const children = [owner];
+  try {
+    const first = await owner.message();
+    assert.equal(first.status, 'completed');
+    assert.equal(first.inferenceCalls, 4);
+    assert.equal(first.originalCaptured, false);
+    owner.child.kill('SIGKILL');
+    assert.equal((await owner.closed).signal, 'SIGKILL');
+    const recovered = worker('recover-fresh-context', directory);
+    children.push(recovered);
+    const next = await recovered.message();
+    assert.equal(next.status, 'accepted');
+    assert.equal(next.inferenceCalls, 0);
+    assert.equal(next.originalResultCommitment, first.originalResultCommitment);
+    assert.equal(next.receiptRetained, true);
+    assert.equal(next.contextUnchanged, true);
+    assert.deepEqual(next.bridgeOperations, ['prepare_advance', 'submit', 'recover']);
+    await recovered.successfulExit();
+  } finally {
+    for (const child of children) child.child.kill('SIGKILL');
+    await Promise.all(children.map(child => child.closed));
+    await rm(directory, { recursive: true, force: true });
+  }
+});
