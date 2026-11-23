@@ -75,6 +75,30 @@ function proposal(prepared: PreparedTransaction): AdvanceRoomInput {
   return { roomId: prepared.checkpoint.roomId, expectedPredecessor: prepared.checkpoint.stateCommitment, ordinal: '1', minimumConfirmedSlot: '101', acceptanceNonce: randomHex(), episodeCommitment: randomHex(), originalResultCommitment: randomHex(), candidateCommitment: randomHex(), lesson: 'Keep the accepted assumption.', selectedProcedure: 0, feedback: { negative: true, magnitude: 10 } };
 }
 
+test('gateway client refuses redirects without forwarding authenticated requests', async () => {
+  let targetCalls = 0;
+  let status = 301;
+  const target = createServer((_request, response) => { targetCalls++; response.end('unexpected redirect'); });
+  await new Promise<void>(resolve => target.listen(0, '127.0.0.1', resolve));
+  const targetAddress = target.address();
+  assert.ok(targetAddress && typeof targetAddress !== 'string');
+  const redirect = createServer((_request, response) => {
+    response.writeHead(status, { location: `http://127.0.0.1:${targetAddress.port}/capture` });
+    response.end('untrusted redirect body');
+  });
+  await new Promise<void>(resolve => redirect.listen(0, '127.0.0.1', resolve));
+  const address = redirect.address();
+  assert.ok(address && typeof address !== 'string');
+  try {
+    const client = new AuthenticatedRingsGatewayClient({ endpoint: `http://127.0.0.1:${address.port}/v1/backrooms`, authenticationKey: crypto.getRandomValues(new Uint8Array(32)), mode: 'synthetic_localnet' });
+    const enrollment: GatewayEnrollment = { scope: { ownerId: 'owner', projectId: 'project', roomId: 'room' }, creationId: 'creation', creationNonce: randomHex(), seedManifestCommitment: randomHex(), fixedMembersCommitment: randomHex(), releaseManifestSha256: randomHex() };
+    for (status of [301, 302, 303, 307, 308]) await assert.rejects(client.bind(enrollment), /gateway_redirect_refused/);
+    assert.equal(targetCalls, 0);
+  } finally {
+    await Promise.all([target, redirect].map(server => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))));
+  }
+});
+
 test('gateway scopes independent writers, persists enrollment and frames, and recovers fresh evidence after restart', async () => {
   const f = await fixture();
   try {
