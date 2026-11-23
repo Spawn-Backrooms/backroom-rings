@@ -10,6 +10,85 @@ import test from 'node:test';
 
 const executable = process.env.BACKROOM_PHOTON_EXECUTABLE;
 
+test('actual Photon rolls back failed file-backed migrations and retries on the repaired database', { skip: !executable, timeout: 30_000 }, async () => {
+  assert.ok(executable && isAbsolute(executable));
+  const directory = await mkdtemp(join(tmpdir(), 'backrooms-photon-rollback-'));
+  const databasePath = join(directory, 'photon.sqlite');
+  const original = new DatabaseSync(databasePath);
+  original.exec("CREATE TABLE idx_rings_transactions_signature_event (marker TEXT NOT NULL); INSERT INTO idx_rings_transactions_signature_event VALUES ('retained');");
+  original.close();
+  const snapshot = () => {
+    const database = new DatabaseSync(databasePath, { readOnly: true });
+    try {
+      return database.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'table' ORDER BY name").all();
+    } finally { database.close(); }
+  };
+  const before = snapshot();
+  let child: ChildProcess | undefined;
+  let diagnostics = '';
+  let attempt = 0;
+  const start = async () => {
+    diagnostics = '';
+    const portProbe = createServer();
+    await new Promise<void>(resolve => portProbe.listen(0, '127.0.0.1', resolve));
+    const address = portProbe.address();
+    assert.ok(address && typeof address !== 'string');
+    await new Promise<void>((resolve, reject) => portProbe.close(error => error ? reject(error) : resolve()));
+    const readyFile = join(directory, `ready-${attempt++}.json`);
+    child = spawn(executable, ['--db-url', `sqlite://${databasePath}?mode=rwc`, '--migrate', '--max-db-conn', '2', '--disable-indexing', '--bind-address', '127.0.0.1', '--port', String(address.port), '--ready-file', readyFile, '--rpc-url', 'http://127.0.0.1:9'], { env: { PATH: process.env.PATH, RUST_LOG: 'warn', TOKIO_WORKER_THREADS: '2' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    const active = child;
+    const timeout = setTimeout(() => active.kill('SIGKILL'), 10_000);
+    timeout.unref();
+    for (const output of [child.stdout!, child.stderr!]) output.on('data', chunk => { diagnostics = `${diagnostics}${String(chunk)}`.slice(-8000); });
+    const exited = new Promise<{ code: number | null; signal: NodeJS.Signals | null }>((resolve, reject) => {
+      child!.once('error', reject);
+      child!.once('close', (code, signal) => { clearTimeout(timeout); resolve({ code, signal }); });
+    });
+    return { exited, readyFile };
+  };
+  try {
+    const failed = await (await start()).exited;
+    assert.equal(failed.code, 1);
+    assert.equal(failed.signal, null);
+    assert.match(diagnostics, /Failed to run migrations/);
+    assert.deepEqual(snapshot(), before, 'a failed batch must not retain schema or migration-prefix rows');
+    const repair = new DatabaseSync(databasePath);
+    assert.deepEqual(repair.prepare('SELECT marker FROM idx_rings_transactions_signature_event').all().map(row => row.marker), ['retained']);
+    repair.exec('DROP TABLE idx_rings_transactions_signature_event');
+    repair.close();
+    let retained: unknown;
+    for (let round = 0; round < 2; round += 1) {
+      const { exited, readyFile } = await start();
+      const deadline = Date.now() + 5000;
+      let ready = false;
+      while (Date.now() < deadline) {
+        assert.equal(child!.exitCode, null, diagnostics);
+        try {
+          ready = (JSON.parse(await readFile(readyFile, 'utf8')) as { pid: number }).pid === child!.pid;
+          if (ready) break;
+        } catch {}
+        await delay(25);
+      }
+      assert.ok(ready, diagnostics);
+      const database = new DatabaseSync(databasePath, { readOnly: true });
+      const migrations = database.prepare('SELECT version FROM seaql_migrations ORDER BY version').all();
+      database.close();
+      assert.ok(migrations.length > 0);
+      if (round === 0) retained = migrations;
+      else assert.deepEqual(migrations, retained);
+      child!.kill('SIGINT');
+      assert.deepEqual(await exited, { code: 0, signal: null });
+    }
+  } finally {
+    if (child && child.exitCode === null && child.signalCode === null) {
+      const exited = new Promise<void>(resolve => child!.once('exit', () => resolve()));
+      child.kill('SIGKILL');
+      await exited;
+    }
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test('actual Photon migrates a fresh supplied database and resumes retained progress across restarts', { skip: !executable, timeout: 90_000 }, async () => {
   assert.ok(executable && isAbsolute(executable));
   const directory = await mkdtemp(join(tmpdir(), 'backrooms-photon-startup-'));

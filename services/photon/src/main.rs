@@ -19,7 +19,10 @@ use photon_indexer::ingester::indexer::{
 };
 use photon_indexer::migration::{
     MigratorTrait, RingsMigrator,
-    sea_orm::{DatabaseBackend, DatabaseConnection, SqlxPostgresConnector, SqlxSqliteConnector},
+    sea_orm::{
+        ConnectionTrait, DatabaseBackend, DatabaseConnection, SqlxPostgresConnector,
+        SqlxSqliteConnector, TransactionTrait,
+    },
 };
 
 use photon_indexer::monitor::continuously_monitor_photon;
@@ -430,9 +433,28 @@ async fn main() -> Result<()> {
 
     if args.db_url.is_none() || args.migrate {
         info!("Running migrations...");
-        RingsMigrator::up(db_conn.as_ref(), None)
-            .await
-            .context("Failed to run migrations")?;
+        if db_conn.get_database_backend() == DatabaseBackend::Sqlite {
+            // SQLite DDL must share one connection and commit as a single batch.
+            let transaction = db_conn
+                .begin()
+                .await
+                .context("Failed to begin SQLite migrations")?;
+            if let Err(error) = RingsMigrator::up(&transaction, None).await {
+                transaction
+                    .rollback()
+                    .await
+                    .with_context(|| format!("Failed to roll back migrations after: {error}"))?;
+                return Err(error).context("Failed to run migrations");
+            }
+            transaction
+                .commit()
+                .await
+                .context("Failed to commit SQLite migrations")?;
+        } else {
+            RingsMigrator::up(db_conn.as_ref(), None)
+                .await
+                .context("Failed to run migrations")?;
+        }
     }
 
     let is_rpc_node_local = args.rpc_url.contains("127.0.0.1");
