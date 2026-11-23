@@ -36,7 +36,7 @@ The bridge receives a temporary configuration in an owner-only directory with an
 
 `LocalnetBridge` verifies the executable's SHA256 digest at startup. It supplies the pinned RPC genesis, deployed program digests, tree, and artifact directory to the actual `ProcessRingsTransport`. The Rust bridge performs its existing genesis and program checks on every operation.
 
-Optional test-writer funding is bounded to 10 billion lamports per configured balance target. Funding uses only the configured loopback RPC. The gateway verifies its pinned genesis before each funding attempt and waits for the confirmed balance. No production funding path is provided.
+Optional test-writer funding is bounded to 10 billion lamports per configured balance target. Funding uses only the configured loopback RPC. The gateway verifies its pinned genesis before each funding attempt, queries the current rent-exempt minimum, and requests the larger of that minimum and the balance deficit. It waits for the confirmed target balance. No production funding path is provided.
 
 ## Retained operations
 
@@ -70,3 +70,5 @@ node --import tsx --test tests/gateway-localnet.test.ts
 ```
 
 Without both environment variables, the live test is explicitly skipped. A passing synthetic test does not establish live proof generation, chain submission, or production readiness.
+
+The recorded qualification run passed against the actual local validator, release Photon, Rust bridge, and prover. It created two distinct custodied writers, rejected cross-room operations, recovered both bindings after a SQLite restart with historical storage keys, and advanced one room to revision 1 with its accepted lesson and scores `[40, 50]`. See [verification](VERIFICATION.md#authenticated-gateway-qualification) for the exact tested source and artifact boundary.
