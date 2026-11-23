@@ -34,6 +34,10 @@ const VERSION: &str = "backrooms.v0";
 const ARTIFACT_VERSION: &str = "backrooms.localnet.v0";
 type Client = SprClient<SolanaRpc>;
 
+#[cfg(test)]
+#[path = "bridge/recovery.rs"]
+mod recovery_tests;
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct Config {
@@ -107,6 +111,11 @@ struct Host {
     config: Config,
     client: Client,
     writer: ShieldedKeypair,
+}
+
+struct RoomScan {
+    note: Option<DataUtxo<RoomStateV0>>,
+    context_slot: u64,
 }
 
 enum SubmissionState {
@@ -253,7 +262,7 @@ impl Host {
         room_authority(&self.writer.pubkey())
     }
 
-    fn recover_note(&self, room: Field, minimum: u64) -> Result<Option<DataUtxo<RoomStateV0>>> {
+    fn recover_note(&self, room: Field, minimum: u64) -> Result<RoomScan> {
         let snapshot = self.client.get_slot()?.max(minimum);
         let mut cursor = None;
         let mut transactions: Vec<ShieldedTransaction> = Vec::new();
@@ -307,7 +316,10 @@ impl Host {
                 "room writer differs from host"
             );
         }
-        Ok(note)
+        Ok(RoomScan {
+            note,
+            context_slot: snapshot,
+        })
     }
 
     fn checkpoint(&self, note: &DataUtxo<RoomStateV0>) -> Result<Value> {
@@ -388,7 +400,7 @@ impl Host {
             ..Default::default()
         }
         .identity()?;
-        if self.recover_note(room, 0)?.is_some() {
+        if self.recover_note(room, 0)?.note.is_some() {
             return Err(BridgeFailure::StateConflict.into());
         }
         let program = CreateRoom {
@@ -431,6 +443,7 @@ impl Host {
         let room = from_bytes(&bytes32(&input.room_id)?)?;
         let note = self
             .recover_note(room, decimal(&input.minimum_confirmed_slot)?)?
+            .note
             .ok_or_else(|| anyhow!("room absent"))?;
         if note.utxo.utxo_hash != bytes32(&input.expected_predecessor)? {
             return Err(BridgeFailure::StateConflict.into());
@@ -642,15 +655,18 @@ impl Host {
 
     fn recover(&self, input: RecoverInput) -> Result<Value> {
         let room = from_bytes(&bytes32(&input.room_id)?)?;
-        let Some(note) = self.recover_note(room, decimal(&input.minimum_confirmed_slot)?)? else {
-            return Ok(json!({ "status": "not_found" }));
+        let scan = self.recover_note(room, decimal(&input.minimum_confirmed_slot)?)?;
+        let Some(note) = scan.note else {
+            return Ok(
+                json!({ "status": "not_found", "contextSlot": scan.context_slot.to_string() }),
+            );
         };
         let memory = note.data.memory;
         let lesson = std::str::from_utf8(&memory.lesson[..memory.length as usize])?;
         Ok(
             json!({ "status": "recovered", "checkpoint": self.checkpoint(&note)?, "memory": {
             "lesson": lesson, "episodeCommitment": hex::encode(memory.episode), "originalResultCommitment": hex::encode(memory.original_result), "candidateCommitment": hex::encode(memory.candidate), "predecessorCommitment": hex::encode(to_bytes(&note.data.predecessor)), "authorizationCommitment": hex::encode(to_bytes(&note.data.authorization)),
-        }, "policy": { "policyId": note.data.policy.id.to_string(), "scores": [note.data.policy.first, note.data.policy.second] }, "writerIdentity": self.writer.pubkey().to_string(), "seedManifestCommitment": hex::encode(note.data.seed_manifest), "fixedMembersCommitment": hex::encode(note.data.fixed_members), "signature": note.utxo.tx_signature.to_string(), "slot": note.utxo.slot.to_string(), "artifactVersion": ARTIFACT_VERSION }),
+        }, "policy": { "policyId": note.data.policy.id.to_string(), "scores": [note.data.policy.first, note.data.policy.second] }, "writerIdentity": self.writer.pubkey().to_string(), "seedManifestCommitment": hex::encode(note.data.seed_manifest), "fixedMembersCommitment": hex::encode(note.data.fixed_members), "signature": note.utxo.tx_signature.to_string(), "slot": note.utxo.slot.to_string(), "contextSlot": scan.context_slot.to_string(), "artifactVersion": ARTIFACT_VERSION }),
         )
     }
 }

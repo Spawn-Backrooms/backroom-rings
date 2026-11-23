@@ -17,7 +17,7 @@ function recoveredFixture(): RecoveredRoom {
     protocolVersion: PROTOCOL_VERSION, operationId: 'injected-expiry-state', status: 'recovered',
     checkpoint: { roomId: randomHex(), uniqueAddress: randomHex(), stateCommitment: randomHex(), revision: '0' },
     memory: { lesson: '', episodeCommitment: zero, originalResultCommitment: zero, candidateCommitment: zero, predecessorCommitment: zero, authorizationCommitment: zero },
-    policy: { policyId: '1', scores: [50, 50] }, slot: '1', signature: 'unit-fixture-signature',
+    policy: { policyId: '1', scores: [50, 50] }, slot: '1', contextSlot: '1', signature: 'unit-fixture-signature',
     seedManifestCommitment: randomHex(), fixedMembersCommitment: randomHex(), writerIdentity: 'unit-fixture-writer', artifactVersion: 'backrooms.localnet.v0',
   };
 }
@@ -48,7 +48,7 @@ class ExpiryProtocolFixture implements RingsTransport {
       state.fixedMembersCommitment = this.creation.fixedMembersCommitment;
     }
     return {
-      ...state, checkpoint: this.prepared.checkpoint, slot: '2', signature: 'accepted-unit-signature',
+      ...state, checkpoint: this.prepared.checkpoint, slot: '2', contextSlot: '2', signature: 'accepted-unit-signature',
       ...(this.advance ? {
         policy: { policyId: '1' as const, scores: [40, 50] as [number, number] },
         memory: {
@@ -78,7 +78,7 @@ class ExpiryProtocolFixture implements RingsTransport {
     }
     if (request.op === 'recover') {
       if (this.recoveryUnavailable && this.oldSubmissions > 0) throw new Error('injected_indexer_outage');
-      return this.current ? { ...this.current, ...envelope } : { ...envelope, status: 'not_found' };
+      return this.current ? { ...this.current, ...envelope } : { ...envelope, status: 'not_found', contextSlot: '1' };
     }
     assert.ok(this.prepared);
     if (request.op === 'submit') {

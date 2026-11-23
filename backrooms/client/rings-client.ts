@@ -120,12 +120,15 @@ export class RingsClient {
     assertDigest(roomId);
     assertU64(minimumConfirmedSlot);
     const item = await this.call({ protocolVersion: PROTOCOL_VERSION, operationId, op: 'recover', input: { roomId, minimumConfirmedSlot } });
-    if (item.status === 'not_found' || item.status === 'pending') return { protocolVersion: PROTOCOL_VERSION, operationId, status: item.status };
-    if (item.status !== 'recovered') throw new Error('invalid_recovery_status');
+    if (item.status === 'pending') return { protocolVersion: PROTOCOL_VERSION, operationId, status: 'pending' };
+    if (item.status !== 'recovered' && item.status !== 'not_found') throw new Error('invalid_recovery_status');
+    assertU64(item.contextSlot);
+    if (BigInt(item.contextSlot) < BigInt(minimumConfirmedSlot)) throw new Error('indexer_below_confirmed_slot');
+    if (item.status === 'not_found') return { protocolVersion: PROTOCOL_VERSION, operationId, status: 'not_found', contextSlot: item.contextSlot };
     const checkpoint = parseCheckpoint(item.checkpoint);
     if (checkpoint.roomId !== roomId) throw new Error('recovered_room_mismatch');
     assertU64(item.slot);
-    if (BigInt(item.slot) < BigInt(minimumConfirmedSlot)) throw new Error('indexer_below_confirmed_slot');
+    if (BigInt(item.slot) > BigInt(item.contextSlot)) throw new Error('checkpoint_after_recovery_context');
     assertIdentifier(item.signature);
     assertIdentifier(item.writerIdentity);
     assertDigest(item.seedManifestCommitment);
@@ -140,7 +143,7 @@ export class RingsClient {
     assertInteger(policy.scores[1], 0, 100);
     return {
       protocolVersion: PROTOCOL_VERSION, operationId, status: 'recovered', checkpoint,
-      memory: memory as unknown as RecoveredRoom['memory'], policy: { policyId: '1', scores: [policy.scores[0], policy.scores[1]] }, slot: item.slot, signature: item.signature,
+      memory: memory as unknown as RecoveredRoom['memory'], policy: { policyId: '1', scores: [policy.scores[0], policy.scores[1]] }, slot: item.slot, contextSlot: item.contextSlot, signature: item.signature,
       seedManifestCommitment: item.seedManifestCommitment, fixedMembersCommitment: item.fixedMembersCommitment,
       writerIdentity: item.writerIdentity, artifactVersion: this.artifactVersion,
     };

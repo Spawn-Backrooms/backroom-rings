@@ -101,6 +101,7 @@ export interface RecoveredRoom {
   };
   policy: { policyId: '1'; scores: [number, number] };
   slot: U64;
+  contextSlot: U64;
   signature: string;
   seedManifestCommitment: Digest;
   fixedMembersCommitment: Digest;
@@ -108,11 +109,13 @@ export interface RecoveredRoom {
   artifactVersion: string;
 }
 
-export interface UnrecoveredRoom {
+export type UnrecoveredRoom = {
   protocolVersion: typeof PROTOCOL_VERSION;
   operationId: string;
-  status: 'not_found' | 'pending';
-}
+} & (
+  | { status: 'not_found'; contextSlot: U64 }
+  | { status: 'pending' }
+);
 
 export type BridgeRequest = {
   protocolVersion: typeof PROTOCOL_VERSION;

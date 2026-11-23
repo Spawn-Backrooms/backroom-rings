@@ -76,7 +76,7 @@ Only the recent blockhash and transaction signature change. All instructions, ac
 
 `op: "recover"` takes `input: { roomId, minimumConfirmedSlot }`.
 
-The bridge paginates Photon history, checks the indexer's minimum slot, decrypts program-owned notes, removes spent notes, validates the state codec and commitment, and rejects duplicate live checkpoints for one room. A match returns the following.
+The bridge freezes a scan bound at the greater of the current RPC slot and `minimumConfirmedSlot`. It paginates Photon history through that bound and requires every page's indexer context to have reached it. It decrypts program-owned notes, removes spent notes, validates the state codec and commitment, and rejects duplicate live checkpoints for one room. A match returns the following.
 
 ```json
 {
@@ -103,8 +103,23 @@ The bridge paginates Photon history, checks the indexer's minimum slot, decrypts
   "fixedMembersCommitment": "64 lowercase hex characters",
   "signature": "base58",
   "slot": "123",
+  "contextSlot": "130",
   "artifactVersion": "backrooms.localnet.v0"
 }
 ```
 
-No match after a complete fresh scan returns `status: "not_found"`. An indexer behind the required slot, an incomplete scan, corrupt ciphertext, a wrong commitment, or an invalid state produces an error. These conditions do not authorize a new genesis or plaintext fallback.
+`slot` is the checkpoint's creation slot. `contextSlot` is the frozen bound through which the complete history was scanned. A checkpoint at slot 123 can remain current after a scan through slot 130. Later page contexts do not increase `contextSlot`, because the history filter excludes transactions beyond the frozen bound. Both slots use canonical decimal u64 strings.
+
+No match after a complete fresh scan returns `status: "not_found"` and `contextSlot`. The client requires `contextSlot >= minimumConfirmedSlot` for both complete outcomes and `slot <= contextSlot` for a recovered checkpoint. Missing, malformed, or stale watermarks fail validation. A `pending` response claims no completed scan.
+
+An indexer behind the required slot, an incomplete scan, corrupt ciphertext, a wrong commitment, or an invalid state produces an error. These conditions do not authorize a new genesis or plaintext fallback.
+
+### Recovery regression checks
+
+Run the bridge recovery checks without a validator or prover:
+
+```sh
+cargo test --locked -p backroom-rings-program --features bridge --bin backroom-rings-bridge
+```
+
+These checks exercise the bridge's RPC clients, pagination validation, and decryption of canonical encrypted room notes against local HTTP fixtures. They cover an old checkpoint with a fresh scan, advancing page contexts, fresh absence, a stale final page, and a spent predecessor followed by its successor. They do not establish freshness of a running Photon indexer or successful chain submission. The existing `localnet` bridge test checks the same response fields against the validator and Photon when its program binaries, proving keys, and services are available.

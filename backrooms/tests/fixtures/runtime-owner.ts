@@ -16,7 +16,7 @@ try {
       protocolVersion: PROTOCOL_VERSION, operationId: 'injected-process-state', status: 'recovered',
       checkpoint: { roomId, uniqueAddress: randomHex(), stateCommitment: randomHex(), revision: '0' },
       memory: { lesson: '', episodeCommitment: zero, originalResultCommitment: zero, candidateCommitment: zero, predecessorCommitment: zero, authorizationCommitment: zero },
-      policy: { policyId: '1', scores: [50, 50] }, slot: '1', signature: 'test-signature',
+      policy: { policyId: '1', scores: [50, 50] }, slot: '1', contextSlot: '1', signature: 'test-signature',
       seedManifestCommitment: host.residents.seedCommitment, fixedMembersCommitment: host.residents.membershipCommitment,
       writerIdentity: 'test-writer', artifactVersion: 'backrooms.localnet.v0',
     };

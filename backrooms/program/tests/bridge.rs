@@ -220,11 +220,13 @@ fn expired_genesis_and_advance_reframe_without_changing_the_authorized_checkpoin
     expire(&localnet, &with_fee)?;
     let expired = bridge.call("submit", parent.clone())?;
     assert_eq!(expired["status"], "expired", "{expired}");
+    let missing_minimum = localnet.client.rpc().client().get_slot()?;
     let missing = bridge.call(
         "recover",
-        json!({ "roomId": create["checkpoint"]["roomId"], "minimumConfirmedSlot": "0" }),
+        json!({ "roomId": create["checkpoint"]["roomId"], "minimumConfirmedSlot": missing_minimum.to_string() }),
     )?;
     assert_eq!(missing["status"], "not_found", "{missing}");
+    assert!(missing["contextSlot"].as_str().unwrap().parse::<u64>()? >= missing_minimum);
     let reframed = bridge.call("reframe", parent.clone())?;
     assert_only_frame_changed(&parent, &reframed)?;
     retain_before_submit(&directory.join("create-reframed.json"), &reframed)?;
@@ -243,6 +245,11 @@ fn expired_genesis_and_advance_reframe_without_changing_the_authorized_checkpoin
         json!({ "roomId": create["checkpoint"]["roomId"], "minimumConfirmedSlot": created["slot"] }),
     )?;
     assert_eq!(recovered["checkpoint"], create["checkpoint"]);
+    assert_eq!(recovered["slot"], created["slot"]);
+    assert!(
+        recovered["contextSlot"].as_str().unwrap().parse::<u64>()?
+            >= created["slot"].as_str().unwrap().parse::<u64>()?
+    );
 
     let advance = bridge.call(
         "prepare_advance",
@@ -263,13 +270,17 @@ fn expired_genesis_and_advance_reframe_without_changing_the_authorized_checkpoin
     expire(&localnet, &decode(&advance)?)?;
     let expired = bridge.call("submit", retained(&advance))?;
     assert_eq!(expired["status"], "expired", "{expired}");
+    let unchanged_minimum = localnet.client.rpc().client().get_slot()?;
+    assert!(unchanged_minimum > created["slot"].as_str().unwrap().parse::<u64>()?);
     let unchanged = bridge.call(
         "recover",
         json!({
-            "roomId": create["checkpoint"]["roomId"], "minimumConfirmedSlot": created["slot"],
+            "roomId": create["checkpoint"]["roomId"], "minimumConfirmedSlot": unchanged_minimum.to_string(),
         }),
     )?;
     assert_eq!(unchanged["checkpoint"], create["checkpoint"]);
+    assert_eq!(unchanged["slot"], created["slot"]);
+    assert!(unchanged["contextSlot"].as_str().unwrap().parse::<u64>()? >= unchanged_minimum);
     let reframed = bridge.call("reframe", retained(&advance))?;
     assert_only_frame_changed(&advance, &reframed)?;
     retain_before_submit(&directory.join("advance-reframed.json"), &reframed)?;
@@ -282,6 +293,11 @@ fn expired_genesis_and_advance_reframe_without_changing_the_authorized_checkpoin
         }),
     )?;
     assert_eq!(learned["checkpoint"], advance["checkpoint"]);
+    assert_eq!(learned["slot"], accepted["slot"]);
+    assert!(
+        learned["contextSlot"].as_str().unwrap().parse::<u64>()?
+            >= accepted["slot"].as_str().unwrap().parse::<u64>()?
+    );
     assert_eq!(
         learned["memory"]["authorizationCommitment"],
         advance["authorizationCommitment"]
