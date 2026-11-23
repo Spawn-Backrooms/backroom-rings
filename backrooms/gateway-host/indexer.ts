@@ -14,7 +14,15 @@ export interface SupervisedIndexerConfiguration {
 
 export class SupervisedIndexer {
   private stopped = false;
-  private constructor(private readonly process: ChildProcess, readonly endpoint: string) {}
+  readonly unexpectedExit: Promise<void>;
+
+  private constructor(private readonly process: ChildProcess, readonly endpoint: string) {
+    this.unexpectedExit = new Promise<void>(resolve => {
+      process.once('exit', () => {
+        if (!this.stopped) resolve();
+      });
+    });
+  }
 
   static async start(supervisor: string, executable: string, rpcUrl: string, configuration: SupervisedIndexerConfiguration, signal?: AbortSignal): Promise<SupervisedIndexer> {
     signal?.throwIfAborted();

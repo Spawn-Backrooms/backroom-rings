@@ -9,6 +9,8 @@ import type { RingsGateway } from './host.js';
 export interface GatewayListener {
   server: Server;
   endpoint: string;
+  /** Resolves if the admitted runtime fails before shutdown starts. */
+  runtimeFailure?: Promise<void>;
   close(): Promise<void>;
 }
 
@@ -33,9 +35,25 @@ async function listen(gateway: RingsGateway, server: Server, host: string, port:
   await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(port, host, resolve); });
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('gateway_listen_failed');
+  let closing: Promise<void> | undefined;
+  const close = () => closing ??= (async () => {
+    try { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
+    finally { await gateway.close(); }
+  })();
+  const failure = gateway.runtimeFailure;
+  const runtimeFailure = failure ? new Promise<void>(resolve => {
+    void failure.then(() => {
+      // An intentional shutdown has already stopped accepting requests.
+      if (closing) return;
+      // Stop accepting, then drain existing operations before releasing ownership.
+      // The CLI reports the failure independently of the cleanup result.
+      void close().catch(() => {});
+      resolve();
+    });
+  }) : undefined;
   return {
-    server, endpoint: `${origin ?? `http://127.0.0.1:${address.port}`}/v1/backrooms`,
-    async close() { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await gateway.close(); },
+    server, endpoint: `${origin ?? `http://127.0.0.1:${address.port}`}/v1/backrooms`, close,
+    ...(runtimeFailure ? { runtimeFailure } : {}),
   };
 }
 
