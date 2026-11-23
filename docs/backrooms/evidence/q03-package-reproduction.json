@@ -1,0 +1,110 @@
+{
+  "scope": "development package reproduction, actual Photon SQLite and workerd loopback verification",
+  "toolchain": {
+    "node": "24.22.3",
+    "npm": "11.19.1",
+    "typescript": "7.0.2",
+    "tsx": "4.20.6",
+    "flue": "2.3.0",
+    "workerd": "2026-11-13",
+    "workerdBinarySha256": "c441a90904a861b60b1b1a4e221a69369c6f4e50c6c2dc4c4dbb1a491f5a53c6",
+    "photonBinarySha256": "8c06b6040924b122d8709f62ab6a00439ec0b95618d96b34c49090f8d4237679"
+  },
+  "git": {
+    "main": "d30b53b2bc3736b993cc55f9838a255d67fc0fd1",
+    "mainTree": "ee2f243681f5d10ea6cb8f29eb67db12adb24843",
+    "mainBackroomsTree": "a32622e9f9979c4cee7c869322656ae5a5fe895c",
+    "candidateBackroomsTree": "04c303c6c4b30549ee94a81fd2608070080cd1f0",
+    "previousCandidate": "e38dc85fe833932ab243227430d6af93530c6cf6",
+    "previousCandidateTree": "671bb9f804f293ef173a7f69d8f100f0c18bee43",
+    "unchangedFromMain": {
+      "services/photon/src/main.rs": "0a1263d033b794ea08e1b88a78859a9d92787415",
+      "backrooms/tests/photon-startup.test.ts": "d3644f88dfb1703cc67b57e629e6fb26a458f558",
+      "backrooms/tests/release.test.ts": "2ec54faa012e545dfc0748e3ff70963f92a24ce1"
+    }
+  },
+  "bridgeContract": {
+    "path": "backrooms/program/bridge-contract.md",
+    "sha256": "8fb8879184b1105dbb5274b1030f598e41e35b9c2ea817ab5c84853a1dcd4dd3",
+    "wireProtocol": "backrooms.v0",
+    "completeRecoveryWatermark": "contextSlot",
+    "developmentArtifactVersion": "backrooms.localnet.v0",
+    "setup": "insecure_test"
+  },
+  "historicalDev2": {
+    "sourceCommit": "3dc650d532708e36c467481350dd7e80029af0fe",
+    "archive": {
+      "bytes": 80939,
+      "sha256": "2d4aa49ddb4cb9e7a327961cac486217e1f33f182f3989451e9b99220a2c7d18",
+      "integrity": "sha512-4GOcWASuQ400ursA0eUE5npLo6vZ7YFhC49ZgGUM2QyMhIYTKsgUc7O4vVCcvj4rQVCBAOYqhBVNdkPx5x3NBA==",
+      "files": 105
+    },
+    "nativeConsumerArchiveComparison": {
+      "publicSourceCommit": "b61f57b1c553d2f39399cc2d1db5d0ade43c67f9",
+      "referenceArchiveGitBlob": "b06bec351a0fd4d26eb224c29622f2e3b7b21c57",
+      "archiveBytesGitBlobSha256AndSha512Agree": true,
+      "matchingFileHashes": 105,
+      "consumerLockIntegrityAgrees": true,
+      "scope": "retained consumer development archive and lockfile; native execution was not tested"
+    },
+    "recordedChecks": "previous qualification, not rerun for this merge"
+  },
+  "baseline": {
+    "version": "0.1.0-dev.4",
+    "archive": {
+      "bytes": 84179,
+      "sha256": "b768e0055aed33717f02bdd5d3fefdcd8a2f4497bc57bc8277fc283eab02e8a0",
+      "integrity": "sha512-Is180LKg3MrDpgK8Uz5CCFEtax0tQIun1KfNExrcpm0TmAZEISW4woVDgX4koLARCE6FZI0SbsmMgx9Oz9J20w==",
+      "files": 105
+    },
+    "lockSha256": "a8685609729398a60360dcd8be67968f161ee513b6bb8c4701907587fe5cb406",
+    "typecheck": true,
+    "build": true,
+    "sealedArchiveMatches": true,
+    "suiteWithWorkerd": {
+      "passed": 72,
+      "failed": 0,
+      "skippedCount": 3
+    }
+  },
+  "candidate": {
+    "version": "0.1.0-dev.5",
+    "archive": {
+      "bytes": 95994,
+      "sha256": "89128f59626663eb6eff096658a913bfd79f4571a902c6417fec0677b144047a",
+      "integrity": "sha512-ywTmdWRyybZPpkfXZnDD6+S8EXxRmeXliS48Qxo+6LnIIHZ8a7gewtsfrEbsHYt9+aVacbxnAisaw7E0SAMzPw==",
+      "files": 109
+    },
+    "lockSha256": "727b84f8431630d6ad24bec3cc94243829fbfd78279a15ef996f4f1186f89fd5",
+    "typecheck": true,
+    "build": true,
+    "repeatPackMatches": true,
+    "packedClientComparison": {
+      "baselineExports": 34,
+      "candidateExports": 49,
+      "removed": [],
+      "canonicalRoundTrip": true,
+      "priorVersion": "0.1.0-dev.4",
+      "candidateVersion": "0.1.0-dev.5",
+      "protocol": "backrooms.v0"
+    },
+    "suiteWithWorkerdAndPhoton": {
+      "total": 129,
+      "passed": 128,
+      "failed": 0,
+      "skipped": [
+        "authenticated gateway creates two actual Rings rooms and advances accepted memory across restart"
+      ]
+    },
+    "actualPhotonTests": [
+      "failed SQLite migration rollback and retry",
+      "fresh database migration and retained progress across restarts using fixture RPC"
+    ],
+    "workerd": "actual executable and built client against authenticated loopback fixture"
+  },
+  "outstanding": [
+    "actual-chain two-room gateway and validator/proof-backed two-process learning on candidate",
+    "native installation of dev.5",
+    "production qualification and activation"
+  ]
+}

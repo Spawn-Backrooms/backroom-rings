@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { once } from 'node:events';
-import { createServer } from 'node:http';
+import { createServer, get } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
@@ -393,3 +393,49 @@ test('a fatal runtime signal stops admission without dropping the response alrea
     await listener.close();
   }
 });
+
+
+for (const mode of ['synthetic_localnet', 'production'] as const) {
+  test(`a disconnected caller drains before ${mode} gateway ownership is released`, { timeout: 5000 }, async () => {
+    const entered = Promise.withResolvers<void>();
+    const finish = Promise.withResolvers<void>();
+    const events: string[] = [];
+    const gateway = {
+      mode,
+      async fetch() {
+        events.push('admitted');
+        entered.resolve();
+        await finish.promise;
+        events.push('handler finished');
+        return new Response('done');
+      },
+      async close() { events.push('ownership released'); },
+    } as unknown as RingsGateway;
+    const listener = mode === 'synthetic_localnet'
+      ? await listenLocalnetGateway(gateway)
+      : await listenProductionGateway(gateway, { mode: 'trusted_proxy', port: 0, publicOrigin: 'https://gateway.invalid' });
+    const { port } = listener.server.address() as AddressInfo;
+    const url = `http://127.0.0.1:${port}/v1/backrooms`;
+    const caller = get(url, { agent: false });
+    try {
+      await entered.promise;
+      const transportClosed = once(listener.server, 'close');
+      const closing = listener.close();
+      assert.equal(listener.close(), closing);
+      const disconnected = once(caller, 'error');
+      caller.destroy();
+      await disconnected;
+      await transportClosed;
+      await assert.rejects(fetch(url, { signal: AbortSignal.timeout(1000) }));
+      assert.deepEqual(events, ['admitted']);
+      finish.resolve();
+      await closing;
+      await listener.close();
+      assert.deepEqual(events, ['admitted', 'handler finished', 'ownership released']);
+    } finally {
+      finish.resolve();
+      caller.destroy();
+      await listener.close();
+    }
+  });
+}
