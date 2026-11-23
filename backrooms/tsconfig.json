@@ -23,6 +23,7 @@
     "client/**/*.ts",
     "flue/**/*.ts",
     "reference-host/**/*.ts",
+    "gateway-host/**/*.ts",
     "examples/**/*.ts",
     "tests/**/*.ts",
     "releases/**/*.ts"

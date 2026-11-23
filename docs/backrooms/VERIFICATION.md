@@ -190,6 +190,65 @@ another inference call, even when recovery observes a newer `contextSlot`.
 Observation metadata may change, while the retained episode's checkpoint,
 memory, policy, writer, and authorization bindings remain strict.
 
+### Authenticated gateway qualification
+
+The final combined client suite passed 57 tests, with one opt-in localnet test
+explicitly skipped, at local source `a18f5662af5b8f3ca3d0d3c3ce6fcb8d100b5507`
+and complete tree `696835c4ea64f4afdd43cbdfa40ad31c69001cac`.
+Typecheck and build passed. Independent review also passed all nine gateway
+tests and exercised malformed funding responses, pinned-genesis refusal, and
+the localnet-only host boundary.
+
+The opt-in authenticated gateway test then passed separately against the real
+local validator, Photon, Rust bridge, and prover, with one test passed and none
+skipped. It enrolled two distinct room writers, created and recovered both
+checkpoints, rejected cross-room frames and recovery requests, reopened SQLite
+with historical and new storage keys, and advanced one room to revision 1. The
+recovered accepted lesson and policy scores `[40, 50]` matched the request. The
+original writer and a sufficiently recent completed-scan watermark survived.
+
+The live checkout had composite tree
+`97fc74ef78dedc62758ad6df4b7bbfa96f48f7a4`. Its gateway implementation, gateway
+tests, and Rust source match the final combined source. It retains
+`0.1.0-dev.0` in the client version constant, package metadata, lockfile, and
+development manifest; the combined source uses `0.1.0-dev.1` and has additional
+verification notes. This is a recorded mechanical version difference, not a
+claim that the complete trees are identical.
+
+The same qualification stack also passed six native transition tests, two
+compiled application proof tests, one actual validator lifecycle/replay test,
+and one natural-expiry reframing test. It used Rust 1.98.1, Solana CLI 4.2.2,
+cargo-build-sbf 4.1.0 with platform-tools v1.54, Surfpool 1.6.0, and the
+checksum-verified cli-v0.10.0 Zolana and prover release. The prover reports
+2.0.7. Node was 24.22.3.
+
+| Artifact | SHA256 |
+| --- | --- |
+| SBF program, 87,264 bytes | `2c1f20098eb3612b9733c672513353dce8d2f46e1b109fdc6ee3a0bc2d838a17` |
+| Rust bridge | `5cd7c2f2e05a86ab7df63c4b122d4a07a2a8398969ead69c2259ab6150493cd5` |
+| Localnet launcher | `62373fef18c0ab5b64cec23d1f396e80d8f6479b85ffbd8ed87200a44dabb3c8` |
+| Release Photon | `46425b41d622fdf29a3cf03d626a837896c9eb36d1c58a6b9161f0079db3fdd1` |
+
+The program, circuit bytecode, and proving/verifying keys match the earlier
+recorded artifacts. Regenerated metadata files have different hashes and new
+timestamps. Prior metadata bytes were unavailable, so a timestamp-only change
+is an inference. This run used the pinned release Photon binary, which differs
+from the earlier same-source Photon build.
+
+Two matching-runtime failures were corrected before qualification. Actual
+workerd rejects Fetch's `redirect: "error"`, so the portable client now uses
+manual redirects and explicitly refuses all 3xx responses. The native mounted
+host fixture passes with that client, and the HTTP regression confirms that
+redirect destinations receive no request. Actual Surfpool rejects a tiny fee
+deficit airdrop below the rent-exempt minimum, so localnet funding now queries
+that minimum before requesting funds. The failing cases and passing reruns
+are retained in the review handoff.
+
+These checks use explicitly insecure deterministic test setup. The gateway
+host remains localnet-only, with a trusted operator. No production circuit
+setup, complete deployed-artifact attestation, paid inference, or default
+rollout is established by this qualification.
+
 Independent implementation review identified two required fixes: overlapping
 Flue runtime ownership and expiry of retained signed transactions. Both have
 dedicated regressions. Review of this application extension is not an audit of

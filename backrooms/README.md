@@ -46,6 +46,8 @@ The local host and prover are trusted with plaintext. Flue's `flue.sqlite` holds
 
 `EpisodeAuthority` owns admitted episode bindings, captured original results and immutable acceptance authorizations. `RingsClient` owns the versioned bridge boundary. `createResidents` accepts the host's admitted model specifiers; it does not register a provider or read credentials. The reference host explicitly registers only the local fixture provider.
 
+`AuthenticatedRingsGatewayClient` connects an authorized native host to a separately operated Rings signer. The Node `gateway-host` export retains per-room custody, encrypted operation journals, and exact signed transaction frames. Its authenticated request boundary rejects changed preparation, cross-room frames, and replayed packets. The [gateway reference](../docs/backrooms/GATEWAY.md) describes its localnet restrictions, historical key recovery, and opt-in live-chain test.
+
 Revisions, ordinals and slots use canonical decimal strings, so values above JavaScript's safe integer limit remain exact. Transaction and ciphertext digests use SHA256. Protocol commitments use the upstream circuit hash. The client does not treat a host Boolean as proof verification. It relies on the pinned program and prover path, then validates the recovered commitment and provenance against the retained prepared transition.
 
 ## Release qualification
