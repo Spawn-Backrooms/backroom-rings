@@ -1,5 +1,16 @@
 # Zolana
 
+## Backrooms extension
+
+The Backrooms extension adds private room checkpoints, bounded learning, and
+seeded agent execution to this upstream Rings workspace. Start with the
+[private learning-room example](backrooms/README.md). See the
+[Backrooms contributor guide](docs/backrooms/CONTRIBUTING.md) and
+[privacy contract](docs/backrooms/PRIVACY.md) for the application boundary and
+the evidence required before a production rollout. The
+[implementation evidence](docs/backrooms/VERIFICATION.md) records the checks
+completed for the development example and their limits.
+
 ## In scope
 
 | Path | Role |

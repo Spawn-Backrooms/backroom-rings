@@ -1,0 +1,39 @@
+{
+  "name": "@spawn-backrooms/backroom-rings",
+  "version": "0.1.0-dev.0",
+  "private": true,
+  "type": "module",
+  "description": "Public Backrooms client, Flue adapter, and reference host for private room checkpoints",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "demo": "node --import tsx examples/private-learning-room/main.ts",
+    "check:release": "node --import tsx releases/check.ts"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "1.1.0",
+    "@flue/runtime": "2.3.0",
+    "valibot": "1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "tsx": "4.20.6",
+    "typescript": "7.0.2"
+  },
+  "exports": {
+    "./client": "./dist/client/index.js",
+    "./flue": "./dist/flue/index.js",
+    "./reference-host": "./dist/reference-host/index.js"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "Apache-2.0"
+}

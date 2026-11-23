@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "backrooms/program",
     "protocol-ops/forester",
     "program-libs/account-checks",
     "program-libs/feature-gate",
