@@ -6,3 +6,4 @@ export * from './learning.js';
 export * from './release.js';
 export * from './rings-client.js';
 export * from './gateway.js';
+export * from './knowledge.js';
