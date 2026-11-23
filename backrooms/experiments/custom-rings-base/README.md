@@ -9,7 +9,7 @@ Use a disposable isolated development VM with no production secrets, wallets, pr
 In the disposable VM:
 
 ```bash
-git clone --no-recurse-submodules https://github.com/helius-labs/custom-privacy-rings.git custom-rings
+git clone --no-recurse-submodules https://github.com/Spawn-Backrooms/custom-privacy-rings.git custom-rings
 git -C custom-rings checkout --detach 02bca33729051798834ecbb4d94e968cdc0ef9b8
 git -C custom-rings submodule update --init --recursive
 # From the Backroom Rings checkout:
@@ -19,7 +19,7 @@ set -o pipefail
 SPAWN_DISPOSABLE_LOCALNET=1 node backrooms/experiments/custom-rings-base/baseline.mjs /absolute/path/to/custom-rings --run-localnet 2>&1 | tee /tmp/custom-rings-baseline.log
 ```
 
-The preflight checks the exact pinned upstream commit and Zolana gitlink/checkouts, clean tracked and untracked working trees, and the absence of root/submodule dotenv files. It reports the proving-key lockfile Git blob identity, not a validation of downloaded key bytes. It does not certify environment isolation or audit source. Use a fresh checkout for each baseline run. The separate public fork is tracked by CR01; the detached upstream checkout unblocks reproduction before the fork exists. Changes to upstream pins need review.
+The preflight checks the exact pinned upstream commit and Zolana gitlink/checkouts, clean tracked and untracked working trees, and the absence of root/submodule dotenv files. It reports the proving-key lockfile Git blob identity, not a validation of downloaded key bytes. It does not certify environment isolation or audit source. Use a fresh checkout for each baseline run. The public organization fork now exists. Its parent, visibility, exact main commit and Zolana gitlink were verified. The connected integration has read-only access; branch creation returned HTTP 403. Detached reproduction can proceed on the build host without write access. Changes to upstream pins need review.
 
 The runner executes the upstream `check-all`, `test-hermetic`, `test-custom-ring` and focused `test-custom-ring-validator` recipes. The exact validator cases are in [anonymous.rs](https://github.com/helius-labs/custom-privacy-rings/blob/02bca33729051798834ecbb4d94e968cdc0ef9b8/program-tests/custom-ring/tests/ring/anonymous.rs). Inspect test output to verify both named tests ran and passed, not just that a filter returned success. Record actual artifact digests, source, toolchain and sanitized logs as required by CR01.
 
