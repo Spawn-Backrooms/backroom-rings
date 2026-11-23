@@ -1,5 +1,5 @@
 export const PROTOCOL_VERSION = 'backrooms.v0' as const;
-export const CLIENT_VERSION = '0.1.0-dev.0' as const;
+export const CLIENT_VERSION = '0.1.0-dev.1' as const;
 export const MAX_LESSON_BYTES = 96;
 
 export type Digest = string;
