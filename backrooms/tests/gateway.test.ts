@@ -25,6 +25,7 @@ async function fixture() {
   const releaseManifestSha256 = await digest(manifest);
   const balances = new Map<string, number>();
   const airdrops: string[] = [];
+  const airdropAmounts: number[] = [];
   let genesis = '11111111111111111111111111111111';
   const rpc = createServer(async (request, response) => {
     let data = '';
@@ -33,7 +34,19 @@ async function fixture() {
     let result: unknown;
     if (method === 'getGenesisHash') result = genesis;
     else if (method === 'getBalance') result = { context: { slot: 1 }, value: balances.get(String(params[0])) ?? 0 };
-    else if (method === 'requestAirdrop') { airdrops.push(String(params[0])); balances.set(String(params[0]), Number(params[1])); result = 'fixture-airdrop-signature'; }
+    else if (method === 'getMinimumBalanceForRentExemption') result = 890_880;
+    else if (method === 'requestAirdrop') {
+      const writer = String(params[0]), amount = Number(params[1]);
+      if (amount < 890_880) {
+        response.setHeader('content-type', 'application/json');
+        response.end(JSON.stringify({ jsonrpc: '2.0', id, error: { code: -32602, message: 'Airdrop below rent-exempt minimum' } }));
+        return;
+      }
+      airdrops.push(writer);
+      airdropAmounts.push(amount);
+      balances.set(writer, (balances.get(writer) ?? 0) + amount);
+      result = 'fixture-airdrop-signature';
+    }
     else throw new Error(`unexpected_fixture_rpc:${method}`);
     response.setHeader('content-type', 'application/json');
     response.end(JSON.stringify({ jsonrpc: '2.0', id, result }));
@@ -59,9 +72,10 @@ async function fixture() {
   };
   const client = await start();
   return {
-    directory, artifacts, options, oldKey, newKey, authenticationKey, airdrops, client,
+    directory, artifacts, options, oldKey, newKey, authenticationKey, airdrops, airdropAmounts, client,
     get endpoint() { return listener!.endpoint; },
     setGenesis(value: string) { genesis = value; },
+    setBalance(writer: string, lamports: number) { balances.set(writer, lamports); },
     enrollment(roomId: string): GatewayEnrollment { return { scope: { ownerId: 'owner-1', projectId: 'project-1', roomId }, creationId: `creation/${roomId}`, creationNonce: randomHex(), seedManifestCommitment: randomHex(), fixedMembersCommitment: randomHex(), releaseManifestSha256 }; },
     rings(binding: GatewayBinding, selectedClient = client) { return new RingsClient(selectedClient.transport(binding), binding.artifactVersion); },
     async controls(value: unknown) { await writeFile(join(artifacts, 'controls.json'), JSON.stringify(value)); },
@@ -74,6 +88,19 @@ async function fixture() {
 function proposal(prepared: PreparedTransaction): AdvanceRoomInput {
   return { roomId: prepared.checkpoint.roomId, expectedPredecessor: prepared.checkpoint.stateCommitment, ordinal: '1', minimumConfirmedSlot: '101', acceptanceNonce: randomHex(), episodeCommitment: randomHex(), originalResultCommitment: randomHex(), candidateCommitment: randomHex(), lesson: 'Keep the accepted assumption.', selectedProcedure: 0, feedback: { negative: true, magnitude: 10 } };
 }
+
+test('gateway funds a small localnet fee deficit with a rent-exempt airdrop', async () => {
+  const f = await fixture();
+  try {
+    const enrollment = f.enrollment('funded-room');
+    const binding = await f.client.bind(enrollment);
+    const rings = f.rings(binding);
+    const prepared = await rings.prepareCreate('create', { creationNonce: enrollment.creationNonce, seedManifestCommitment: enrollment.seedManifestCommitment, fixedMembersCommitment: enrollment.fixedMembersCommitment });
+    f.setBalance(binding.writerIdentity, f.options.bridge.fundingLamports! - 10_000);
+    assert.equal((await rings.submit(prepared)).status, 'confirmed');
+    assert.deepEqual(f.airdropAmounts, [f.options.bridge.fundingLamports, 890_880]);
+  } finally { await f.close(); }
+});
 
 test('gateway client refuses redirects without forwarding authenticated requests', async () => {
   let targetCalls = 0;
