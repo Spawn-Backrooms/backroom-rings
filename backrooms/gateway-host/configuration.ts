@@ -21,7 +21,7 @@ const configSchema = v.strictObject({
   bridge: v.strictObject({
     configuration: v.strictObject({ rpcUrl: https, proverUrl: https, treeAddress: identifier, treeId: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(65_535)), genesisHash: identifier }),
     artifacts: v.strictObject({ directory: path, bridge: path, indexer: path }),
-    indexer: v.strictObject({ port, databasePath: path, startSlot: v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => BigInt(value) <= 18_446_744_073_709_551_615n)) }),
+    indexer: v.strictObject({ port, databasePath: path, startSlot: v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => /^(0|[1-9][0-9]{0,19})$/.test(value) && BigInt(value) <= 18_446_744_073_709_551_615n)) }),
     timeoutMs: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(3_600_000))),
   }),
   listener: v.variant('mode', [

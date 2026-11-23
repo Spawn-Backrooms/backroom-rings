@@ -26,7 +26,7 @@ export class SupervisedIndexer {
     await new Promise<void>((resolve, reject) => { probe.once('error', reject); probe.listen(configuration.port, '127.0.0.1', resolve); });
     await new Promise<void>((resolve, reject) => probe.close(error => error ? reject(error) : resolve()));
     const readyFile = join(dirname(executable), 'indexer-ready.json');
-    const child = spawn(supervisor, ['--supervise-indexer', executable, '--bind-address', '127.0.0.1', '--ready-file', readyFile, '--port', String(configuration.port), '--rpc-url', rpcUrl, '--db-url', `sqlite://${configuration.databasePath}?mode=rwc`, '--start-slot', configuration.startSlot, '--max-concurrent-block-fetches', '4'], {
+    const child = spawn(supervisor, ['--supervise-indexer', executable, '--bind-address', '127.0.0.1', '--ready-file', readyFile, '--port', String(configuration.port), '--rpc-url', rpcUrl, '--db-url', `sqlite://${configuration.databasePath}?mode=rwc`, '--migrate', '--resume-from-database', '--start-slot', configuration.startSlot, '--max-concurrent-block-fetches', '4'], {
       env: { PATH: process.env.PATH }, stdio: ['pipe', 'ignore', 'ignore'],
     });
     await new Promise<void>((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });

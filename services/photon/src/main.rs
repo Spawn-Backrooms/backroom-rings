@@ -59,6 +59,12 @@ struct Args {
     #[arg(short, long)]
     db_url: Option<String>,
 
+    #[arg(long, requires = "db_url")]
+    migrate: bool,
+
+    #[arg(long, requires = "start_slot")]
+    resume_from_database: bool,
+
     /// The start slot to begin indexing from. Defaults to the last indexed slot in the database plus
     /// one.
     #[arg(short, long)]
@@ -422,7 +428,7 @@ async fn main() -> Result<()> {
     let db_conn = setup_database_connection(args.db_url.clone(), args.max_db_conn).await?;
     info!("Running Photon as a Rings indexer");
 
-    if args.db_url.is_none() {
+    if args.db_url.is_none() || args.migrate {
         info!("Running migrations...");
         RingsMigrator::up(db_conn.as_ref(), None)
             .await
@@ -447,7 +453,17 @@ async fn main() -> Result<()> {
                     let start_slot = start_slot
                         .parse::<u64>()
                         .with_context(|| format!("Invalid start slot '{}'", start_slot))?;
-                    fetch_block_parent_slot(&rpc_client, start_slot).await?
+                    let retained = if args.resume_from_database {
+                        fetch_last_indexed_slot_with_infinite_retry(db_conn.as_ref()).await
+                            .map(u64::try_from).transpose()
+                            .context("Retained indexer slot is negative")?
+                    } else {
+                        None
+                    };
+                    match retained {
+                        Some(slot) if slot >= start_slot => slot,
+                        _ => fetch_block_parent_slot(&rpc_client, start_slot).await?,
+                    }
                 }
             },
             None => match fetch_last_indexed_slot_with_infinite_retry(db_conn.as_ref()).await {

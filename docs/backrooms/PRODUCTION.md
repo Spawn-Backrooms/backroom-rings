@@ -178,6 +178,8 @@ node backrooms/dist/gateway-host/serve.js /absolute/gateway.json
 
 Startup copies verified bytes into a new owner-only runtime directory and runs those retained copies. Replacing source files after admission cannot change the files being executed. Photon receives a private readiness-file path and reports only after its loopback server binds. The gateway also checks its live JSON-RPC slot. A second process cannot own the same indexer database. Its retained identity binds the genesis, pool binary and history floor; an existing unbound or mismatched database is rejected.
 
+The supervised path explicitly passes `--migrate` to initialize or update its supplied persistent database before indexing. Ordinary Photon invocations with `--db-url` retain operator-managed migration semantics unless they opt in. The supervisor also passes `--resume-from-database`: a new database begins at the approved `--start-slot` floor, while a retained database at or above that floor resumes after its highest indexed slot. The approved floor stays in the database identity across restarts.
+
 Before listening, the bridge checks the real network and programs, attests the prover, and validates its complete key inventory. No witness is sent during this check. Failed startup releases ownership and stops its child processes. SIGTERM/SIGINT abort startup or drain the running listener and journal. The bridge supervisor kills Photon when the gateway's control pipe closes, including gateway process termination. Abandoned private runtime directories are removed on the next exclusively owned startup.
 
 Enrollment creates a distinct writer and returns its Solana identity. Fund that fee account with real SOL before preparing genesis. Production has no airdrop path and rejects localnet funding options. Retrying the enrollment or preparation retains its original identity and operation. Production deployment, SOL funding and paid prover operation are not performed by these release tools.
@@ -185,5 +187,15 @@ Enrollment creates a distinct writer and returns its Solana identity. Fund that 
 ## Verification boundary
 
 Run `npm --prefix backrooms run check`, `npm --prefix backrooms test`, and `cargo test -p backroom-rings-program --features bridge --bin backroom-rings-bridge`. Production tests reject every runtime file swap, binary replacement, insecure metadata, changed identity, wrong tree/genesis/history floor, cross-network indexer database reuse, unsafe transport, config exposure and listener mode confusion. They verify retained-byte use and failed-startup lock cleanup.
+
+Run the persistent-database regression against the actual freshly built Photon executable:
+
+```sh
+cd backrooms
+BACKROOM_PHOTON_EXECUTABLE=/absolute/target/debug/photon \
+  node --import tsx --test tests/photon-startup.test.ts
+```
+
+This test starts the real executable with a fresh supplied SQLite file and a synthetic loopback chain. It checks actual migrations and indexed blocks, then restarts twice and verifies that block fetching resumes beyond the retained high-water mark without re-fetching the release floor. It preserves and compares migration rows and indexed data across processes. Without the explicit executable path, this test is skipped; it does not contact a production network.
 
 Real localnet proof and recovery tests retain their prior commands and explicit opt-in environment variables. Hardware-backed attestation, genuine ceremony provenance, production source/package release, deployed immutable programs and funded production writer accounts require their real inputs and separate evidence. Their absence is not bypassed by metadata or by a passing synthetic test.

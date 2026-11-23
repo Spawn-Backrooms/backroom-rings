@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import test from 'node:test';
 import { digest, digestBytes } from '../client/codec.js';
 import { decodeDeploymentIdentity } from '../client/deployment.js';
+import { GATEWAY_VERSION, parseGatewayRequest } from '../client/gateway-protocol.js';
 import { assertProductionEligible, decodeReleaseManifest, productionBlockers, runtimeArtifacts, type ProductionReleaseManifest } from '../client/release.js';
 import { RuntimeArtifacts, validateCircuitMetadata, verifiedFile } from '../gateway-host/artifacts.js';
 import { ProductionBridge, type ProductionBridgeOptions } from '../gateway-host/production.js';
@@ -221,5 +222,35 @@ test('strict owner-only production configuration resolves explicit secrets and r
     const alias = join(f.directory, 'config-alias.json');
     await symlink(configPath, alias);
     await assert.rejects(loadProductionGatewayConfiguration(alias, {}));
+  } finally { await f.close(); }
+});
+
+test('malformed decimal fields return validation errors without native BigInt exceptions', async () => {
+  const f = await syntheticArtifactFixture();
+  try {
+    const identity = JSON.parse(f.bytes.get(f.manifest.runtime.identity.path)!.toString('utf8')) as Record<string, unknown>;
+    const configuration = { version: 1, mode: 'production', databasePath: join(f.directory, 'gateway.sqlite'), releaseManifestFile: join(f.directory, 'release.json'), approvedManifestSha256: await digest(f.manifest), authenticationKeyEnvironment: 'RINGS_AUTH_KEY', storageKeys: { currentKeyRef: 'current', keys: { current: 'RINGS_STORAGE_KEY' } }, bridge: f.options, listener: { mode: 'trusted_proxy', port: 8783, publicOrigin: 'https://gateway.invalid' } };
+    const packet = (minimumConfirmedSlot: unknown) => ({ version: GATEWAY_VERSION, issuedAt: 0, nonce: '1'.repeat(64), kind: 'bridge', binding: { version: GATEWAY_VERSION, bindingId: '2'.repeat(64), scope: { ownerId: 'owner', projectId: 'project', roomId: 'room' }, creationId: 'creation', writerIdentity: '3'.repeat(44), keyRef: 'custody', artifactVersion: '1.0.0', releaseManifestSha256: '4'.repeat(64) }, request: { protocolVersion: 'backrooms.v0', operationId: 'recover', op: 'recover', input: { roomId: '5'.repeat(64), minimumConfirmedSlot } } });
+    const validationError = (error: unknown) => error instanceof Error && error.name === 'ValiError';
+    for (const value of ['abc', '', '+1', '-1', '01', '1.5', '1e3', ' 1 ', '0x10', '18446744073709551616', '9'.repeat(1000), 1, null, undefined]) {
+      const manifest = { ...f.manifest, runtime: { ...f.manifest.runtime, indexer: { ...f.manifest.runtime.indexer, startSlot: value } } };
+      assert.deepEqual(productionBlockers(manifest), ['invalid_manifest']);
+      assert.throws(() => decodeReleaseManifest(manifest), validationError);
+      assert.throws(() => decodeDeploymentIdentity({ ...identity, deployment: value }), validationError);
+      assert.throws(() => decodeProductionGatewayConfiguration({ ...configuration, bridge: { ...configuration.bridge, indexer: { ...configuration.bridge.indexer, startSlot: value } } }), validationError);
+      assert.throws(() => parseGatewayRequest(packet(value)), { name: 'Error', message: 'gateway_invalid_request' });
+    }
+    for (const value of ['0', '1', '18446744073709551615']) {
+      const manifest = { ...f.manifest, runtime: { ...f.manifest.runtime, indexer: { ...f.manifest.runtime.indexer, startSlot: value } } };
+      assert.deepEqual(productionBlockers(manifest), []);
+      assert.equal(decodeProductionGatewayConfiguration({ ...configuration, bridge: { ...configuration.bridge, indexer: { ...configuration.bridge.indexer, startSlot: value } } }).bridge.indexer.startSlot, value);
+      const decoded = parseGatewayRequest(packet(value));
+      assert.equal(decoded.kind, 'bridge');
+      if (decoded.kind !== 'bridge' || decoded.request.op !== 'recover') throw new Error('fixture');
+      assert.equal(decoded.request.input.minimumConfirmedSlot, value);
+      if (value === '0') assert.throws(() => decodeDeploymentIdentity({ ...identity, deployment: value }), validationError);
+      else assert.equal(decodeDeploymentIdentity({ ...identity, deployment: value }).deployment, value);
+    }
+    for (const malformed of [undefined, null, {}, { ...f.manifest, runtime: null }]) assert.deepEqual(productionBlockers(malformed), ['invalid_manifest']);
   } finally { await f.close(); }
 });

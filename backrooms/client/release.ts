@@ -19,7 +19,7 @@ const runtime = v.strictObject({
   circuits: v.strictObject({ createRoom: circuitFiles, advanceRoom: circuitFiles }),
   proverPolicy: file,
   poolProvingKeys: v.pipe(v.array(v.strictObject({ name: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_.-]+$/)), sha256: requiredHash })), v.minLength(1), v.maxLength(64)),
-  indexer: v.strictObject({ kind: v.literal('supervised'), binarySha256: requiredHash, startSlot: v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => BigInt(value) <= 18_446_744_073_709_551_615n)) }),
+  indexer: v.strictObject({ kind: v.literal('supervised'), binarySha256: requiredHash, startSlot: v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,19})$/), v.check(value => /^(0|[1-9][0-9]{0,19})$/.test(value) && BigInt(value) <= 18_446_744_073_709_551_615n)) }),
   privacy: v.strictObject({ applicationProving: v.literal('trusted_bridge'), poolProving: v.literal('attested'), inference: v.literal('native_authority') }),
 });
 const manifestFields = {
