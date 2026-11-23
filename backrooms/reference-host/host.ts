@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { digest, randomHex } from '../client/codec.js';
+import { canonicalJson, digest, randomHex } from '../client/codec.js';
 import type { CreateRoomInput, DiagnosticSink, EpisodeBinding, LearningOutcome, PreparedTransaction, PriorTransactionFrame, RecoveredRoom, RingsTransport } from '../client/contracts.js';
 import { LearningCoordinator } from '../client/learning.js';
 import { RingsClient } from '../client/rings-client.js';
@@ -101,35 +101,45 @@ export class ReferenceHost {
     return recovered;
   }
 
-  async episode(label: string): Promise<LearningOutcome> {
-    const room = await this.ensureRoom();
+  private async reconcileCheckpointEpisode(room: RecoveredRoom): Promise<void> {
+    const authority = new ReferenceAuthority(this.records);
+    const binding = await authority.getCheckpointEpisode(room.checkpoint);
+    if (!binding) return;
+    const coordinator = new LearningCoordinator(authority, this.residents, this.rings, this.records, this.diagnostic);
+    const outcome = await coordinator.run(binding, room);
+    if (outcome.status === 'commit_pending') throw new Error('room_episode_in_progress');
+    if (outcome.status === 'state_conflict' || canonicalJson(outcome.room.checkpoint) !== canonicalJson(room.checkpoint)) throw new Error('room_episode_state_conflict');
+  }
+
+  private async resolveEpisode(label: string, room: RecoveredRoom): Promise<EpisodeBinding> {
     const episodeId = await digest({ domain: 'backrooms.episode.id.v0', roomId: room.checkpoint.roomId, label });
     let retained = await this.records.read<EpisodeBinding>(`episode/${episodeId}`);
     if (!retained) {
-      const binding: EpisodeBinding = {
+      await this.reconcileCheckpointEpisode(room);
+      const binding = await new ReferenceAuthority(this.records).reserveEpisode({
         roomId: room.checkpoint.roomId, episodeId,
         episodeCommitment: await digest({ domain: 'backrooms.episode.v0', roomId: room.checkpoint.roomId, label, blinding: randomHex() }),
         predecessor: room.checkpoint, ordinal: (BigInt(room.checkpoint.revision) + 1n).toString(), minimumConfirmedSlot: room.slot, residentIds: this.intent.residentIds,
-      };
+      });
       await this.records.create(`episode/${episodeId}`, binding);
       retained = await this.records.read<EpisodeBinding>(`episode/${episodeId}`);
     }
     if (!retained) throw new Error('episode_not_retained');
+    return retained.value;
+  }
+
+  async episode(label: string): Promise<LearningOutcome> {
+    const room = await this.ensureRoom();
+    const binding = await this.resolveEpisode(label, room);
     const coordinator = new LearningCoordinator(new ReferenceAuthority(this.records), this.residents, this.rings, this.records, this.diagnostic);
-    return coordinator.run(retained.value, room);
+    return coordinator.run(binding, room);
   }
 
   async inspectNextEpisode(label: string): Promise<{ room: RecoveredRoom; selectedProcedure: number; value: number }> {
     const room = await this.ensureRoom();
-    const episodeId = await digest({ domain: 'backrooms.episode.id.v0', roomId: room.checkpoint.roomId, label });
     const authority = new ReferenceAuthority(this.records);
-    const prior = await this.records.read<EpisodeBinding>(`episode/${episodeId}`);
-    const binding = await authority.resolveEpisode(prior?.value ?? {
-      roomId: room.checkpoint.roomId, episodeId,
-      episodeCommitment: await digest({ domain: 'backrooms.episode.v0', roomId: room.checkpoint.roomId, label, blinding: randomHex() }),
-      predecessor: room.checkpoint, ordinal: (BigInt(room.checkpoint.revision) + 1n).toString(), minimumConfirmedSlot: room.slot, residentIds: this.intent.residentIds,
-    });
-    const existing = await authority.getOriginalResult(episodeId);
+    const binding = await authority.resolveEpisode(await this.resolveEpisode(label, room));
+    const existing = await authority.getOriginalResult(binding.episodeId);
     const result = existing ?? await authority.captureOriginalResult(binding, await this.residents.run(binding, room));
     const candidate = JSON.parse(result.investigator) as { selectedProcedure: number; value: number };
     return { room, selectedProcedure: candidate.selectedProcedure, value: candidate.value };

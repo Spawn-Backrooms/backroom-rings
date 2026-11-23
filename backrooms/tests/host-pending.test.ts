@@ -15,6 +15,7 @@ class PendingAcceptanceTransport implements RingsTransport {
   current: FixtureRoom | undefined;
   recoveredView: FixtureRoom | undefined;
   acceptanceRecoveryUnavailable = false;
+  beforeRecoveryResponse: ((operationId: string) => Promise<void>) | undefined;
   advancePreparations = 0;
   advanceSubmissions = 0;
   private readonly transactions = new Map<string, PreparedFixture>();
@@ -25,6 +26,7 @@ class PendingAcceptanceTransport implements RingsTransport {
     if (request.op === 'recover') {
       if (this.acceptanceRecoveryUnavailable && request.operationId.startsWith('accept/')) throw new Error('injected_acceptance_recovery_outage');
       const recovered = this.recoveredView ?? this.current;
+      await this.beforeRecoveryResponse?.(request.operationId);
       return recovered ? { ...recovered, ...envelope } : { ...envelope, status: 'not_found', contextSlot: '1' };
     }
     if (request.op === 'submit') {
@@ -142,6 +144,45 @@ test('an acceptance recovery outage blocks new episode and inspection labels bef
     assert.equal(fixture.transport.advancePreparations, 2);
   } finally { await fixture.close(); }
 });
+
+for (const delayedLabel of ['next', 'competing']) {
+test(`concurrent ${delayedLabel === 'next' ? 'retries converge' : 'labels reserve one episode'} after delayed predecessor reconciliation`, { timeout: 10_000 }, async () => {
+  const fixture = await hostFixture();
+  const paused = Promise.withResolvers<void>();
+  const resume = Promise.withResolvers<void>();
+  let delayed: ReturnType<ReferenceHost['episode']> | undefined;
+  try {
+    assert.equal((await fixture.host.episode('first')).status, 'commit_pending');
+    fixture.transport.acceptanceRecoveryUnavailable = false;
+    let intercepted = false;
+    fixture.transport.beforeRecoveryResponse = async operationId => {
+      if (!intercepted && operationId.startsWith('accept/')) {
+        intercepted = true;
+        paused.resolve();
+        await resume.promise;
+      }
+    };
+    delayed = fixture.host.episode(delayedLabel);
+    await paused.promise;
+    const accepted = await fixture.host.episode('next');
+    assert.equal(accepted.status, 'accepted');
+    resume.resolve();
+    if (delayedLabel === 'next') assert.deepEqual(await delayed, accepted);
+    else {
+      await assert.rejects(delayed, /room_episode_in_progress/);
+      const episodeId = await digest({ domain: 'backrooms.episode.id.v0', roomId: fixture.transport.current!.checkpoint.roomId, label: delayedLabel });
+      assert.equal(await fixture.host.records.read(`episode/${episodeId}`), undefined);
+    }
+    assert.equal(fixture.host.residents.inferenceCalls, 8);
+    assert.equal(fixture.transport.advancePreparations, 2);
+    assert.equal(fixture.transport.advanceSubmissions, 2);
+  } finally {
+    resume.resolve();
+    await delayed?.catch(() => {});
+    await fixture.close();
+  }
+});
+}
 
 test('reference authority requires a receipt for the episode that produced a new predecessor', async () => {
   const fixture = await hostFixture();

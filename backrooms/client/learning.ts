@@ -13,6 +13,8 @@ interface CommitRecord {
 
 interface Reconciliation { outcome: LearningOutcome; predecessorAvailable: boolean }
 
+export interface AcceptanceReceipt { authorization: AcceptanceAuthorization; room: RecoveredRoom }
+
 export class LearningCoordinator {
   constructor(
     private readonly authority: EpisodeAuthority,
@@ -37,7 +39,7 @@ export class LearningCoordinator {
 
   private async accept(authorization: AcceptanceAuthorization, original: OriginalResult, reframesRemaining = 1): Promise<LearningOutcome> {
     const { operationId } = authorization;
-    const receipt = await this.records.read<{ authorization: AcceptanceAuthorization; room: RecoveredRoom }>(`receipt/${operationId}`);
+    const receipt = await this.records.read<AcceptanceReceipt>(`receipt/${operationId}`);
     if (receipt) {
       if (canonicalJson(receipt.value.authorization) !== canonicalJson(authorization) || receipt.value.room.artifactVersion !== this.rings.artifactVersion) throw new Error('retained_receipt_binding_mismatch');
       return { status: 'accepted', originalResult: original, room: receipt.value.room };
