@@ -80,7 +80,10 @@ export class LocalnetBridge {
     };
     const current = await balance();
     if (current >= minimum) return;
-    const signature = await this.rpc('requestAirdrop', [writer, minimum - current, { commitment: 'confirmed' }]);
+    const rentExemptMinimum = await this.rpc('getMinimumBalanceForRentExemption', [0, { commitment: 'confirmed' }]);
+    assertInteger(rentExemptMinimum, 0, 10_000_000_000);
+    const amount = Math.max(minimum - current, rentExemptMinimum);
+    const signature = await this.rpc('requestAirdrop', [writer, amount, { commitment: 'confirmed' }]);
     assertIdentifier(signature);
     for (let attempt = 0; attempt < 20; attempt++) {
       if (await balance() >= minimum) return;
