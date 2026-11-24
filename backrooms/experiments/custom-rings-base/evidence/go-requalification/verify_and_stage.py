@@ -119,6 +119,8 @@ def main():
         for optional in ("run_packages_initial.py", "default-skips.json", "verification-guards.json"):
             if (HERE / optional).exists():
                 fixed.append((HERE / optional, Path(optional)))
+        for report in sorted((HERE / "inspection").glob("*.json")):
+            fixed.append((report, Path("inspection") / report.name))
         for src, dest in files + fixed:
             target = stage / dest
             target.parent.mkdir(parents=True, exist_ok=True)

@@ -1,6 +1,6 @@
 # Anonymous Custom Rings base: upstream reproduction
 
-> **Current Go evidence:** [fresh qualification packet](evidence/go-requalification/README.md) — **9/18 whole packages** verified (three passing test packages and six explicit no-test-file packages). Full Go qualification remains incomplete. The [recovery checkpoint](evidence/go-recovery-checkpoint/recovery-checkpoint.md) explains the lost unpublished logs and preserves the observed history. The earlier execution status below is a frozen checkpoint; its running-process references are no longer current.
+> **Current Go evidence:** [fresh qualification packet](evidence/go-requalification/README.md) — **14/18 whole packages** verified (8 passing test packages and 6 explicit no-test-file packages). Full Go qualification remains incomplete. The [recovery checkpoint](evidence/go-recovery-checkpoint/recovery-checkpoint.md) explains the lost unpublished logs and preserves the observed history. The earlier execution status below is a frozen checkpoint; its running-process references are no longer current.
 
 This is the first contributor bootstrap for [O05](https://github.com/Spawn-Backrooms/backroom-rings/issues/26) and [CR01](https://github.com/Spawn-Backrooms/backroom-rings/issues/34). It is intentionally separate from the published Backroom Rings v0 package and does not change its build, exports, circuits or release manifests. It does not implement anonymous Backroom operations yet.
 

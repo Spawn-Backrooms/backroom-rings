@@ -1,11 +1,11 @@
 {
   "schema": "cr01-durable-go-requalification-v1",
-  "generatedAt": "2026-11-24T11:48:41.093988+00:00",
+  "generatedAt": "2026-11-24T11:56:09.056722+00:00",
   "status": "incomplete",
   "executionMode": "18-separate-unfiltered-package-commands",
   "requiredPackageCount": 18,
-  "verifiedTerminalPackageCount": 9,
-  "passedTestPackageCount": 3,
+  "verifiedTerminalPackageCount": 14,
+  "passedTestPackageCount": 8,
   "explicitNoTestFilesPackageCount": 6,
   "source": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
@@ -21,6 +21,83 @@
   },
   "catalogSha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
   "packages": [
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 34.959,
+      "passEvents": 56,
+      "topLevelPasses": 12,
+      "skipEvents": 0,
+      "skippedTests": [],
+      "logSha256": "cc7b9bfa293da1b21e421631f7c509ee80e43ccd42bd1dbcc59cdbe2d66a0f97",
+      "logBytes": 53583,
+      "sampledConcurrentRssPeakKiB": 81124,
+      "receipt": "packages/circuits-20261124T115020Z.json",
+      "receiptSha256": "45b5232bc91494c5d0bb861f68ca3aa5d356e0d44ce045763e397d84dec98c03"
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 37.856,
+      "passEvents": 106,
+      "topLevelPasses": 31,
+      "skipEvents": 0,
+      "skippedTests": [],
+      "logSha256": "d78b9d1c18589d904ec83fd9739ad9e84571c441dfe12210c368407bc3872879",
+      "logBytes": 137793,
+      "sampledConcurrentRssPeakKiB": 742040,
+      "receipt": "packages/circuits-audit-20261124T115055Z.json",
+      "receiptSha256": "8e6ceb3373b44fa68328534e5da7ea8647dd20092da8999990d0b3c4a2c4a974"
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 115.283,
+      "passEvents": 147,
+      "topLevelPasses": 34,
+      "skipEvents": 1,
+      "skippedTests": [
+        "TestSharedQuadProofMillionMembers"
+      ],
+      "logSha256": "91eb4aa5f3b503585a4446f7307c79b673593aaf1266f83d389bf206b3413435",
+      "logBytes": 157724,
+      "sampledConcurrentRssPeakKiB": 536708,
+      "receipt": "packages/circuits-registry-20261124T115133Z.json",
+      "receiptSha256": "f7cc2634448cdf39e171f704f035c089e6b32eab58317af3d0ca2a850fa98a60"
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 2.227,
+      "passEvents": 8,
+      "topLevelPasses": 2,
+      "skipEvents": 0,
+      "skippedTests": [],
+      "logSha256": "e7d4d3d5fade521bc3305c1ec49d0f654a918870579334afdbeed84ebd5c0513",
+      "logBytes": 12242,
+      "sampledConcurrentRssPeakKiB": 2628,
+      "receipt": "packages/circuits-ringgadget-20261124T115016Z.json",
+      "receiptSha256": "2f58efcdc7d77bcf6b55bedf66eed582c75ae5849b062fcae3f04de2e5e390d3"
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 1.222,
+      "passEvents": 5,
+      "topLevelPasses": 5,
+      "skipEvents": 0,
+      "skippedTests": [],
+      "logSha256": "10437c8c9da1789c6c1eb4880ee6b6be7489c9c686c8a16fdeb3a6383d728489",
+      "logBytes": 5263,
+      "sampledConcurrentRssPeakKiB": 2564,
+      "receipt": "packages/circuits-shared-20261124T115019Z.json",
+      "receiptSha256": "564ebaff37ee08cd006b94e9c85432391b9ab8c21641878111d423958334e95c"
+    },
     {
       "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
       "status": "no-tests",
@@ -158,12 +235,7 @@
     }
   ],
   "missingPackages": [
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits",
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
     "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
     "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
     "github.com/helius-labs/zolana-custom-rings/prover/ring",
     "github.com/helius-labs/zolana-custom-rings/prover/ringtest"
@@ -171,6 +243,6 @@
   "incompleteAttempts": [],
   "historicalMetadataCountedAsNewExecution": false,
   "wholeSuiteSingleCommandExitClaimed": false,
-  "verifierSha256": "0417018536d61e12fcd76fde75c73c4efcb2325784311e620cb6884839dbd2c7",
+  "verifierSha256": "63fd1b30b4db472ac59674a18ea776f7637b8eb26e89a75ef73ba7bc4bff3fbf",
   "scope": "Fresh terminal raw evidence at unchanged source after loss of unpublished local logs. Native/application evidence remains in its original public packets; broad CR04 and independent review gates are separate."
 }

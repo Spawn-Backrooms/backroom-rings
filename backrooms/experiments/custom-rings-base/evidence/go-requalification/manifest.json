@@ -1,16 +1,16 @@
 {
   "schema": "cr01-go-requalification-manifest-v1",
-  "generatedAt": "2026-11-24T11:48:41.093988+00:00",
+  "generatedAt": "2026-11-24T11:56:09.056722+00:00",
   "qualificationStatus": "incomplete",
-  "verifiedTerminalPackageCount": 9,
+  "verifiedTerminalPackageCount": 14,
   "requiredPackageCount": 18,
-  "summarySha256": "673cb00e2a14cb5ea698003bbe73185b5306350d716f75dc9914194bd7522cf9",
+  "summarySha256": "62ec53b9335d1016c255d95bd2667c864f97e5e460783044fe0740dadb608961",
   "files": [
     {
       "path": "README.md",
-      "bytes": 2356,
-      "sha256": "893f107d6b165bf174713eafdd7cf1418c24a6913a4a0d93ab31b92c3be35dd3",
-      "gitBlobSha1": "830a55104ab1cc3dc2af083041d6d2bc5ac31f62"
+      "bytes": 2351,
+      "sha256": "b9e32c12329651309f67bfb0a9b5c1bf882a380dac39f8f1bdad2e317264d886",
+      "gitBlobSha1": "b54f563f88ffa51d1b4c5631a99bca6d8a1cfc9f"
     },
     {
       "path": "daybreak-status.json",
@@ -37,6 +37,12 @@
       "gitBlobSha1": "d8e008c6c49e909dcbd79b98c9139cdfb484fd26"
     },
     {
+      "path": "inspection/terminal-logs-14-packages.json",
+      "bytes": 44281,
+      "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4",
+      "gitBlobSha1": "91bc965adf560efba79ac954386d31f55686a87f"
+    },
+    {
       "path": "keys-recovery.json",
       "bytes": 27973,
       "sha256": "11694efd2aa61bab733515fc3ad6f3d56181545fd539470ac5bea52864185c51",
@@ -53,6 +59,96 @@
       "bytes": 1190,
       "sha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
       "gitBlobSha1": "a7b80c2156e38fa95c51bc731df709490b3b3ea0"
+    },
+    {
+      "path": "packages/circuits-20261124T115020Z.json",
+      "bytes": 5092,
+      "sha256": "45b5232bc91494c5d0bb861f68ca3aa5d356e0d44ce045763e397d84dec98c03",
+      "gitBlobSha1": "f59c1f9476352c277456b9b792c37d8c5d6defe3"
+    },
+    {
+      "path": "packages/circuits-20261124T115020Z.jsonl",
+      "bytes": 53583,
+      "sha256": "cc7b9bfa293da1b21e421631f7c509ee80e43ccd42bd1dbcc59cdbe2d66a0f97",
+      "gitBlobSha1": "6cb492f168bff67e3abc39221ce4a7b01763afae"
+    },
+    {
+      "path": "packages/circuits-20261124T115020Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-audit-20261124T115055Z.json",
+      "bytes": 5945,
+      "sha256": "8e6ceb3373b44fa68328534e5da7ea8647dd20092da8999990d0b3c4a2c4a974",
+      "gitBlobSha1": "38e40c4155f6c31f4a443bf589971c3a79ff99bb"
+    },
+    {
+      "path": "packages/circuits-audit-20261124T115055Z.jsonl",
+      "bytes": 137793,
+      "sha256": "d78b9d1c18589d904ec83fd9739ad9e84571c441dfe12210c368407bc3872879",
+      "gitBlobSha1": "11655c0dd1b3c4199f43b2de5cb5f1562d4fe1aa"
+    },
+    {
+      "path": "packages/circuits-audit-20261124T115055Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-registry-20261124T115133Z.json",
+      "bytes": 6269,
+      "sha256": "f7cc2634448cdf39e171f704f035c089e6b32eab58317af3d0ca2a850fa98a60",
+      "gitBlobSha1": "82d842ecec3fedafa6b2bf279295daa70bd3ef25"
+    },
+    {
+      "path": "packages/circuits-registry-20261124T115133Z.jsonl",
+      "bytes": 157724,
+      "sha256": "91eb4aa5f3b503585a4446f7307c79b673593aaf1266f83d389bf206b3413435",
+      "gitBlobSha1": "ed353b5f87b50871a7820ff0422c1c22b3fa9f8f"
+    },
+    {
+      "path": "packages/circuits-registry-20261124T115133Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-ringgadget-20261124T115016Z.json",
+      "bytes": 4778,
+      "sha256": "2f58efcdc7d77bcf6b55bedf66eed582c75ae5849b062fcae3f04de2e5e390d3",
+      "gitBlobSha1": "7e1f711872caaf32b4d07d3ca0a32fb7b056a147"
+    },
+    {
+      "path": "packages/circuits-ringgadget-20261124T115016Z.jsonl",
+      "bytes": 12242,
+      "sha256": "e7d4d3d5fade521bc3305c1ec49d0f654a918870579334afdbeed84ebd5c0513",
+      "gitBlobSha1": "f8a1e346ea73471ceec373160d3780466bd06064"
+    },
+    {
+      "path": "packages/circuits-ringgadget-20261124T115016Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-shared-20261124T115019Z.json",
+      "bytes": 4872,
+      "sha256": "564ebaff37ee08cd006b94e9c85432391b9ab8c21641878111d423958334e95c",
+      "gitBlobSha1": "232c5f2e16f1f8fae6fc714708c6b26fbf5c9c99"
+    },
+    {
+      "path": "packages/circuits-shared-20261124T115019Z.jsonl",
+      "bytes": 5263,
+      "sha256": "10437c8c9da1789c6c1eb4880ee6b6be7489c9c686c8a16fdeb3a6383d728489",
+      "gitBlobSha1": "78039b9bb92e27b7821027bd54157ce1c0b68822"
+    },
+    {
+      "path": "packages/circuits-shared-20261124T115019Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
       "path": "packages/cmd-catalog-20261124T114223Z.json",
@@ -230,21 +326,21 @@
     },
     {
       "path": "summary.json",
-      "bytes": 7576,
-      "sha256": "673cb00e2a14cb5ea698003bbe73185b5306350d716f75dc9914194bd7522cf9",
-      "gitBlobSha1": "7be5336d3238de73a4a10abd6860f687f207a901"
+      "bytes": 10224,
+      "sha256": "62ec53b9335d1016c255d95bd2667c864f97e5e460783044fe0740dadb608961",
+      "gitBlobSha1": "4cee5600046ae42f9e92a9e6e6adbdf4791b5a6b"
     },
     {
       "path": "verification-guards.json",
-      "bytes": 906,
-      "sha256": "22485692441a7f8ed03f7380efb8c91049945290c146492691caba2e1e1c7ce0",
-      "gitBlobSha1": "a5aee07d4f7abfab3b34282b96ecb07d02210f90"
+      "bytes": 910,
+      "sha256": "7e1df09100769c94ef3adc4e944edfbc6c2292000f6e610823dd7bbbaf2437d5",
+      "gitBlobSha1": "d1d2d5e8c452d5eacd336c3f0426dfcdbf621d9b"
     },
     {
       "path": "verify_and_stage.py",
-      "bytes": 12336,
-      "sha256": "0417018536d61e12fcd76fde75c73c4efcb2325784311e620cb6884839dbd2c7",
-      "gitBlobSha1": "765ef284f8d3c096c341c7a938762aec35c969bc"
+      "bytes": 12473,
+      "sha256": "63fd1b30b4db472ac59674a18ea776f7637b8eb26e89a75ef73ba7bc4bff3fbf",
+      "gitBlobSha1": "a0ccd1dafb4fbedfd89f575ebec50338d8c8a87c"
     }
   ]
 }

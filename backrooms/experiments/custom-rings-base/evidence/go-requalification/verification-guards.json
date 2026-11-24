@@ -1,7 +1,7 @@
 {
   "schema": "cr01-durable-verification-negative-guards-v1",
-  "recordedAt": "2026-11-24T11:48:40.598045+00:00",
-  "verifierSha256": "0417018536d61e12fcd76fde75c73c4efcb2325784311e620cb6884839dbd2c7",
+  "recordedAt": "2026-11-24T11:54:41.732203+00:00",
+  "verifierSha256": "63fd1b30b4db472ac59674a18ea776f7637b8eb26e89a75ef73ba7bc4bff3fbf",
   "actualPassedReceiptBaselineSha256": "498d0da5d292ffba271236269c79ecb6723c3e2ecc930a8e203f6c2fe7c723ba",
   "results": [
     {
@@ -25,7 +25,7 @@
       "rejected": true
     },
     {
-      "case": "claim-complete-with-nine-of-eighteen",
+      "case": "claim-complete-with-fourteen-of-eighteen",
       "rejected": true,
       "exitCode": 1
     }
