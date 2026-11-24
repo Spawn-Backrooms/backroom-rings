@@ -154,7 +154,7 @@
     "five owned service groups stopped and application, Zolana and reference-host source remained unchanged"
   ],
   "pending": [
-    "complete fresh upstream Go qualification: 14/18 packages have publicly retained terminal raw evidence; historical summaries do not replace missing current receipts",
+    "complete fresh upstream Go qualification: 15/18 packages have publicly retained terminal raw evidence; historical summaries do not replace missing current receipts",
     "complete the broader CR02/CR04 qualification listed in ACCEPTANCE-STATUS.md; the executed named live corpus does not establish every acceptance variant",
     "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
     "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
@@ -858,21 +858,20 @@
     "go": {
       "status": "incomplete",
       "requiredPackages": 18,
-      "completedWholePackages": 14,
-      "retainedTerminalPassedPackages": 8,
+      "completedWholePackages": 15,
+      "retainedTerminalPassedPackages": 9,
       "explicitNoTestFilesPackages": 6,
       "wholeSuitePass": false,
       "executionMode": "18-separate-unfiltered-package-commands",
       "wholeSuiteSingleCommandExitClaimed": false,
       "remainingPackages": [
-        "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
         "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
         "github.com/helius-labs/zolana-custom-rings/prover/ring",
         "github.com/helius-labs/zolana-custom-rings/prover/ringtest"
       ],
-      "summaryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
-      "summarySha256": "62ec53b9335d1016c255d95bd2667c864f97e5e460783044fe0740dadb608961",
-      "recordedAt": "2026-11-24T11:56:09.056722+00:00",
+      "summaryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+      "summarySha256": "6860025950bb5e3bf22e7212037488cb5be0202b991435f614d52c254c72c0c4",
+      "recordedAt": "2026-11-24T12:15:28.424682+00:00",
       "historicalMetadataCountedAsNewExecution": false,
       "historicalCheckpoint": {
         "frozen": true,
@@ -998,7 +997,7 @@
           }
         }
       },
-      "recoveryHistoryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md",
+      "recoveryHistoryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md",
       "scope": "Fresh terminal evidence for every counted package; prior interrupted and failed attempts remain historical, and the application patch/live receipt are unchanged."
     },
     "anonymousValidator": {
@@ -1272,11 +1271,11 @@
     }
   },
   "goQualificationPacket": {
-    "commit": "30ea1a297f74934a5d46186072c4c8953c403ff8",
-    "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md",
-    "summary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+    "commit": "4e6bc4edb08aefc620489d23429b1073c2bcd5b8",
+    "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md",
+    "summary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
     "status": "incomplete",
-    "count": 14,
+    "count": 15,
     "required": 18
   }
 }
