@@ -1,0 +1,49 @@
+{
+  "schema": "cr01-go-timeout-checkpoint-v1",
+  "scope": "Failed incomplete 60-minute transfer attempt and the recorded larger retry deadline. This packet does not establish complete Go coverage.",
+  "status": "failed-incomplete-attempt-preserved",
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+  "attemptExitCode": 1,
+  "durationSeconds": 3605.007,
+  "testEvents": {
+    "pass": 191,
+    "fail": 0,
+    "skip": 0
+  },
+  "packageSuccess": false,
+  "wholeSuiteSuccess": false,
+  "publicationInspection": "The complete JSONL was inspected for publication; it contains test output, public-statement comparison diagnostics and runtime stack addresses, with no serialized private request, witness, secret, wallet or database payload.",
+  "pathNote": "Absolute paths identify the recording workspace; this directory contains the listed public copies.",
+  "files": [
+    {
+      "file": "transfer-timeout.jsonl",
+      "bytes": 239408,
+      "sha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234"
+    },
+    {
+      "file": "transfer-timeout-receipt.json",
+      "bytes": 2405,
+      "sha256": "4cb0e13d5f8ca73839e52544eda16b60b7e88c6b4fdf9c0dc981b32a53816aa0"
+    },
+    {
+      "file": "attempt-summary.json",
+      "bytes": 28360,
+      "sha256": "3ca6e2bfe11db7b383e44cc8fd9d44587f0b138862bc4d6fa6834f6923d9cbdc"
+    },
+    {
+      "file": "retry-budget.json",
+      "bytes": 2120,
+      "sha256": "7cffec775b9c00eaa48cb8b3393f2abc5cc4c0d04622d3908bb5e868bd6e3662"
+    },
+    {
+      "file": "qualification-guards.json",
+      "bytes": 782,
+      "sha256": "fa7e121978b4f9c1478f5e0f5c206066dab990174b04f956776fd32af1ad372e"
+    }
+  ]
+}

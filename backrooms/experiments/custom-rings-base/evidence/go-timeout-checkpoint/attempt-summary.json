@@ -1,0 +1,745 @@
+{
+  "schema": "cr01-go-package-resume-v1",
+  "status": "failed",
+  "phase": "heavy",
+  "startedAt": "2026-11-24T03:11:17.960108+00:00",
+  "sourceBefore": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "allPackages": [
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+    "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+    "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+    "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer"
+  ],
+  "priorCompletedPackages": [
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
+  ],
+  "priorLog": "/workspace/scratch/06977f839292/context/cr01-complete-go-60m.log",
+  "priorLogSha256": "1f72b938e0247487527c597305120f467342ef5098ed460f79e613de5c07f592",
+  "packages": [
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:57:28.896303+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-cmd-catalog-20261124T025728Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:33.980380+00:00",
+      "elapsedSeconds": 5.053,
+      "packageTerminalAction": "skip",
+      "logSha256": "da323fb537dd2eee6875174a69de08cdcd8dfb2935760e00fdaa0be0b17fa183",
+      "maximumChildRssKiB": 83696,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:57:34.009404+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-cmd-prover-20261124T025734Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "elapsedSeconds": 18.356,
+      "lastTest": null,
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:52.389671+00:00",
+      "packageTerminalAction": "skip",
+      "logSha256": "b3e334818ab4e9d9e447c05036311dee00b81ae65bcf798c53c76715eacf2c47",
+      "maximumChildRssKiB": 90176,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "passed",
+      "startedAt": "2026-11-24T02:57:52.420022+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringaudit-20261124T025752Z.jsonl",
+      "tests": {
+        "pass": 1,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:55.687882+00:00",
+      "elapsedSeconds": 3.239,
+      "packageTerminalAction": "pass",
+      "logSha256": "cf38aa45bae02ea8e490c30975a8b35c993bac3a538ed0fbcdd7d7e429d16416",
+      "maximumChildRssKiB": 286352,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:57:55.734936+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringkey-20261124T025755Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:56.538199+00:00",
+      "elapsedSeconds": 0.768,
+      "packageTerminalAction": "skip",
+      "logSha256": "db4f7a315909b88e40dd318ee572b9f961ad12ccd3d3ef1ece8e0fc35db6a7b0",
+      "maximumChildRssKiB": 286352,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:57:56.578054+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringmerge-20261124T025756Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:57.326123+00:00",
+      "elapsedSeconds": 0.722,
+      "packageTerminalAction": "skip",
+      "logSha256": "ade2cd0ff2e5ae73c00afb3f04642f5c1f6701ee65884cfa1678839106cda2c7",
+      "maximumChildRssKiB": 286352,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:57:57.371067+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringpolicy-20261124T025757Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:58.005660+00:00",
+      "elapsedSeconds": 0.607,
+      "packageTerminalAction": "skip",
+      "logSha256": "ad4532759eb35b28e599b32d2b5388c4144ddbc498c160e32e98f32c90df34c8",
+      "maximumChildRssKiB": 286352,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "passed",
+      "startedAt": "2026-11-24T02:57:58.070650+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringprotocol-20261124T025758Z.jsonl",
+      "tests": {
+        "pass": 13,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:57:59.877941+00:00",
+      "elapsedSeconds": 1.781,
+      "packageTerminalAction": "pass",
+      "logSha256": "5f0c248faf2e0ad739dffcdd7880a0af560028c18f6ded73fc58c61bfcaee547",
+      "maximumChildRssKiB": 286352,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "passed",
+      "startedAt": "2026-11-24T02:57:59.914877+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringregistry-20261124T025759Z.jsonl",
+      "tests": {
+        "pass": 16,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:58:02.848273+00:00",
+      "elapsedSeconds": 2.905,
+      "packageTerminalAction": "pass",
+      "logSha256": "c492afefd493b3ed512d7813d971420cf6291f5c44a96aab8d87b74dd2da0e20",
+      "maximumChildRssKiB": 287000,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "no-tests",
+      "startedAt": "2026-11-24T02:58:02.888847+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringtransfer-20261124T025802Z.jsonl",
+      "tests": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "8ecdcf115a0a83ebc5f98eb4760e04b4b559eb6a00e78b357c2b5972e4871905",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "exitCode": 0,
+      "finishedAt": "2026-11-24T02:58:03.660189+00:00",
+      "elapsedSeconds": 0.744,
+      "packageTerminalAction": "skip",
+      "logSha256": "fec5584efee48f18c4785748adb114b7c91bb1d00ca8f9ebea6490fe9bb345b5",
+      "maximumChildRssKiB": 287000,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+      "command": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "test",
+        "-json",
+        "-p",
+        "1",
+        "-parallel",
+        "1",
+        "-timeout",
+        "60m",
+        "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+        "-count=1"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+      "status": "failed",
+      "startedAt": "2026-11-24T03:11:18.476960+00:00",
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-circuits-transfer-20261124T031118Z.jsonl",
+      "tests": {
+        "pass": 191,
+        "fail": 0,
+        "skip": 0
+      },
+      "environment": {
+        "GOENV": "off",
+        "GOWORK": "off",
+        "GOFLAGS": "",
+        "GOTOOLCHAIN": "local",
+        "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+        "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "REQUIRE_RING_KEYS": "1",
+        "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+      },
+      "defaultOptInsUnset": [
+        "WRITE_RING_GOLDENS",
+        "REQUEST_FIXTURES",
+        "RING_RPC_ESCROW_MEMBER",
+        "STORAGE_REGISTRY",
+        "UPDATE_RING_GOLDENS",
+        "WRITE_RING_PINS",
+        "WRITE_RING_PROOF_VECTORS",
+        "WRITE_AUDIT_VECTORS",
+        "AEGLOS_FIXTURES",
+        "RING_MILLION_RECORDS"
+      ],
+      "runnerSha256": "842df583f012070afcf5391a78984311386b7750e777dbd07682688e1b91a087",
+      "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+      "elapsedSeconds": 3605.007,
+      "lastTest": "TestOwnerCapacity/four_and_thirteen_owners,_plain_and_policy",
+      "heartbeatAt": "2026-11-24T04:11:12.471019+00:00",
+      "processAlive": false,
+      "logBytes": 216119,
+      "exitCode": 1,
+      "finishedAt": "2026-11-24T04:11:23.511443+00:00",
+      "packageTerminalAction": "fail",
+      "logSha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+      "maximumChildRssKiB": 1707000,
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      }
+    }
+  ],
+  "deferredPackages": [],
+  "priorAttemptReceipts": [
+    "/workspace/scratch/06977f839292/context/cr01-go-package-circuits-transfer-prior-e1256fed5a6b5322.json"
+  ],
+  "priorFailedAttempt": "/workspace/scratch/06977f839292/context/cr01-go-failed-transfer-20261124T020317Z.json",
+  "limitations": [
+    "Original whole-suite process was interrupted; this receipt aggregates terminal package results at unchanged source.",
+    "The failed transfer attempt remains preserved separately; lower heap and GC settings are a resource adjustment, not a confirmed diagnosis of its process kill."
+  ],
+  "heartbeatAt": "2026-11-24T04:11:12.471019+00:00",
+  "exitCode": 1,
+  "finishedAt": "2026-11-24T04:11:23.606347+00:00",
+  "sourceAfter": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  }
+}

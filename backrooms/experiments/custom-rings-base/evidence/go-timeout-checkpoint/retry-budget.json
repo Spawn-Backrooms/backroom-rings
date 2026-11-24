@@ -1,0 +1,50 @@
+{
+  "schema": "cr01-observed-timeout-adjustment-v1",
+  "status": "recorded-after-terminal-timeout",
+  "createdAt": "2026-11-24T04:13:14.262921+00:00",
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "packages": [
+    "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
+  ],
+  "executionOrder": [
+    "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
+  ],
+  "previousTimeout": "60m",
+  "newTimeout": "180m",
+  "unfilteredWholePackages": true,
+  "resourceProfile": {
+    "GOMAXPROCS": "1",
+    "GOMEMLIMIT": "1GiB",
+    "GOGC": "25"
+  },
+  "reason": "The full unfiltered transfer package reached the actual Go 60-minute timeout after 28 of 44 top-level tests finished. A longer ceiling accommodates the unchanged conservative memory profile while preserving complete whole-package execution. It is not a runtime estimate.",
+  "triggerReceipt": {
+    "path": "/workspace/scratch/06977f839292/context/cr01-go-timeout-transfer-20261124T041123Z.json",
+    "sha256": "4cb0e13d5f8ca73839e52544eda16b60b7e88c6b4fdf9c0dc981b32a53816aa0"
+  },
+  "triggerLog": {
+    "path": "/workspace/scratch/06977f839292/context/cr01-go-package-circuits-transfer-20261124T031118Z.jsonl",
+    "sha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+    "bytes": 239408
+  },
+  "observedTimeoutLines": [
+    "panic: test timed out after 1h0m0s"
+  ],
+  "observedPackageTerminalActions": [
+    "fail"
+  ],
+  "retainedCompletedPackages": 15,
+  "testSelectionChanged": false,
+  "sourceChanged": false,
+  "earlierKilledAttemptCause": "not established",
+  "maximumChildRssKiB": 1707000,
+  "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak"
+}

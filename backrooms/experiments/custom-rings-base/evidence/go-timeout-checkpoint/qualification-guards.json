@@ -1,0 +1,24 @@
+{
+  "schema": "cr01-timeout-qualification-guards-v1",
+  "checkedAt": "2026-11-24T04:16:12.596903+00:00",
+  "status": "passed",
+  "scope": "Bookkeeping qualification checks only; no Go tests or application source review",
+  "consolidatorSha256": "bc1098a515e0400f782c886969039b056d5e82e6869cd98cfec4905503dc2053",
+  "adjustmentSha256": "7cffec775b9c00eaa48cb8b3393f2abc5cc4c0d04622d3908bb5e868bd6e3662",
+  "unchangedSixtyMinutePassedPackageAccepted": true,
+  "archivedTimedOutAttemptRemainsFailed": true,
+  "cases": [
+    {
+      "case": "extended-deadline-on-unapproved-package",
+      "rejected": true
+    },
+    {
+      "case": "added-test-filter",
+      "rejected": true
+    },
+    {
+      "case": "failed-timeout-cannot-be-relabelled-passed",
+      "rejected": true
+    }
+  ]
+}
