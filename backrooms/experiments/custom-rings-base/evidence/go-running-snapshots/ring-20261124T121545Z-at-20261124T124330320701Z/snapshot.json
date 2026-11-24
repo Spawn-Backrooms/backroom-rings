@@ -1,0 +1,176 @@
+{
+  "schema": "cr01-running-ring-prefix-capture-v1",
+  "captureStartedAt": "2026-11-24T12:43:30.159793+00:00",
+  "receiptCapturedAt": "2026-11-24T12:43:30.160109+00:00",
+  "prefixCapturedAt": "2026-11-24T12:43:30.160671+00:00",
+  "snapshotDirectory": "/workspace/scratch/06977f839292/context/go-recovery/running-snapshots/ring-20261124T121545Z-at-20261124T124330320701Z",
+  "sourceAtCapture": {
+    "customRings": {
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "expectedCommit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "pinMatches": true,
+      "clean": true,
+      "statusPorcelain": ""
+    },
+    "zolana": {
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "expectedCommit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "pinMatches": true,
+      "clean": true,
+      "statusPorcelain": ""
+    },
+    "checkedAt": "2026-11-24T12:43:30.319549+00:00",
+    "lockfiles": {
+      "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+      "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+      "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+    },
+    "lockfileHashesMatchStart": true
+  },
+  "runIdentity": {
+    "package": "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "startedAt": "2026-11-24T12:15:45.715504+00:00",
+    "coordinatorToolSessionId": 30876,
+    "coordinatorToolSessionIdIsOsPid": false,
+    "processIdFromReceipt": 67,
+    "runnerSha256": "c177f9f747e821d14427aa198591ce55ad593150bcdd74efb057ef954cf4af73",
+    "catalogSha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
+    "command": [
+      "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+      "test",
+      "-json",
+      "-p",
+      "1",
+      "-parallel",
+      "1",
+      "-timeout",
+      "180m",
+      "github.com/helius-labs/zolana-custom-rings/prover/ring",
+      "-count=1"
+    ],
+    "toolchain": "go version go1.27.3 linux/amd64",
+    "sourceScope": "Clean unmodified upstream checkout; application overlay is not applied."
+  },
+  "rawPrefix": {
+    "file": "ring-prefix.jsonl",
+    "sourcePath": "/workspace/scratch/06977f839292/context/go-recovery/packages/ring-20261124T121545Z.jsonl",
+    "capturedBytes": 158510,
+    "sha256": "577b36f662185b08a9ab981d76204767e84af0e68db47d9b49871f8e880b1c80",
+    "sourceFileSizeAtRead": 158510,
+    "discardedIncompleteTrailingBytes": 0,
+    "completeLineCount": 621,
+    "firstEventTime": "2026-11-24T13:15:49.199221526+01:00",
+    "lastEventTime": "2026-11-24T13:42:39.50284263+01:00"
+  },
+  "runningReceipt": {
+    "file": "running-receipt.json",
+    "sourcePath": "/workspace/scratch/06977f839292/context/go-recovery/packages/ring-20261124T121545Z.json",
+    "bytes": 3862,
+    "sha256": "20821eaddf8d07a5f0c34f82081d43f977e3a702bf4e7ffa4d07e447dc9f64ce",
+    "status": "running",
+    "heartbeatAt": "2026-11-24T12:43:29.093855+00:00",
+    "lastHeartbeatLogBytes": 158510,
+    "exitCode": null,
+    "finishedAt": null
+  },
+  "captureConsistency": "The running receipt was read through one file descriptor before the log. The log copy is exactly the complete-line prefix of the size observed through its descriptor; the receipt heartbeat and later prefix are not claimed to be one atomic pair. Live files were not modified.",
+  "parserCounts": {
+    "run": 155,
+    "pass": 149,
+    "fail": 0,
+    "skip": 4,
+    "eventCount": 621,
+    "outputEventCount": 312,
+    "topLevelPassCount": 16,
+    "packageTerminalActionCount": 0
+  },
+  "requestedParentTerminalEvents": {
+    "TestRingKeysCompileToTheVerifiedShape": [
+      {
+        "eventLine": 341,
+        "time": "2026-11-24T13:24:47.833779433+01:00",
+        "action": "pass",
+        "elapsedSeconds": 229.43
+      }
+    ],
+    "TestRingKeysCarryTheCompiledCircuits": [
+      {
+        "eventLine": 449,
+        "time": "2026-11-24T13:39:40.974967095+01:00",
+        "action": "pass",
+        "elapsedSeconds": 893.14
+      }
+    ]
+  },
+  "skippedTests": [
+    "TestExportAeglosRingFixtures",
+    "TestWriteGoldenRequests",
+    "TestWriteRequestFixtures",
+    "TestWriteConstraintPins"
+  ],
+  "packageTerminalResultObserved": false,
+  "exitCodeObserved": null,
+  "fullPackageQualificationCredit": 0,
+  "wholeSuiteQualificationCredit": 0,
+  "publicationDecision": "Pending coordinating agent; this capture does not assert output suitability for publication.",
+  "reviewScope": "Factual upstream log capture only. Does not perform or substitute for the blocked independent application source review.",
+  "outputClassification": {
+    "scope": "Classification of the 312 output events in the captured prefix, not a publication or security assessment. Non-output JSON events are separately counted as structured execution metadata.",
+    "structuredNonOutputEvents": 309,
+    "outputEventCounts": {
+      "status": 308,
+      "defaultSkipNotice": 4,
+      "constraintDiagnostics": 0,
+      "unknown": 0
+    },
+    "defaultSkipNotices": [
+      {
+        "eventLine": 4,
+        "test": "TestExportAeglosRingFixtures",
+        "unsetOptIn": "AEGLOS_FIXTURES",
+        "message": "aeglos_fixture_test.go:13: AEGLOS_FIXTURES is unset"
+      },
+      {
+        "eventLine": 213,
+        "test": "TestWriteGoldenRequests",
+        "unsetOptIn": "WRITE_RING_GOLDENS",
+        "message": "golden_write_test.go:15: WRITE_RING_GOLDENS=1 rewrites the request fixtures"
+      },
+      {
+        "eventLine": 218,
+        "test": "TestWriteRequestFixtures",
+        "unsetOptIn": "REQUEST_FIXTURES",
+        "message": "golden_write_test.go:39: REQUEST_FIXTURES=<dir> writes a request per ring key"
+      },
+      {
+        "eventLine": 231,
+        "test": "TestWriteConstraintPins",
+        "unsetOptIn": "WRITE_RING_PINS",
+        "message": "keys_test.go:70: WRITE_RING_PINS=1 rewrites prover/ringtest/ringkey/constraints.json"
+      }
+    ],
+    "unknownOutputs": [],
+    "unknownContentFlagged": false,
+    "constraintDiagnosticCountNote": "No output needed a constraint-diagnostics classification. Unrecognized text is marked unknown rather than presumed to be a constraint diagnostic.",
+    "requestedParentChildEventCounts": {
+      "TestRingKeysCompileToTheVerifiedShape": {
+        "childPassEvents": 26,
+        "childFailEvents": 0,
+        "childSkipEvents": 0
+      },
+      "TestRingKeysCarryTheCompiledCircuits": {
+        "childPassEvents": 26,
+        "childFailEvents": 0,
+        "childSkipEvents": 0
+      }
+    },
+    "partialSkipCountIsNotFullRunExpectation": true
+  },
+  "immutableFiles": {
+    "rawPrefixAndReceiptCreatedExclusively": true,
+    "rawPrefixAndReceiptReadOnly": true,
+    "snapshotDirectorySealedReadOnlyAfterMetadata": true
+  }
+}
