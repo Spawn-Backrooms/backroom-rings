@@ -149,6 +149,11 @@ retry, process and product-readiness contracts.
 
 ## Review and baseline gates
 
+The [acceptance status map](ACCEPTANCE-STATUS.md) links all five CR02 and four
+CR04 acceptance bullets to the existing records and names the portions not yet
+established. The 15 live refusals cover the named cases in this run; broader
+conformance and final independent acceptance remain open.
+
 [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md),
 [SDK-NATIVE-REVIEW.md](SDK-NATIVE-REVIEW.md) and
 [NATIVE-WORKER-REVIEW.md](NATIVE-WORKER-REVIEW.md) preserve the independent reviews
@@ -165,13 +170,30 @@ reported `credits_exhausted` and no Cloud environment containing this repository
 overlay, rather than treating a scan of the unmodified base as review of this
 profile. This checkpoint carries no final independent sign-off or merge approval.
 
-CR01 also remains incomplete. Fifteen of 18 upstream Go packages now have retained terminal coverage: nine
-test packages passed and six explicitly reported no test files. Transfer, ring
-and ringtest remain incomplete. An earlier transfer-package process ended with
-`signal: killed` after 130 passing test events; its package command exited 1,
-and the cause of the kill is not established. The original default-timeout and
-interrupted extended whole-suite attempts remain recorded. Neither partial
-results nor completed builds establish a whole-suite pass. Both exact upstream
+CR01 also remains incomplete. Fifteen of 18 upstream Go packages have retained
+terminal coverage: nine test packages passed and six explicitly reported no
+test files. Transfer, ring and ringtest remain incomplete.
+
+The latest completed transfer attempt reached the actual Go one-hour timeout
+and exited 1 after 3,605.007 seconds. It recorded 191 passing test/subtest events,
+zero failed-test events and zero skips, with 28 of 44 top-level tests completed.
+The package result is **failed/incomplete**, despite those partial passes; source
+pins and cleanliness remained unchanged. The complete JSONL log SHA-256 is
+`eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234`.
+The earlier transfer attempt killed after 130 passing events, original
+default-timeout run and interrupted extended whole-suite attempt remain in the
+history. The earlier kill's underlying cause is not established.
+
+A new unfiltered sequential attempt uses the recorded 180-minute ceiling in
+the order **ring → ringtest → transfer**. Only ring is active at this checkpoint;
+ringtest and transfer are queued. `GOMAXPROCS=1`, `GOMEMLIMIT=1GiB`, `GOGC=25`
+and bounded test parallelism are unchanged. The longer ceiling is not a runtime
+estimate or a passing result. Coverage remains 15/18 until terminal results are
+verified. [APPLICATION-EVIDENCE.json](APPLICATION-EVIDENCE.json) retains the
+timeout, adjustment and new runner identities. Neither partial results nor
+completed builds establish a whole-suite pass.
+
+Both exact upstream
 anonymous-validator cases passed at unchanged clean source pins. The hidden-sender
 policy case took 137.717 seconds, and the owner-hiding/auditor case took 270.612
 seconds. The full recipe exited zero after 495.928 seconds. Its exact log SHA-256

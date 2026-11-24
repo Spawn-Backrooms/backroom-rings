@@ -154,8 +154,8 @@
     "five owned service groups stopped and application, Zolana and reference-host source remained unchanged"
   ],
   "pending": [
-    "complete upstream Go package coverage; transfer, ring and ringtest retry is in progress, with the earlier killed transfer attempt retained",
-    "complete CR02/CR04 acceptance reconciliation; the executed named live corpus does not establish every broader variant",
+    "complete upstream Go package coverage; a new unfiltered ring \u2192 ringtest \u2192 transfer run is in progress with a 180-minute per-package ceiling after the prior actual one-hour transfer timeout; retained coverage remains 15/18",
+    "complete the broader CR02/CR04 qualification listed in ACCEPTANCE-STATUS.md; the executed named live corpus does not establish every acceptance variant",
     "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
     "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
     "authorized native-maintainer developer-preview activation; no production activation"
@@ -881,17 +881,78 @@
       },
       "currentRetry": {
         "status": "running",
+        "execution": "sequential",
+        "startedAt": "2026-11-24T04:13:45.093199+00:00",
+        "checkpointAt": "2026-11-24T04:18:12.031447+00:00",
         "packages": [
-          "circuits/transfer",
           "ring",
-          "ringtest"
+          "ringtest",
+          "circuits/transfer"
+        ],
+        "executionOrder": [
+          "ring",
+          "ringtest",
+          "circuits/transfer"
+        ],
+        "activePackageAtCheckpoint": "ring",
+        "queuedPackagesAtCheckpoint": [
+          "ringtest",
+          "circuits/transfer"
         ],
         "GOMAXPROCS": "1",
         "GOMEMLIMIT": "1GiB",
         "GOGC": "25",
-        "timeoutPerPackage": "60m",
+        "packageParallelism": 1,
+        "testParallelism": 1,
+        "previousTimeoutPerPackage": "60m",
+        "timeoutPerPackage": "180m",
+        "timeoutIsRuntimeEstimate": false,
         "testFilter": null,
-        "retainedCompletePackageCount": 15
+        "unfilteredWholePackages": true,
+        "retainedCompletePackageCount": 15,
+        "sourceBefore": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "runnerSha256": "5c93544aa349af7a05393c7709c37e776bd205c0bf62418613f4ca3b817b7ec1",
+        "timeoutAdjustmentRecord": "cr01-go-timeout-adjustment.json",
+        "timeoutAdjustmentSha256": "7cffec775b9c00eaa48cb8b3393f2abc5cc4c0d04622d3908bb5e868bd6e3662",
+        "reason": "The full unfiltered transfer package reached the actual Go 60-minute timeout after 28 of 44 top-level tests finished. A longer ceiling accommodates the unchanged conservative memory profile while preserving complete whole-package execution. It is not a runtime estimate.",
+        "scope": "Only ring was active at this checkpoint; ringtest and transfer were queued. Coverage remains 15/18 until verified terminal results add completed packages.",
+        "executionSessionId": 65736
+      },
+      "priorTimeoutTransferAttempt": {
+        "status": "failed",
+        "wholePackageComplete": false,
+        "exitCode": 1,
+        "packageTerminalAction": "fail",
+        "causeObserved": "panic: test timed out after 1h0m0s",
+        "timeoutPerPackage": "60m",
+        "startedAt": "2026-11-24T03:11:18.476960+00:00",
+        "finishedAt": "2026-11-24T04:11:23.511443+00:00",
+        "durationSeconds": 3605.007,
+        "passedTestEvents": 191,
+        "failedTestEvents": 0,
+        "skippedTestEvents": 0,
+        "completedTopLevelTests": 28,
+        "requiredTopLevelTests": 44,
+        "sourceBefore": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "sourceAfter": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "receiptName": "cr01-go-timeout-transfer-20261124T041123Z.json",
+        "receiptSha256": "4cb0e13d5f8ca73839e52544eda16b60b7e88c6b4fdf9c0dc981b32a53816aa0",
+        "logSha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+        "logBytes": 239408,
+        "runnerSha256": "842df583f012070afcf5391a78984311386b7750e777dbd07682688e1b91a087",
+        "scope": "191 passing test/subtest events do not establish package completion; the package failed at the actual Go one-hour timeout."
       }
     },
     "anonymousValidator": {
