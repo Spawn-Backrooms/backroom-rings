@@ -1,0 +1,34 @@
+{
+  "schema": "cr01-durable-verification-negative-guards-v1",
+  "recordedAt": "2026-11-24T11:54:41.732203+00:00",
+  "verifierSha256": "63fd1b30b4db472ac59674a18ea776f7637b8eb26e89a75ef73ba7bc4bff3fbf",
+  "actualPassedReceiptBaselineSha256": "498d0da5d292ffba271236269c79ecb6723c3e2ecc930a8e203f6c2fe7c723ba",
+  "results": [
+    {
+      "case": "filtered-command",
+      "rejected": true
+    },
+    {
+      "case": "nonzero-exit",
+      "rejected": true
+    },
+    {
+      "case": "missing-source-binding",
+      "rejected": true
+    },
+    {
+      "case": "different-log-digest",
+      "rejected": true
+    },
+    {
+      "case": "missing-runner-snapshot",
+      "rejected": true
+    },
+    {
+      "case": "claim-complete-with-fourteen-of-eighteen",
+      "rejected": true,
+      "exitCode": 1
+    }
+  ],
+  "scope": "Evidence-integrity guards on copied metadata, not an application source/security review."
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "cr01-recovered-package-catalog-v1",
+  "observedAt": "2026-11-24T11:42:16.349533+00:00",
+  "command": [
+    "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+    "list",
+    "./..."
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings-base/prover",
+  "exitCode": 0,
+  "sha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
+  "packages": [
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+    "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+    "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+    "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+    "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer"
+  ],
+  "sourceBefore": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true,
+    "lockfiles": {
+      "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+      "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+      "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+    }
+  },
+  "sourceAfter": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true,
+    "lockfiles": {
+      "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+      "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+      "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+    }
+  }
+}

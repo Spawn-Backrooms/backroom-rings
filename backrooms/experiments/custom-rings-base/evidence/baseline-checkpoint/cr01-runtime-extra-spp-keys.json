@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-11-24T03:05:31.424337+00:00",
+  "scope": "additional pinned SPP key newly observed after the successful canonical anonymous validator cases; original 28-key and 2-key manifests remain separate",
+  "keys": [
+    {
+      "name": "merge_ring_8_1.key",
+      "size": 55779149,
+      "sha256": "635f9f6d7d74447f2313264c691b818bc6a5611aedb0dcca3abd24405919d4a4",
+      "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+      "verified": true,
+      "observedModifiedAt": "2026-11-24T03:02:07.795048+00:00"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+cargo check --workspace --all-targets
+    Checking custom-ring-sdk v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/sdk)
+    Checking zolana-ring-client v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/client)
+    Checking zolana-ring-transaction v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/transaction)
+    Checking zolana-ring-keys v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/keys)
+    Checking zolana-ring-member-registry v0.1.0 (/workspace/scratch/06977f839292/custom-rings/program-libs/member-registry)
+    Checking zolana-ring-indexer v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/indexer)
+    Checking zolana-cli-common v0.1.0 (/workspace/scratch/06977f839292/custom-rings/cli/common)
+    Checking custom-ring-interface v0.1.0 (/workspace/scratch/06977f839292/custom-rings/program-libs/interface)
+    Checking enrollment-vault v0.1.0 (/workspace/scratch/06977f839292/custom-rings/examples/enrollment-vault)
+    Checking zolana-secret-file v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/secret-file)
+    Finished `dev` profile [unoptimized] target(s) in 37.57s

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "just",
+    "build-ring-rpc"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "sourceBefore": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "startedAt": "2026-11-24T01:42:21.946368+00:00",
+  "status": "passed",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-rpc-20261124T014221Z.log",
+  "environmentManifest": "/workspace/scratch/06977f839292/context/cr01-environment.json",
+  "sameParentServices": false,
+  "environmentOverrides": {
+    "CARGO_BUILD_JOBS": "2",
+    "NEXTEST_TEST_THREADS": "1"
+  },
+  "exitCode": 0,
+  "finishedAt": "2026-11-24T01:44:29.943676+00:00",
+  "durationSeconds": 127.996,
+  "logSha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee",
+  "sourceAfter": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  }
+}

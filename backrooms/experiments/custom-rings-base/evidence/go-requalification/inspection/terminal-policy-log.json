@@ -1,0 +1,234 @@
+{
+  "schema": "cr01-upstream-terminal-log-content-inspection-v1",
+  "recordedAt": "2026-11-24T12:14:51.172549+00:00",
+  "scope": "Factual content/provenance inspection of one completed upstream CR01 Go policy execution packet. No tests, proofs, source changes, application inspection, or GitHub writes were performed.",
+  "notASecurityReview": true,
+  "excluded": [
+    "Application overlay and logs",
+    "Previously blocked latest application source/observer review",
+    "Other running or nonterminal packages",
+    "A full18-package completion claim or production qualification"
+  ],
+  "previousFourteenPackageInspectionUnchanged": {
+    "path": "context/go-recovery/inspection/terminal-logs-14-packages.json",
+    "bytes": 44281,
+    "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4"
+  },
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec"
+  },
+  "method": [
+    "Recomputed complete log, stderr and receipt identities; recounted all JSONL outcomes and compared with terminal receipt.",
+    "Classified every Output line and traced each non-status callsite to its exact pinned source blob.",
+    "Matched each diagnostic-producing test to its terminal pass event."
+  ],
+  "interpretation": {
+    "expected_synthetic_constraint_rejection": "Ten numeric BN254 constraint equations emitted by hintattack.RequireConstraintRejection, which requires an UnsatisfiedConstraintError and an actual constraint equation. Seven come from the fixed two-output ringpolicy.Confidential fixture with named forged comparison/division/rule hints; three from fixed synthetic outflow/approval fixtures with amounts1000,100,1100 and secondLargest peak-hint substitution. The World fixture supplies constant owner/asset identifiers and its Build method constructs test assignments. These messages occur within passing tests and are not failed test events.",
+    "compiled_constraint_counts": "Eight t.Logf messages from TestPooledPolicyConstraintMatrix report compiled section/delegate circuit sizes for fixed output/withdrawal widths and compact/full record capacities. They are shape/count diagnostics."
+  },
+  "counts": {
+    "terminalPackagesInspected": 1,
+    "passedPackages": 1,
+    "emptyStderrFiles": 1,
+    "outputLinesByCategory": {
+      "go_status_and_result": 810,
+      "expected_synthetic_constraint_rejection": 10,
+      "compiled_constraint_counts": 8
+    },
+    "unclassifiedOutputLines": 0
+  },
+  "sources": {
+    "prover/circuits/policy/approval_totals_test.go": {
+      "path": "custom-rings-base/prover/circuits/policy/approval_totals_test.go",
+      "bytes": 6936,
+      "sha256": "f57cc2e8d40e772c4e2bb2cd414abca4b25ff2058eb52a2da7dc04dcfa0d39b9",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "b483bef628ab08d4bf2c969f518f13e6e74ef5d9",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/policy/policy_test.go": {
+      "path": "custom-rings-base/prover/circuits/policy/policy_test.go",
+      "bytes": 22846,
+      "sha256": "2e897898c5d104d89a11a2c24d5b23eac061fd59658cfc3bab37b99645c4dc22",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "ae21e6077ad94b9eddb9e4cb34e3b5cb1fe0b341",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/policy/pooled_policy_test.go": {
+      "path": "custom-rings-base/prover/circuits/policy/pooled_policy_test.go",
+      "bytes": 8069,
+      "sha256": "7af3ab9c112c4defea11c9ac47a79054fba78e7ee2bc61a46f82d1f6c3237579",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "1e2eaaa49512abe0232a571da2fc76f732f5894e",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/policy/quantities_test.go": {
+      "path": "custom-rings-base/prover/circuits/policy/quantities_test.go",
+      "bytes": 26756,
+      "sha256": "effa67ea94105e3aeba1912e14f15d2a5a16e16d1e56e1947e04ba25ae50bee3",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "e7dd5bf3213da9dd7ada95a06f5aa6effc5697ec",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringpolicy/world.go": {
+      "path": "custom-rings-base/prover/ringtest/ringpolicy/world.go",
+      "bytes": 5935,
+      "sha256": "21e7f34a233693eb99d9794ccc76da4f5d8a8845e1372a622cf1d2860c3f56f4",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "e909c16fc2f5b0e436ebbc4e7374fa25d18327bd",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringpolicy/witness.go": {
+      "path": "custom-rings-base/prover/ringtest/ringpolicy/witness.go",
+      "bytes": 11693,
+      "sha256": "5f2c84db14f97bfcbd40f36274f5df6536c46f5feb88611968cf45712cf99f5b",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "b615c903e1b5e9e898ddd1c87317400a93f0908e",
+      "matchesPinnedBlob": true
+    },
+    "zolana/prover/server/prover-test/hintattack/attacks.go": {
+      "path": "custom-rings-base/zolana/prover/server/prover-test/hintattack/attacks.go",
+      "bytes": 7143,
+      "sha256": "e2fe5266f612db3a0dc63f39a010aedae5287ef9ee607f3292ea8ec122bcd5aa",
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "gitBlob": "07ebe0a132a621b763cd6e0ce08b50de4104ee45",
+      "matchesPinnedBlob": true
+    }
+  },
+  "logsBySha256": {
+    "fb0169a31e6d06bde7e854bccc7ce796582a2d3b60102aa86d5902f9bd177d3c": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 933.091,
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-policy-20261124T115642Z.json",
+        "bytes": 7841,
+        "sha256": "aeef021fa67d4f16add7f5320ee888c64a7061509c946e3e539e7ec83d7a4adf"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-policy-20261124T115642Z.jsonl",
+        "bytes": 434158,
+        "sha256": "fb0169a31e6d06bde7e854bccc7ce796582a2d3b60102aa86d5902f9bd177d3c"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-policy-20261124T115642Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "eventCount": 1638,
+      "testEvents": {
+        "pass": 404,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 72,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 810,
+        "expected_synthetic_constraint_rejection": 10,
+        "compiled_constraint_counts": 8
+      },
+      "statusOnlyOutput": false,
+      "nonStatusSourceLocations": [
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/policy/approval_totals_test.go",
+          "line": 141,
+          "caller": "hintattack.RequireConstraintRejection(t, ringkey.Compile(t, b.Assignment()).IsSolved(witness, hintattack.SkipMissingLookupQueries(t), solver.OverrideHint(solver.GetHintID(policy.PeakHint), secondLargest)))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            308
+          ],
+          "tests": [
+            "TestApprovalTotalsCannotUnderstateOutflow"
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/policy/policy_test.go",
+          "line": 456,
+          "caller": "hintattack.RequireConstraintRejection(t, err)",
+          "outputLines": 7,
+          "jsonlEvents": [
+            771,
+            776,
+            781,
+            786,
+            791,
+            796,
+            801
+          ],
+          "tests": [
+            "TestPolicySections/comparison_bit_flipped",
+            "TestPolicySections/comparison_low_part_wrapped",
+            "TestPolicySections/comparison_bit_off_the_bits",
+            "TestPolicySections/quotient_raised_over_a_negative_remainder",
+            "TestPolicySections/quotient_lowered_over_a_remainder_past_the_divisor",
+            "TestPolicySections/rule_part_carried_into_its_neighbour",
+            "TestPolicySections/rule_subject_dropped"
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "compiled_constraint_counts",
+          "source": "prover/circuits/policy/pooled_policy_test.go",
+          "line": 44,
+          "caller": "t.Logf(\"section-%d-w%d capacity=%d/%d constraints=%d\", shape.Outputs, shape.Withdrawals, len(c.OwnRecords), len(c.CuratorRecords), cs.GetNbConstraints())",
+          "outputLines": 4,
+          "jsonlEvents": [
+            852,
+            853,
+            854,
+            855
+          ],
+          "tests": [
+            "TestPooledPolicyConstraintMatrix"
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "compiled_constraint_counts",
+          "source": "prover/circuits/policy/pooled_policy_test.go",
+          "line": 59,
+          "caller": "t.Logf(\"delegate-%dx%d capacity=%d/%d constraints=%d\", width, width, len(c.OwnRecords), len(c.CuratorRecords), cs.GetNbConstraints())",
+          "outputLines": 4,
+          "jsonlEvents": [
+            856,
+            857,
+            858,
+            859
+          ],
+          "tests": [
+            "TestPooledPolicyConstraintMatrix"
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/policy/quantities_test.go",
+          "line": 183,
+          "caller": "hintattack.RequireConstraintRejection(t, ringkey.Compile(t, b.Assignment()).IsSolved(witness, hintattack.SkipMissingLookupQueries(t), solver.OverrideHint(solver.GetHintID(policy.PeakHint), secondLargest)))",
+          "outputLines": 2,
+          "jsonlEvents": [
+            1014,
+            1019
+          ],
+          "tests": [
+            "TestOwnerPastTheCapBesideOneUnderIt/the_first_row_past_the_cap",
+            "TestOwnerPastTheCapBesideOneUnderIt/the_second_row_past_the_cap"
+          ],
+          "terminalTestOutcome": "pass"
+        }
+      ],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    }
+  },
+  "unclassifiedOutput": []
+}

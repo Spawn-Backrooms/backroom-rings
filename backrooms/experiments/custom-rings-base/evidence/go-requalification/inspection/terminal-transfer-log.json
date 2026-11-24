@@ -1,0 +1,402 @@
+{
+  "schema": "cr01-upstream-terminal-log-content-inspection-v1",
+  "recordedAt": "2026-11-24T14:17:26.097178+00:00",
+  "scope": "Factual content/provenance inspection of one terminal upstream CR01 Go circuits/transfer execution packet. This inspector only read source and completed execution files; it did not run tests/proofs, control the root session, change source, or publish.",
+  "notASecurityReview": true,
+  "excluded": [
+    "Application overlay and logs",
+    "Previously blocked latest application source/observer review",
+    "Other packages and any whole-suite completion claim",
+    "Production qualification"
+  ],
+  "previousInspectionsUnchanged": {
+    "terminal-logs-14-packages.json": {
+      "path": "context/go-recovery/inspection/terminal-logs-14-packages.json",
+      "bytes": 44281,
+      "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4"
+    },
+    "terminal-policy-log.json": {
+      "path": "context/go-recovery/inspection/terminal-policy-log.json",
+      "bytes": 10311,
+      "sha256": "56a518cbf02cd3c434c7a65d17e0033ec3e400449bfd409ea30e787d43901bc7"
+    },
+    "terminal-ring-log.json": {
+      "path": "context/go-recovery/inspection/terminal-ring-log.json",
+      "bytes": 11198,
+      "sha256": "e9ae2b2e6246056778d5ac3309e9b3778cd3ebf47545cb841a3baba9f194b919"
+    },
+    "terminal-ringtest-log.json": {
+      "path": "context/go-recovery/inspection/terminal-ringtest-log.json",
+      "bytes": 8092,
+      "sha256": "a1128e3582ab495b960913b5e96a4a81fc478c5e0b83daaf7006c6a4b71eb17b"
+    }
+  },
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec"
+  },
+  "method": [
+    "Recomputed complete log, stderr and receipt identities only after the terminal receipt existed.",
+    "Independently counted all JSONL outcomes and compared against the receipt.",
+    "Matched only the fixed pinned diagnostic callsites and their test identities; unknown content remains explicit.",
+    "Recorded the terminal outcome of every diagnostic-producing test without assuming that diagnostics establish a test pass."
+  ],
+  "interpretation": {
+    "go_status_and_result": "Go test lifecycle, names, durations and package result output.",
+    "expected_synthetic_constraint_rejection": "Numeric BN254 equations emitted by hintattack.RequireConstraintRejection through ringkey.Bind calibration and RefuseStatement. The two identified callers construct ringtransfer.Signed(confidential2) fixed fixtures; the delegate case changes the rail, while the statement case adds one to each statement element. The fixed World/newAudit/spend helpers supply synthetic owners, amounts and note data. These lines are expected rejection diagnostics; each associated test outcome is recorded separately.",
+    "compiled_constraint_counts": "The fixed transfer catalog test emits each compiled key shape name and constraint count at transfer_test.go:146.",
+    "defaultSkipCorrespondence": {
+      "expectedActualSkipCountWithoutShort": 0,
+      "actualSkippedTests": [],
+      "shortFlagsInReceiptCommand": [],
+      "goFlagsInReceipt": "",
+      "pinnedConditionalShortGates": {
+        "TestEveryKeySolves": {
+          "line": 117,
+          "reason": "solves every catalog key"
+        },
+        "TestCatalogCompilesToTheVerifiedShape": {
+          "line": 136,
+          "reason": "compiles the transfer keys"
+        },
+        "TestStatementBindsEveryElement": {
+          "line": 743,
+          "reason": "solves the compiled key once per statement element"
+        }
+      },
+      "unexpectedActualSkipsForThisUnfilteredRun": []
+    }
+  },
+  "counts": {
+    "terminalPackagesInspected": 1,
+    "outputLinesByCategory": {
+      "go_status_and_result": 510,
+      "compiled_constraint_counts": 10,
+      "expected_synthetic_constraint_rejection": 47
+    },
+    "actualSkippedTests": 0,
+    "unclassifiedOutputLines": 0,
+    "stderrBytes": 0
+  },
+  "sources": {
+    "prover/circuits/transfer/transfer_test.go": {
+      "path": "custom-rings-base/prover/circuits/transfer/transfer_test.go",
+      "bytes": 35691,
+      "sha256": "7b582d03f3aca3354f47e20b4cc5119ca13037907bfd01c3e181159ead13467c",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "ea30284ec8b65406f922205bde56bd22bbb1537e",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringkey/bound.go": {
+      "path": "custom-rings-base/prover/ringtest/ringkey/bound.go",
+      "bytes": 3409,
+      "sha256": "10325fd2b6f476d8fe4562b36cfba6743fefc64ff53059333cec9a44d4bcdac4",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "f3db4d915e2428dc9648e24f27710babda446df6",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringtransfer/confidential.go": {
+      "path": "custom-rings-base/prover/ringtest/ringtransfer/confidential.go",
+      "bytes": 2708,
+      "sha256": "5ed09cc693581b1bffa6ea36677f002b08139b085f9d843b5c743f0be78874fc",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "36223064dfb784d7d5f59997c8babc8d6cea53ac",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringtransfer/ringtransfer.go": {
+      "path": "custom-rings-base/prover/ringtest/ringtransfer/ringtransfer.go",
+      "bytes": 16795,
+      "sha256": "1c02dfcaf5c524ba1dbb44425fd484cdabfb74e6c74df762b9d27ab388d85bab",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "bfb0be1779198ef212be8eb1f109000c65cf18cc",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/audited.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/audited.go",
+      "bytes": 7290,
+      "sha256": "49a9ca9667a0ce0a9c0c81b33175311fad6eb8945f13e4ee92faa9eb6378bb8a",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "95497771649b369c7ff77dddbaf73d710e9303be",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/transfer.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/transfer.go",
+      "bytes": 6860,
+      "sha256": "0eccb6cf172a09a2f1eb735e769cb897c1fb34bf1f8cfc72a41836eb6bb8f6b8",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "9d7619b9b7b9dcfb0d25d465e4b95436ded7fbb3",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/ringaudit.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/ringaudit.go",
+      "bytes": 5560,
+      "sha256": "9c9521fbbd137309821d721f2e368cc736c68e3a6e2b24e80661773df70b1ceb",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "110ef2bf9df003679adaa430dd2d2c9f123a204d",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/must.go": {
+      "path": "custom-rings-base/prover/ringtest/must.go",
+      "bytes": 2027,
+      "sha256": "d827b2526c4148f5023164cf010d1a8931b27da06b4950f5c1a73dae5fea7f4f",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "86e1e04fd5481938aee5ae842e30508bb40f24bd",
+      "matchesPinnedBlob": true
+    },
+    "zolana/prover/server/prover-test/hintattack/attacks.go": {
+      "path": "custom-rings-base/zolana/prover/server/prover-test/hintattack/attacks.go",
+      "bytes": 7143,
+      "sha256": "e2fe5266f612db3a0dc63f39a010aedae5287ef9ee607f3292ea8ec122bcd5aa",
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "gitBlob": "07ebe0a132a621b763cd6e0ce08b50de4104ee45",
+      "matchesPinnedBlob": true
+    }
+  },
+  "logsBySha256": {
+    "abc3a03cb3424e73035598ef53319714843e9d06d2c2aadfc6b7e2edc86fdbbf": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+      "receiptStatus": "passed",
+      "exitCode": 0,
+      "durationSeconds": 3203.231,
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-transfer-20261124T132336Z.json",
+        "bytes": 6904,
+        "sha256": "b0a07370d0c42dd422510ee4f933b71175abecd13d1641c7c3caa73823aa9ad7"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-transfer-20261124T132336Z.jsonl",
+        "bytes": 287556,
+        "sha256": "abc3a03cb3424e73035598ef53319714843e9d06d2c2aadfc6b7e2edc86fdbbf"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-transfer-20261124T132336Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "classification": "empty"
+      },
+      "eventCount": 1077,
+      "testEvents": {
+        "pass": 244,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 44,
+      "topLevelPassed": [
+        "Test40InputsOnTheWideKey",
+        "Test8DefaultNotesOnTheWideEntryKey",
+        "TestAddressChainIsBoundThroughThePrivateTransactionHash",
+        "TestAddressSlots",
+        "TestAnonymousOwnerRails",
+        "TestApprovalTotalsReachTheStatement",
+        "TestCatalogCompilesToTheVerifiedShape",
+        "TestDataOutputs",
+        "TestDelegateAssetHoldsEveryNote",
+        "TestDelegateBitIsTheProgramsWall",
+        "TestDelegateBypass",
+        "TestDelegateInputOwners",
+        "TestEntry",
+        "TestEveryKeySolves",
+        "TestHiddenOwnerRequiresAFirstNote",
+        "TestInputCompositionFillsTheEntryBitmap",
+        "TestInputCompositionRefusesAnotherOrder",
+        "TestInputOrder",
+        "TestInputPredicateOnEveryRail",
+        "TestInputsHoldNotesThenDummies",
+        "TestKeysHoldTheAmountBound",
+        "TestNarrowKeysFitTheWideKey",
+        "TestOutputPredicateOnEveryRail",
+        "TestOwnerCapacity",
+        "TestOwnerPredicates",
+        "TestPoolCapacityVector",
+        "TestPublicDepositIntoTheRing",
+        "TestRailCells",
+        "TestRailsSolve",
+        "TestRingRefusesAnotherSeed",
+        "TestRingRefusesAnotherTransactionBlinding",
+        "TestSaltedList",
+        "TestSignerSetVector",
+        "TestSppRefusesAChangedOutputBlinding",
+        "TestSppSeedComposesOnEveryRail",
+        "TestStatementBindsEveryElement",
+        "TestTheWidestInlineSpendOpensEveryTrackingRow",
+        "TestTheWidestPayoutOpensEveryTrackingRow",
+        "TestTransferStatementVector",
+        "TestVouchBindsTheTransfer",
+        "TestVoucherAdmitsUnlistedOwners",
+        "TestWrongAuditorRecordFailsAtTheStatement",
+        "TestWrongTrackingKeyFailsAtItsPredicate",
+        "TestZeroKeyInputs"
+      ],
+      "terminalActions": [
+        "pass"
+      ],
+      "unterminatedTests": [],
+      "actualSkippedTests": [],
+      "outputLineCategories": {
+        "go_status_and_result": 510,
+        "compiled_constraint_counts": 10,
+        "expected_synthetic_constraint_rejection": 47
+      },
+      "nonStatusSourceLocations": [
+        {
+          "category": "compiled_constraint_counts",
+          "source": "prover/circuits/transfer/transfer_test.go",
+          "line": 146,
+          "caller": "t.Logf(\"%s: %d constraints\", name, cs.GetNbConstraints())",
+          "outputLines": 10,
+          "jsonlEvents": [
+            562,
+            567,
+            572,
+            577,
+            582,
+            587,
+            592,
+            597,
+            602,
+            607
+          ],
+          "testOutcomes": {
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_2_in24_w4_s4": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_entry_8_in8_w32_s8": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_entry_8_in5_w4_s4": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_entry_8_in2_w4_s2": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_entry_4_in8_w4_s8": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_wide_2_in40_w4_s9": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_wide_8_in24_w32_s13": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_16_in4_w4_s2": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_8_in16_w4_s4": "pass",
+            "TestCatalogCompilesToTheVerifiedShape/custom_ring_transfer_4_in24_w4_s4": "pass"
+          }
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/transfer/transfer_test.go",
+          "line": 431,
+          "caller": "bound := ringkey.Bind(t, circuit, honest.Circuit)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            770
+          ],
+          "testOutcomes": {
+            "TestDelegateBitIsTheProgramsWall": "pass"
+          }
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/transfer/transfer_test.go",
+          "line": 435,
+          "caller": "bound.RefuseStatement(t, forged.Circuit, statement)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            771
+          ],
+          "testOutcomes": {
+            "TestDelegateBitIsTheProgramsWall": "pass"
+          }
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/transfer/transfer_test.go",
+          "line": 750,
+          "caller": "bound := ringkey.Bind(t, circuit, b.Circuit)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            964
+          ],
+          "testOutcomes": {
+            "TestStatementBindsEveryElement": "pass"
+          }
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/transfer/transfer_test.go",
+          "line": 755,
+          "caller": "bound.RefuseStatement(t, b.Circuit, moved)",
+          "outputLines": 44,
+          "jsonlEvents": [
+            965,
+            966,
+            967,
+            968,
+            969,
+            970,
+            971,
+            972,
+            973,
+            974,
+            975,
+            976,
+            977,
+            978,
+            979,
+            980,
+            981,
+            982,
+            983,
+            984,
+            985,
+            986,
+            987,
+            988,
+            989,
+            990,
+            991,
+            992,
+            993,
+            994,
+            995,
+            996,
+            997,
+            998,
+            999,
+            1000,
+            1001,
+            1002,
+            1003,
+            1004,
+            1005,
+            1006,
+            1007,
+            1008
+          ],
+          "testOutcomes": {
+            "TestStatementBindsEveryElement": "pass"
+          }
+        }
+      ],
+      "unclassifiedOutput": [],
+      "independentCountsMatchReceipt": {
+        "eventCount": true,
+        "testEvents": true,
+        "topLevelPassCount": true,
+        "terminalActions": true
+      },
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      },
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      }
+    }
+  },
+  "unclassifiedOutput": []
+}

@@ -1,0 +1,52 @@
+   Compiling aws-smithy-http-client v1.5.2
+   Compiling aws-smithy-observability v0.3.1
+   Compiling solana-loader-v3-interface v7.0.0
+   Compiling md-5 v0.10.6
+   Compiling sqlx-postgres v0.8.6
+   Compiling aws-smithy-runtime v1.16.3
+   Compiling dcap-qvl v0.6.6
+   Compiling solana-account-decoder v4.3.2
+   Compiling agave-votor-messages v4.3.2
+   Compiling solana-rpc-client-api v4.3.2
+   Compiling sqlx-sqlite v0.8.6
+   Compiling aws-types v1.7.0
+   Compiling aws-sigv4 v1.6.5
+   Compiling aws-smithy-xml v0.64.1
+   Compiling aws-runtime v1.10.4
+   Compiling solana-rpc-client v4.3.2
+   Compiling spr-api v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/sdk-libs/spr-api)
+   Compiling sqlx v0.8.6
+   Compiling spr-prover-tee v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/sdk-libs/prover-tee)
+   Compiling aws-smithy-json v0.65.1
+   Compiling spr-event-parser v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/sdk-libs/event)
+   Compiling jsonrpsee-types v0.26.0
+   Compiling spr-user-registry-interface v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/program-libs/user-registry-interface)
+   Compiling sha1 v0.10.7
+   Compiling jsonrpsee-core v0.26.0
+   Compiling soketto v0.8.1
+   Compiling spr-client v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/sdk-libs/client)
+   Compiling sea-query-binder v0.7.0
+   Compiling aws-smithy-query v0.64.0
+   Compiling zolana-ring-keys v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/keys)
+   Compiling zolana-ring-member-registry v0.1.0 (/workspace/scratch/06977f839292/custom-rings/program-libs/member-registry)
+   Compiling jsonrpsee-server v0.26.0
+   Compiling zolana-ring-indexer v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/indexer)
+   Compiling zolana-ring-transaction v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/transaction)
+   Compiling aws-sdk-sts v1.126.0
+   Compiling sea-orm v1.1.20
+   Compiling aws-config v1.13.2
+   Compiling tracing-subscriber v0.3.23
+   Compiling zolana-ring-client v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/client)
+   Compiling sea-schema v0.16.2
+   Compiling jsonrpsee v0.26.0
+   Compiling aws-sdk-kms v1.131.0
+   Compiling spr-program v0.10.0 (/workspace/scratch/06977f839292/custom-rings/zolana/sdk-libs/program)
+   Compiling psl-types v2.0.11
+   Compiling psl v2.1.232
+   Compiling zolana-operator-custody v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/operator-custody)
+   Compiling custom-ring-sdk v0.1.0 (/workspace/scratch/06977f839292/custom-rings/sdk-libs/sdk)
+   Compiling spr-rpc-http v0.1.0 (/workspace/scratch/06977f839292/custom-rings/zolana/services/rpc-http)
+   Compiling sea-orm-migration v1.1.20
+   Compiling solana-loader-v3-interface v8.1.1
+   Compiling zolana-ring-rpc v0.1.0 (/workspace/scratch/06977f839292/custom-rings/services/ring-rpc)
+    Finished `dev` profile [unoptimized] target(s) in 2m 07s

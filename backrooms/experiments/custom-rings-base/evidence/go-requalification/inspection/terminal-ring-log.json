@@ -1,0 +1,256 @@
+{
+  "schema": "cr01-upstream-terminal-log-content-inspection-v1",
+  "recordedAt": "2026-11-24T13:09:34.075737+00:00",
+  "scope": "Factual content/provenance inspection of one terminal upstream CR01 Go ring execution packet. This inspector only read source and completed execution files; it did not run tests/proofs, control the root execution session, change source, or publish.",
+  "notASecurityReview": true,
+  "excluded": [
+    "Application overlay and logs",
+    "Previously blocked latest application source/observer review",
+    "Other packages and any whole-suite completion claim",
+    "Production qualification"
+  ],
+  "previousInspectionsUnchanged": {
+    "terminal-logs-14-packages.json": {
+      "path": "context/go-recovery/inspection/terminal-logs-14-packages.json",
+      "bytes": 44281,
+      "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4"
+    },
+    "terminal-policy-log.json": {
+      "path": "context/go-recovery/inspection/terminal-policy-log.json",
+      "bytes": 10311,
+      "sha256": "56a518cbf02cd3c434c7a65d17e0033ec3e400449bfd409ea30e787d43901bc7"
+    }
+  },
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec"
+  },
+  "method": [
+    "Recomputed complete log, stderr and receipt hashes and byte sizes after the terminal receipt appeared.",
+    "Independently counted every JSONL outcome and compared against the terminal receipt.",
+    "Matched each recognized non-status skip message to its pinned source callsite and actual skip event.",
+    "Reported any unrecognized content explicitly instead of classifying it by assumption."
+  ],
+  "interpretation": {
+    "go_status_and_result": "Test names, lifecycle markers, durations and package result lines emitted by the Go test runner.",
+    "explicit_default_opt_in_skip_reason": "Pinned upstream fixture export/rewrite and caller-supplied escrow/storage fixture opt-ins. A recorded skip is not an executed test. None of these opt-ins was enabled for this inspection.",
+    "requiredKeys": "keys_test.go loadRingSystem uses Fatal for a missing key when REQUIRE_RING_KEYS=1. Its alternative missing-key Skipf is distinct from these six opt-in gates.",
+    "syntheticFixtureProvenance": "Recognized non-status lines contain only the exact fixed upstream opt-in reason strings. No constraint equation, request, witness or fixture payload is assigned this category."
+  },
+  "counts": {
+    "terminalPackagesInspected": 1,
+    "outputLinesByCategory": {
+      "go_status_and_result": 408,
+      "explicit_default_opt_in_skip_reason": 6
+    },
+    "actualDefaultOptInSkips": 6,
+    "unclassifiedOutputLines": 0,
+    "stderrBytes": 0
+  },
+  "sources": {
+    "prover/ring/aeglos_fixture_test.go": {
+      "path": "custom-rings-base/prover/ring/aeglos_fixture_test.go",
+      "bytes": 450,
+      "sha256": "f719ce9b9f66e0a3a204766b6f3106d83f3e61db45eb168f185a6499741a5298",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "023ef0b0a8f72335626fd677c684d4a8a1877e18",
+      "matchesPinnedBlob": true
+    },
+    "prover/ring/golden_write_test.go": {
+      "path": "custom-rings-base/prover/ring/golden_write_test.go",
+      "bytes": 2123,
+      "sha256": "ab6616f085a099c696628d8805d2f1fe74429d823b193648ff678c678b222118",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "e5ae3d6f8a0974e0949f7dbc31283dbc973a0f41",
+      "matchesPinnedBlob": true
+    },
+    "prover/ring/keys_test.go": {
+      "path": "custom-rings-base/prover/ring/keys_test.go",
+      "bytes": 4714,
+      "sha256": "5b3e580958e2fb55e1ba844486d7454b501fb440fde8cc0b43197a829bf6cd08",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "c1778fa143cfc95bbc557f44ba655f34496aa816",
+      "matchesPinnedBlob": true
+    },
+    "prover/ring/ring_rpc_escrow_test.go": {
+      "path": "custom-rings-base/prover/ring/ring_rpc_escrow_test.go",
+      "bytes": 1873,
+      "sha256": "021d4a7e86465075e18d7e1d0f172aff5a8b1ef31436441560afd71074092f59",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "570294eefb4a835a4707869db59b5b6cb5d8a7b0",
+      "matchesPinnedBlob": true
+    },
+    "prover/ring/storage_test.go": {
+      "path": "custom-rings-base/prover/ring/storage_test.go",
+      "bytes": 2814,
+      "sha256": "693d65287f79ae689e9ea23bf62dda553116e69c9ffe4a9e081c659ac91f1f1d",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "955dfda53f95fe08792c8a27a2379b4d5d747069",
+      "matchesPinnedBlob": true
+    }
+  },
+  "logsBySha256": {
+    "64653a502d17b15877e95095e5b1a8af3db9ea9b3f5f3b20ea7964f238d38722": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ring",
+      "receiptStatus": "passed",
+      "exitCode": 0,
+      "durationSeconds": 3192.277,
+      "receipt": {
+        "path": "context/go-recovery/packages/ring-20261124T121545Z.json",
+        "bytes": 6383,
+        "sha256": "dbb5eb78d9721aba069ef69798d9062e79ea8ef8f4e0e3f25028fefdea290366"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ring-20261124T121545Z.jsonl",
+        "bytes": 212667,
+        "sha256": "64653a502d17b15877e95095e5b1a8af3db9ea9b3f5f3b20ea7964f238d38722"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ring-20261124T121545Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "classification": "empty"
+      },
+      "eventCount": 822,
+      "testEvents": {
+        "pass": 197,
+        "fail": 0,
+        "skip": 6
+      },
+      "topLevelPassCount": 21,
+      "topLevelPassed": [
+        "TestAnApplyProofOverAssetLimitsVerifies",
+        "TestAnonymousEntryRequestsSolve",
+        "TestApplyRequestsDecodeOnlyUnderTheirMode",
+        "TestCatalogRequestsProveWithTheInstalledKeys",
+        "TestDecodeNamesEveryMissingValue",
+        "TestDecodeRejectsMalformedRequests",
+        "TestEveryKeyIsRegisteredAndPinned",
+        "TestExactApprovalRequestsSolveAndAFalseDigestIsRefused",
+        "TestFrameVectorWalksEveryField",
+        "TestGoldenRequestsAssignTheRecordedWitness",
+        "TestGoldenRequestsProveWithTheInstalledKeys",
+        "TestHostRequestsDecodeAndSolve",
+        "TestKeysMatchTheRustCatalog",
+        "TestMergeFrameVectorWalksTheRecord",
+        "TestMergeVectorPinsHostAndCircuit",
+        "TestPolicyRequestsRejectMalformedPayloads",
+        "TestRingKeysCarryTheCompiledCircuits",
+        "TestRingKeysCompileToTheVerifiedShape",
+        "TestRingSecretsMatchTheRustVectors",
+        "TestRustPolicyTableReachesTheAssignment",
+        "TestTransferRequestsDecodeAndSolve"
+      ],
+      "terminalActions": [
+        "pass"
+      ],
+      "unterminatedTests": [],
+      "actualSkippedTests": [
+        "TestExportAeglosRingFixtures",
+        "TestRingRpcEscrowFixture",
+        "TestStorageFixtures",
+        "TestWriteConstraintPins",
+        "TestWriteGoldenRequests",
+        "TestWriteRequestFixtures"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 408,
+        "explicit_default_opt_in_skip_reason": 6
+      },
+      "defaultOptInSkipRecords": [
+        {
+          "test": "TestExportAeglosRingFixtures",
+          "reason": "AEGLOS_FIXTURES is unset",
+          "source": "prover/ring/aeglos_fixture_test.go",
+          "line": 13,
+          "environmentVariable": "AEGLOS_FIXTURES",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 4,
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "test": "TestWriteGoldenRequests",
+          "reason": "WRITE_RING_GOLDENS=1 rewrites the request fixtures",
+          "source": "prover/ring/golden_write_test.go",
+          "line": 15,
+          "environmentVariable": "WRITE_RING_GOLDENS",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 213,
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "test": "TestWriteRequestFixtures",
+          "reason": "REQUEST_FIXTURES=<dir> writes a request per ring key",
+          "source": "prover/ring/golden_write_test.go",
+          "line": 39,
+          "environmentVariable": "REQUEST_FIXTURES",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 218,
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "test": "TestWriteConstraintPins",
+          "reason": "WRITE_RING_PINS=1 rewrites prover/ringtest/ringkey/constraints.json",
+          "source": "prover/ring/keys_test.go",
+          "line": 70,
+          "environmentVariable": "WRITE_RING_PINS",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 231,
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "test": "TestRingRpcEscrowFixture",
+          "reason": "RING_RPC_ESCROW_MEMBER is unset",
+          "source": "prover/ring/ring_rpc_escrow_test.go",
+          "line": 20,
+          "environmentVariable": "RING_RPC_ESCROW_MEMBER",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 744,
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "test": "TestStorageFixtures",
+          "reason": "STORAGE_REGISTRY is unset",
+          "source": "prover/ring/storage_test.go",
+          "line": 18,
+          "environmentVariable": "STORAGE_REGISTRY",
+          "explicitlyUnsetInReceipt": true,
+          "jsonlEvent": 813,
+          "terminalTestOutcome": "skip"
+        }
+      ],
+      "unclassifiedOutput": [],
+      "independentCountsMatchReceipt": {
+        "eventCount": true,
+        "testEvents": true,
+        "topLevelPassCount": true,
+        "terminalActions": true
+      },
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      },
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      }
+    }
+  },
+  "unclassifiedOutput": []
+}

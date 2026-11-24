@@ -1,0 +1,30 @@
+{
+  "command": [
+    "just",
+    "test-hermetic"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "sourceBefore": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "startedAt": "2026-11-24T01:44:30.061402+00:00",
+  "status": "passed",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-test-hermetic-20261124T014430Z.log",
+  "environmentManifest": "/workspace/scratch/06977f839292/context/cr01-environment.json",
+  "sameParentServices": false,
+  "environmentOverrides": {
+    "CARGO_BUILD_JOBS": "1",
+    "NEXTEST_TEST_THREADS": "1"
+  },
+  "exitCode": 0,
+  "finishedAt": "2026-11-24T02:15:47.187560+00:00",
+  "durationSeconds": 1877.123,
+  "logSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+  "sourceAfter": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  }
+}

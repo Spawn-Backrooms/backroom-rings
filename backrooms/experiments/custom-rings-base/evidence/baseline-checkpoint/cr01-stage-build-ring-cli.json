@@ -1,0 +1,26 @@
+{
+  "command": [
+    "just",
+    "build-cli"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "sourceBefore": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "startedAt": "2026-11-24T01:21:31.585834+00:00",
+  "status": "passed",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-cli-20261124T012131Z.log",
+  "environmentManifest": "/workspace/scratch/06977f839292/context/cr01-environment.json",
+  "sameParentServices": false,
+  "exitCode": 0,
+  "finishedAt": "2026-11-24T01:27:40.992579+00:00",
+  "durationSeconds": 369.407,
+  "logSha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75",
+  "sourceAfter": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  }
+}

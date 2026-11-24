@@ -1,0 +1,1224 @@
+{
+  "schema": "cr01-upstream-terminal-log-content-inspection-v1",
+  "recordedAt": "2026-11-24T11:55:53.412251+00:00",
+  "scope": "Factual content/provenance inspection of fourteen completed upstream CR01 Go execution packets. No tests, proofs, source changes, or GitHub writes were performed by this inspection.",
+  "notASecurityReview": true,
+  "excluded": [
+    "Running or nonterminal packages",
+    "Application overlay and application logs",
+    "Previously blocked latest application source/observer review",
+    "Any claim of full18-package completion or production qualification"
+  ],
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec"
+  },
+  "method": [
+    "Recomputed complete log, stderr and receipt SHA-256 values and file sizes.",
+    "Parsed every JSONL event and independently recounted test outcomes and terminal package actions.",
+    "Classified every Output line; verified reported counts against receipts.",
+    "Matched every non-status source location and helper/fixture source against exact pinned Git blobs.",
+    "Required pass events for tests producing rejection/count diagnostics, and a skip event for the explicit opt-in skip message."
+  ],
+  "interpretation": {
+    "expected_synthetic_constraint_rejection": "Numeric BN254 constraint equations emitted by the pinned hintattack.RequireConstraintRejection helper after requiring an UnsatisfiedConstraintError. Audit diagnostics originate from ringkey.Bind calibration and Refuse/RefuseStatement calls over ringaudit.NewSection/NewAudit fixture builders with fixed scalar/byte seeds. Ringgadget diagnostics originate from local integer boundary and forged-hint fixtures in canonical_test.go. These are expected diagnostic output within passing tests, not failed test events.",
+    "compiled_constraint_counts": "Eleven registry t.Logf lines report constraint counts for circuit shapes created from fixed opening counts, including own100/curator97. No application request or runtime payload is involved in these log calls.",
+    "explicit_default_opt_in_skip_reason": "The registry million-member test reports its pinned RING_MILLION_RECORDS opt-in requirement and has an actual skip event. It is not counted as executed."
+  },
+  "counts": {
+    "terminalPackagesInspected": 14,
+    "passedPackages": 8,
+    "explicitNoTestFilesPackages": 6,
+    "statusOnlyLogs": 11,
+    "emptyStderrFiles": 14,
+    "outputLinesByCategory": {
+      "go_status_and_result": 728,
+      "expected_synthetic_constraint_rejection": 84,
+      "explicit_default_opt_in_skip_reason": 1,
+      "compiled_constraint_counts": 11
+    },
+    "unclassifiedOutputLines": 0
+  },
+  "sources": {
+    "prover/circuits/audit/audit_test.go": {
+      "path": "custom-rings-base/prover/circuits/audit/audit_test.go",
+      "bytes": 651,
+      "sha256": "64e6683d7eda8bfcd77f71bf98cc02154ca3ee856de48e63a69bc28f83905fb6",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "a0bb970ddf8052e64cb31dd0614c40ace829cb9d",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/audit/input_map_test.go": {
+      "path": "custom-rings-base/prover/circuits/audit/input_map_test.go",
+      "bytes": 3587,
+      "sha256": "515567de028726c4a952090e12943a913b2c5b9b8dbe8c5b0b568569e8810bb4",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "3d580c26bb22e095b1bf51660cedaf40719e819f",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/audit/record_test.go": {
+      "path": "custom-rings-base/prover/circuits/audit/record_test.go",
+      "bytes": 9715,
+      "sha256": "ffc7314e3641a8c77866d07da48e7d180efbdeed9b288863e8477dfceb205e73",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "8af1c4a423844dcb92a6968a90659010ca794b0d",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/audit/stream_test.go": {
+      "path": "custom-rings-base/prover/circuits/audit/stream_test.go",
+      "bytes": 15035,
+      "sha256": "be1b9c6c5dd9f8c5594f0bf17f66f65b57accccad05d9c026a4891f3a7a755dd",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "c7c8979f4a73f19b1e105a6ad9eb5f516d6c1b7c",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringkey/bound.go": {
+      "path": "custom-rings-base/prover/ringtest/ringkey/bound.go",
+      "bytes": 3409,
+      "sha256": "10325fd2b6f476d8fe4562b36cfba6743fefc64ff53059333cec9a44d4bcdac4",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "f3db4d915e2428dc9648e24f27710babda446df6",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/section.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/section.go",
+      "bytes": 13244,
+      "sha256": "913f6595688c267f5aee3b8505792342125a1a4b2c7e99b7223bab5836f84f08",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "1ddc551d9741867892d82b6aadc964dfc4ad26f6",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/audited.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/audited.go",
+      "bytes": 7290,
+      "sha256": "49a9ca9667a0ce0a9c0c81b33175311fad6eb8945f13e4ee92faa9eb6378bb8a",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "95497771649b369c7ff77dddbaf73d710e9303be",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/transfer.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/transfer.go",
+      "bytes": 6860,
+      "sha256": "0eccb6cf172a09a2f1eb735e769cb897c1fb34bf1f8cfc72a41836eb6bb8f6b8",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "9d7619b9b7b9dcfb0d25d465e4b95436ded7fbb3",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/ringaudit.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/ringaudit.go",
+      "bytes": 5560,
+      "sha256": "9c9521fbbd137309821d721f2e368cc736c68e3a6e2b24e80661773df70b1ceb",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "110ef2bf9df003679adaa430dd2d2c9f123a204d",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/must.go": {
+      "path": "custom-rings-base/prover/ringtest/must.go",
+      "bytes": 2027,
+      "sha256": "d827b2526c4148f5023164cf010d1a8931b27da06b4950f5c1a73dae5fea7f4f",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "86e1e04fd5481938aee5ae842e30508bb40f24bd",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/ringgadget/canonical_test.go": {
+      "path": "custom-rings-base/prover/circuits/ringgadget/canonical_test.go",
+      "bytes": 5322,
+      "sha256": "968c1f52ca219b780c47cdcfd362bd93b80effed52e8a2d4646065e89500112a",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "af15ba36e82d3da6c3b6c74197f0de5f37c47436",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/registry/shared_path_test.go": {
+      "path": "custom-rings-base/prover/circuits/registry/shared_path_test.go",
+      "bytes": 9605,
+      "sha256": "c5db3360495dad13980c1d94a315e4a6c5ca29e88a1974573058ddecec070862",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "1b04c105f0a8fdde47ef50f3b6f4ce73a75d4ea3",
+      "matchesPinnedBlob": true
+    },
+    "prover/circuits/registry/shared_path_population_test.go": {
+      "path": "custom-rings-base/prover/circuits/registry/shared_path_population_test.go",
+      "bytes": 3468,
+      "sha256": "f9996815403224c543bd71031fa6db5e2efc73e900dcd26f551f3545ff9416c9",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "335318003d1a87bc24e698b44d404fec2eb3a198",
+      "matchesPinnedBlob": true
+    },
+    "zolana/prover/server/prover-test/hintattack/attacks.go": {
+      "path": "custom-rings-base/zolana/prover/server/prover-test/hintattack/attacks.go",
+      "bytes": 7143,
+      "sha256": "e2fe5266f612db3a0dc63f39a010aedae5287ef9ee607f3292ea8ec122bcd5aa",
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "gitBlob": "07ebe0a132a621b763cd6e0ce08b50de4104ee45",
+      "matchesPinnedBlob": true
+    }
+  },
+  "logsBySha256": {
+    "cc7b9bfa293da1b21e421631f7c509ee80e43ccd42bd1dbcc59cdbe2d66a0f97": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-20261124T115020Z.json",
+        "bytes": 5092,
+        "sha256": "45b5232bc91494c5d0bb861f68ca3aa5d356e0d44ce045763e397d84dec98c03"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-20261124T115020Z.jsonl",
+        "bytes": 53583,
+        "sha256": "cc7b9bfa293da1b21e421631f7c509ee80e43ccd42bd1dbcc59cdbe2d66a0f97"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-20261124T115020Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 228,
+      "testEvents": {
+        "pass": 56,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 12,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 114
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "d78b9d1c18589d904ec83fd9739ad9e84571c441dfe12210c368407bc3872879": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-audit-20261124T115055Z.json",
+        "bytes": 5945,
+        "sha256": "8e6ceb3373b44fa68328534e5da7ea8647dd20092da8999990d0b3c4a2c4a974"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-audit-20261124T115055Z.jsonl",
+        "bytes": 137793,
+        "sha256": "d78b9d1c18589d904ec83fd9739ad9e84571c441dfe12210c368407bc3872879"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-audit-20261124T115055Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 503,
+      "testEvents": {
+        "pass": 106,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 31,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 214,
+        "expected_synthetic_constraint_rejection": 75
+      },
+      "statusOnlyOutput": false,
+      "nonStatusSourceLocations": [
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 15,
+          "caller": "c := compileSection(t, plainShape)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            4
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 22,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            7
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 28,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            12
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 33,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            17
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 40,
+          "caller": "c := compileSection(t, shape)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            24
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 51,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { binary.BigEndian.PutUint64(p.Envelope[head:], bits) })",
+          "outputLines": 3,
+          "jsonlEvents": [
+            27,
+            32,
+            37
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/input_map_test.go",
+          "line": 80,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 9,
+          "jsonlEvents": [
+            46,
+            51,
+            56,
+            61,
+            66,
+            71,
+            76,
+            81,
+            86
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 34,
+          "caller": "compileSection(t, shape).RequireSolved(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            121
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 47,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.Records[field.slot][field.offset] ^= 1 })",
+          "outputLines": 7,
+          "jsonlEvents": [
+            128,
+            133,
+            138,
+            143,
+            148,
+            153,
+            158
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 76,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.Records[slot][0] ^= audit.KindZeroKey })",
+          "outputLines": 2,
+          "jsonlEvents": [
+            171,
+            176
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 96,
+          "caller": "refuse(t, func(records [][]byte) { records[ring] = full })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            185
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 99,
+          "caller": "refuse(t, func(records [][]byte) { records[exit] = records[exit][:audit.RingRecordLen] })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            190
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 102,
+          "caller": "refuse(t, func(records [][]byte) {",
+          "outputLines": 1,
+          "jsonlEvents": [
+            195
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 120,
+          "caller": "t.Run(name, func(t *testing.T) { refuseSealed(t, s, edit) })",
+          "outputLines": 5,
+          "jsonlEvents": [
+            204,
+            209,
+            214,
+            219,
+            224
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 136,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 5,
+          "jsonlEvents": [
+            233,
+            238,
+            243,
+            248,
+            253
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 154,
+          "caller": "c.Refuse(t, live.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            262
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 162,
+          "caller": "c.Refuse(t, zero.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            267
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 177,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.SealedTo[0] = ringaudit.ViewingKey(t, 9) })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            280
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 180,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.RecipientKeys[0] = ringaudit.ViewingKey(t, 9) })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            285
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 183,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.Records[1] = p.Records[0] })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            290
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 186,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) {",
+          "outputLines": 1,
+          "jsonlEvents": [
+            295
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 220,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            310
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/record_test.go",
+          "line": 228,
+          "caller": "compileSection(t, plainShape).Refuse(t, circuit)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            315
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 27,
+          "caller": "refuseSealed(t, s, func(p *ringaudit.Plaintexts) { p.Envelope[audit.EnvelopeKeyLen] = count })",
+          "outputLines": 2,
+          "jsonlEvents": [
+            322,
+            327
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 46,
+          "caller": "c.RefuseStatement(t, s.Circuit(t), s.StatementOf(t, s.Stream(t), claim))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            336
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 51,
+          "caller": "c.RefuseStatement(t, padded.Circuit(t), padded.StatementOf(t, padded.Stream(t), claim))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            341
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 59,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            348
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 92,
+          "caller": "t.Run(name, func(t *testing.T) { refuseSealed(t, s, edit) })",
+          "outputLines": 10,
+          "jsonlEvents": [
+            355,
+            360,
+            365,
+            370,
+            375,
+            380,
+            385,
+            390,
+            395,
+            400
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 101,
+          "caller": "c.Refuse(t, s.Circuit(t))",
+          "outputLines": 2,
+          "jsonlEvents": [
+            405,
+            410
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 117,
+          "caller": "compileSection(t, plainShape).RefuseStatement(t, honest.Circuit(t), honest.StatementOf(t, resent.Stream(t), honest.Claim()))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            419
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 144,
+          "caller": "c.Refuse(t, circuit)",
+          "outputLines": 1,
+          "jsonlEvents": [
+            432
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 156,
+          "caller": "t.Run(\"entry on a key with no entry capacity\", func(t *testing.T) { refuse(t, plainShape, audit.LayoutEntry) })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            441
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 157,
+          "caller": "t.Run(\"no entry on an entry key\", func(t *testing.T) { refuse(t, entryShape, 0) })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            446
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 158,
+          "caller": "t.Run(\"a bit past the flags\", func(t *testing.T) { refuse(t, plainShape, 1<<2) })",
+          "outputLines": 1,
+          "jsonlEvents": [
+            451
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 180,
+          "caller": "c.RefuseStatement(t, vouched.Circuit(t), unvouched.Statement(t))",
+          "outputLines": 2,
+          "jsonlEvents": [
+            460,
+            470
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 185,
+          "caller": "c.RefuseStatement(t, vouched.Circuit(t), vouched.StatementOf(t, stream, vouched.Claim()))",
+          "outputLines": 2,
+          "jsonlEvents": [
+            465,
+            475
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/audit/stream_test.go",
+          "line": 262,
+          "caller": "compileSection(t, plainShape).RefuseStatement(t, s.Circuit(t), s.StatementOf(t, moved, s.Claim()))",
+          "outputLines": 1,
+          "jsonlEvents": [
+            494
+          ],
+          "terminalTestOutcome": "pass"
+        }
+      ],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "91eb4aa5f3b503585a4446f7307c79b673593aaf1266f83d389bf206b3413435": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-registry-20261124T115133Z.json",
+        "bytes": 6269,
+        "sha256": "f7cc2634448cdf39e171f704f035c089e6b32eab58317af3d0ca2a850fa98a60"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-registry-20261124T115133Z.jsonl",
+        "bytes": 157724,
+        "sha256": "91eb4aa5f3b503585a4446f7307c79b673593aaf1266f83d389bf206b3413435"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-registry-20261124T115133Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 608,
+      "testEvents": {
+        "pass": 147,
+        "fail": 0,
+        "skip": 1
+      },
+      "topLevelPassCount": 34,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 298,
+        "explicit_default_opt_in_skip_reason": 1,
+        "compiled_constraint_counts": 11
+      },
+      "statusOnlyOutput": false,
+      "nonStatusSourceLocations": [
+        {
+          "category": "explicit_default_opt_in_skip_reason",
+          "source": "prover/circuits/registry/shared_path_population_test.go",
+          "line": 19,
+          "caller": "t.Skip(\"set RING_MILLION_RECORDS=1\")",
+          "outputLines": 1,
+          "jsonlEvents": [
+            304
+          ],
+          "terminalTestOutcome": "skip"
+        },
+        {
+          "category": "compiled_constraint_counts",
+          "source": "prover/circuits/registry/shared_path_test.go",
+          "line": 179,
+          "caller": "t.Logf(\"openings=%d independent=%d shared=%d reduction=%.2f%%\", count, independent.GetNbConstraints(), shared.GetNbConstraints(), 100*(1-float64(shared.GetNbConstraints())/float64(independent.GetNbConstraints())))",
+          "outputLines": 10,
+          "jsonlEvents": [
+            473,
+            474,
+            475,
+            476,
+            477,
+            478,
+            479,
+            480,
+            481,
+            482
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "compiled_constraint_counts",
+          "source": "prover/circuits/registry/shared_path_test.go",
+          "line": 205,
+          "caller": "t.Logf(\"own100_curator97 constraints=%d\", compiled.GetNbConstraints())",
+          "outputLines": 1,
+          "jsonlEvents": [
+            487
+          ],
+          "terminalTestOutcome": "pass"
+        }
+      ],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "e7d4d3d5fade521bc3305c1ec49d0f654a918870579334afdbeed84ebd5c0513": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-ringgadget-20261124T115016Z.json",
+        "bytes": 4778,
+        "sha256": "2f58efcdc7d77bcf6b55bedf66eed582c75ae5849b062fcae3f04de2e5e390d3"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-ringgadget-20261124T115016Z.jsonl",
+        "bytes": 12242,
+        "sha256": "e7d4d3d5fade521bc3305c1ec49d0f654a918870579334afdbeed84ebd5c0513"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-ringgadget-20261124T115016Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 45,
+      "testEvents": {
+        "pass": 8,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 2,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 18,
+        "expected_synthetic_constraint_rejection": 9
+      },
+      "statusOnlyOutput": false,
+      "nonStatusSourceLocations": [
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/ringgadget/canonical_test.go",
+          "line": 78,
+          "caller": "hintattack.RequireConstraintRejection(t, err)",
+          "outputLines": 3,
+          "jsonlEvents": [
+            4,
+            5,
+            6
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/ringgadget/canonical_test.go",
+          "line": 103,
+          "caller": "hintattack.RequireConstraintRejection(t, solve(w, solver.OverrideHint(solver.GetHintID(fieldBytesHint), attack)))",
+          "outputLines": 3,
+          "jsonlEvents": [
+            9,
+            14,
+            19
+          ],
+          "terminalTestOutcome": "pass"
+        },
+        {
+          "category": "expected_synthetic_constraint_rejection",
+          "source": "prover/circuits/ringgadget/canonical_test.go",
+          "line": 170,
+          "caller": "hintattack.RequireConstraintRejection(t, err)",
+          "outputLines": 3,
+          "jsonlEvents": [
+            28,
+            33,
+            38
+          ],
+          "terminalTestOutcome": "pass"
+        }
+      ],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "10437c8c9da1789c6c1eb4880ee6b6be7489c9c686c8a16fdeb3a6383d728489": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/circuits-shared-20261124T115019Z.json",
+        "bytes": 4872,
+        "sha256": "564ebaff37ee08cd006b94e9c85432391b9ab8c21641878111d423958334e95c"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/circuits-shared-20261124T115019Z.jsonl",
+        "bytes": 5263,
+        "sha256": "10437c8c9da1789c6c1eb4880ee6b6be7489c9c686c8a16fdeb3a6383d728489"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/circuits-shared-20261124T115019Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 24,
+      "testEvents": {
+        "pass": 5,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 5,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 12
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "6d1dd9eb56ca21ea1c7d324f68e95865fbc6ad7006bf81b8758af8611a0dbc55": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/cmd-catalog-20261124T114223Z.json",
+        "bytes": 4891,
+        "sha256": "db5cedeabc14b1b34154a56443d86d5387cb5045873815cdbcaf798e09711874"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/cmd-catalog-20261124T114223Z.jsonl",
+        "bytes": 524,
+        "sha256": "6d1dd9eb56ca21ea1c7d324f68e95865fbc6ad7006bf81b8758af8611a0dbc55"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/cmd-catalog-20261124T114223Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "00ee75f3dd47e3c1b79d3172c84e5a0ae7486c5ef46a4845822fcabc245534c2": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/cmd-prover-20261124T114404Z.json",
+        "bytes": 4740,
+        "sha256": "86eeddeb51c3059213b3f065121cc7981a9510fadb24aabc7a7ce9425266975a"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/cmd-prover-20261124T114404Z.jsonl",
+        "bytes": 520,
+        "sha256": "00ee75f3dd47e3c1b79d3172c84e5a0ae7486c5ef46a4845822fcabc245534c2"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/cmd-prover-20261124T114404Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "b5bab8936f30cbc634cba75a47bbb69431fe8face9a5c3357e052a17ee526c66": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringaudit-20261124T114534Z.json",
+        "bytes": 4708,
+        "sha256": "1e099078fc2fee9904152118f6a3d217b955be4bedf57a5ac9f4a8967b02f405"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringaudit-20261124T114534Z.jsonl",
+        "bytes": 1598,
+        "sha256": "b5bab8936f30cbc634cba75a47bbb69431fe8face9a5c3357e052a17ee526c66"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringaudit-20261124T114534Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 8,
+      "testEvents": {
+        "pass": 1,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 1,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 4
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "914ee74e65373e24e792b3bc21e7e002b69e00fa7d3561b2d0cab523d77a2348": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringkey-20261124T114510Z.json",
+        "bytes": 4715,
+        "sha256": "d5fd4b3a8fec02abcb54eaf9a3a97ef554cc2c998fc886d7274d54d65650acf7"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringkey-20261124T114510Z.jsonl",
+        "bytes": 544,
+        "sha256": "914ee74e65373e24e792b3bc21e7e002b69e00fa7d3561b2d0cab523d77a2348"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringkey-20261124T114510Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "7e92fecf922513abb1893b1450bce01101bbf3a8b42c48297d6ed9c2f4585f37": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringmerge-20261124T114532Z.json",
+        "bytes": 4671,
+        "sha256": "c813d1108cc17fa8c2d7e979ad6edb234a13ebf995ae3f8134888da5bc3981da"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringmerge-20261124T114532Z.jsonl",
+        "bytes": 552,
+        "sha256": "7e92fecf922513abb1893b1450bce01101bbf3a8b42c48297d6ed9c2f4585f37"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringmerge-20261124T114532Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "18f2da789989668c301b7b239a17a4775eb8d69866e3099492477cf28ce37224": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringpolicy-20261124T114533Z.json",
+        "bytes": 4675,
+        "sha256": "0d7b00ca50bdc83dfc3b78e87b635634303abefd09a107c307144a1890b39b17"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringpolicy-20261124T114533Z.jsonl",
+        "bytes": 555,
+        "sha256": "18f2da789989668c301b7b239a17a4775eb8d69866e3099492477cf28ce37224"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringpolicy-20261124T114533Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "f7f9996eb30ada458c543866b887eecae353d8d64dbcc62ff7baa795572b168e": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringprotocol-20261124T114538Z.json",
+        "bytes": 4803,
+        "sha256": "2fcf32706f0e4221d24bdd613095986ddf6d48469a09ef805caaf6a0689f6051"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringprotocol-20261124T114538Z.jsonl",
+        "bytes": 14268,
+        "sha256": "f7f9996eb30ada458c543866b887eecae353d8d64dbcc62ff7baa795572b168e"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringprotocol-20261124T114538Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 56,
+      "testEvents": {
+        "pass": 13,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 3,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 28
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "4c84f1dd0861ea8c7b3ad2bf370dc5f762b3c971ce0ee619300c68d6b6ab537c": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+      "status": "passed",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringregistry-20261124T114539Z.json",
+        "bytes": 4827,
+        "sha256": "498d0da5d292ffba271236269c79ecb6723c3e2ecc930a8e203f6c2fe7c723ba"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringregistry-20261124T114539Z.jsonl",
+        "bytes": 18429,
+        "sha256": "4c84f1dd0861ea8c7b3ad2bf370dc5f762b3c971ce0ee619300c68d6b6ab537c"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringregistry-20261124T114539Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 68,
+      "testEvents": {
+        "pass": 16,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 3,
+      "terminalActions": [
+        "pass"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 34
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    },
+    "5dc478d09c54b135d0622f91df8df730b3d8b87c55e727fb1718db2a4f30e5af": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+      "status": "no-tests",
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-ringtransfer-20261124T114534Z.json",
+        "bytes": 4683,
+        "sha256": "18d5071771f2d84af05029e747d261d653c02642855cc3227c74ff57510880ae"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-ringtransfer-20261124T114534Z.jsonl",
+        "bytes": 564,
+        "sha256": "5dc478d09c54b135d0622f91df8df730b3d8b87c55e727fb1718db2a4f30e5af"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-ringtransfer-20261124T114534Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "empty": true
+      },
+      "exitCode": 0,
+      "eventCount": 3,
+      "testEvents": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 0,
+      "terminalActions": [
+        "skip"
+      ],
+      "outputLineCategories": {
+        "go_status_and_result": 1
+      },
+      "statusOnlyOutput": true,
+      "nonStatusSourceLocations": [],
+      "unclassifiedOutput": [],
+      "sourcePinsUnchangedInReceipt": true
+    }
+  },
+  "unclassifiedOutput": []
+}

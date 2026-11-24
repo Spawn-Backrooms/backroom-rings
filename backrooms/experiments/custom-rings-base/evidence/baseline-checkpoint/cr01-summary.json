@@ -1,0 +1,1553 @@
+{
+  "schema": "cr01-consolidated-evidence-v1",
+  "generatedAt": "2026-11-24T03:10:54.398010+00:00",
+  "scope": "pristine-upstream-baseline-only",
+  "status": "incomplete",
+  "conclusion": "A full CR01 pass is not established; missing, incomplete or unverified gates remain visible below.",
+  "source": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "checkout": "/workspace/scratch/06977f839292/custom-rings",
+    "keyLockBlob": "0ec73f965fc094fe38b058ef81fe9b948f99b556",
+    "lockfiles": [
+      {
+        "path": "/workspace/scratch/06977f839292/custom-rings/prover/ring/proving-keys.lock",
+        "sha256": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+      },
+      {
+        "path": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/prover/provingkeys/proving-keys.lock",
+        "sha256": "9416e0b92aebb438fb34e26281f369664b48e8acfe0d6c0ea35724586bcc4313"
+      }
+    ]
+  },
+  "gates": {
+    "check-all": {
+      "name": "check-all",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-check-all-resume.json",
+        "sha256": "3ab65c464b915448863895e9d3902b103cdec72433e45e90354387dfd734d7b9"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T00:27:30.657197+00:00",
+      "finishedAt": "2026-11-24T00:28:08.884143+00:00",
+      "durationSeconds": 38.226,
+      "command": [
+        "just",
+        "check-all"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-check-all-resume.log",
+      "recordedLogSha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3",
+      "observedLogSha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3",
+      "logHashMatches": true
+    },
+    "hermetic": {
+      "name": "hermetic",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-test-hermetic.json",
+        "sha256": "008321c51a8d9af3ec9a2836fa018424edff70d1e0b091117fa61e978a3230d0"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:44:30.061402+00:00",
+      "finishedAt": "2026-11-24T02:15:47.187560+00:00",
+      "durationSeconds": 1877.123,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "test-hermetic"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-test-hermetic-20261124T014430Z.log",
+      "recordedLogSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+      "observedLogSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+      "logHashMatches": true,
+      "testSummaries": [
+        {
+          "run": 149,
+          "passed": 149,
+          "skipped": 0
+        },
+        {
+          "run": 1497,
+          "passed": 1497,
+          "skipped": 33
+        },
+        {
+          "run": 40,
+          "passed": 40,
+          "skipped": 4
+        }
+      ],
+      "skipScope": "Canonical default exclusions reported by each upstream nextest invocation; not silently converted to passes"
+    },
+    "anonymous-validator": {
+      "name": "anonymous-validator",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-anonymous-validator.json",
+        "sha256": "0a544d5f75962dd87b3f99b50c35fda3db032bdb40ad6589db29584c4b6d7195"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T02:55:01.336064+00:00",
+      "finishedAt": "2026-11-24T03:03:17.264737+00:00",
+      "durationSeconds": 495.928,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": true,
+      "command": [
+        "just",
+        "test-custom-ring-validator",
+        "test(an_anonymous_ring_hides_owners_and_preserves_auditor_access) | test(an_anonymous_policy_ring_screens_its_hidden_sender)",
+        "--color",
+        "never",
+        "--status-level",
+        "pass",
+        "--final-status-level",
+        "pass"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-anonymous-validator-20261124T025501Z.log",
+      "recordedLogSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+      "observedLogSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+      "logHashMatches": true,
+      "requiredCases": [
+        {
+          "name": "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access",
+          "status": "passed"
+        },
+        {
+          "name": "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender",
+          "status": "passed"
+        }
+      ]
+    },
+    "go-resource-adjusted": {
+      "name": "go-resource-adjusted",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-complete-go-resumed.json",
+        "sha256": "27511a9e77bdab25c3b874832b77ca371ff652ed16c9dbcdca13b616a2b34f73"
+      },
+      "status": "incomplete",
+      "recordedStatus": "awaiting-remaining-packages",
+      "executionMode": "resumed-terminal-package-coverage",
+      "command": [],
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "startedAt": "2026-11-24T02:57:28.782055+00:00",
+      "finishedAt": null,
+      "exitCode": null,
+      "packageChecks": [
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-cmd-catalog-20261124T025728Z.jsonl",
+            "sha256": "da323fb537dd2eee6875174a69de08cdcd8dfb2935760e00fdaa0be0b17fa183"
+          },
+          "durationSeconds": 5.053,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-cmd-prover-20261124T025734Z.jsonl",
+            "sha256": "b3e334818ab4e9d9e447c05036311dee00b81ae65bcf798c53c76715eacf2c47"
+          },
+          "durationSeconds": 18.356,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+          "status": "passed",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringaudit-20261124T025752Z.jsonl",
+            "sha256": "cf38aa45bae02ea8e490c30975a8b35c993bac3a538ed0fbcdd7d7e429d16416"
+          },
+          "durationSeconds": 3.239,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 1,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "pass"
+          ],
+          "explicitlyHasNoTestFiles": false,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringkey-20261124T025755Z.jsonl",
+            "sha256": "db4f7a315909b88e40dd318ee572b9f961ad12ccd3d3ef1ece8e0fc35db6a7b0"
+          },
+          "durationSeconds": 0.768,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringmerge-20261124T025756Z.jsonl",
+            "sha256": "ade2cd0ff2e5ae73c00afb3f04642f5c1f6701ee65884cfa1678839106cda2c7"
+          },
+          "durationSeconds": 0.722,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringpolicy-20261124T025757Z.jsonl",
+            "sha256": "ad4532759eb35b28e599b32d2b5388c4144ddbc498c160e32e98f32c90df34c8"
+          },
+          "durationSeconds": 0.607,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+          "status": "passed",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringprotocol-20261124T025758Z.jsonl",
+            "sha256": "5f0c248faf2e0ad739dffcdd7880a0af560028c18f6ded73fc58c61bfcaee547"
+          },
+          "durationSeconds": 1.781,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 13,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "pass"
+          ],
+          "explicitlyHasNoTestFiles": false,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+          "status": "passed",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringregistry-20261124T025759Z.jsonl",
+            "sha256": "c492afefd493b3ed512d7813d971420cf6291f5c44a96aab8d87b74dd2da0e20"
+          },
+          "durationSeconds": 2.905,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 16,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "pass"
+          ],
+          "explicitlyHasNoTestFiles": false,
+          "observedFailureEvents": 0
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+          "status": "no-tests",
+          "exitCode": 0,
+          "log": {
+            "path": "/workspace/scratch/06977f839292/context/cr01-go-package-ringtest-ringtransfer-20261124T025802Z.jsonl",
+            "sha256": "fec5584efee48f18c4785748adb114b7c91bb1d00ca8f9ebea6490fe9bb345b5"
+          },
+          "durationSeconds": 0.744,
+          "command": [
+            "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+            "test",
+            "-json",
+            "-p",
+            "1",
+            "-parallel",
+            "1",
+            "-timeout",
+            "60m",
+            "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+            "-count=1"
+          ],
+          "tests": {
+            "pass": 0,
+            "fail": 0,
+            "skip": 0
+          },
+          "sourceBefore": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "sourceAfter": {
+            "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+            "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+            "clean": true
+          },
+          "verified": true,
+          "observedPackageTerminalActions": [
+            "skip"
+          ],
+          "explicitlyHasNoTestFiles": true,
+          "observedFailureEvents": 0
+        }
+      ],
+      "limitations": [
+        "Original whole-suite process was interrupted; this receipt aggregates terminal package results at unchanged source.",
+        "The failed transfer attempt remains preserved separately; lower heap and GC settings are a resource adjustment, not a confirmed diagnosis of its process kill."
+      ],
+      "owner": "root",
+      "packageCatalog": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-go-resume-plan.json",
+        "sha256": "b10ed4879f313b7ee24a5c1ee10826cf1764d41ffc37d5310831fde6fe014047"
+      },
+      "independentPackageCatalog": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-go-package-catalog.json",
+        "sha256": "e87517e2fece9b883bc3df356aae56920847bfdbe4d599500c012686d568571e"
+      },
+      "independentPackageCatalogVerified": true,
+      "priorLog": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-complete-go-60m.log",
+        "sha256": "1f72b938e0247487527c597305120f467342ef5098ed460f79e613de5c07f592"
+      },
+      "priorInterruptedReceipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-complete-go-interrupted.json",
+        "sha256": "1daa596728dc7cc0a2f63760b1ad603de0be2fac15c79b8d39eadae6945a334c"
+      },
+      "observedPassedPackages": [
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+          "duration": "29.734s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+          "duration": "44.670s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/policy",
+          "duration": "1310.010s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+          "duration": "132.968s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+          "duration": "0.052s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+          "duration": "0.045s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+          "duration": "5.053s",
+          "status": "no-tests"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/prover",
+          "duration": "18.356s",
+          "status": "no-tests"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
+          "duration": "3.239s",
+          "status": "passed"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey",
+          "duration": "0.768s",
+          "status": "no-tests"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringmerge",
+          "duration": "0.722s",
+          "status": "no-tests"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringpolicy",
+          "duration": "0.607s",
+          "status": "no-tests"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringprotocol",
+          "duration": "1.781s",
+          "status": "passed"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringregistry",
+          "duration": "2.905s",
+          "status": "passed"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer",
+          "duration": "0.744s",
+          "status": "no-tests"
+        }
+      ],
+      "coveredPackageCount": 15,
+      "requiredPackageCount": 18,
+      "missingPackages": [
+        "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+        "github.com/helius-labs/zolana-custom-rings/prover/ring",
+        "github.com/helius-labs/zolana-custom-rings/prover/ringtest"
+      ],
+      "logHashMatches": true,
+      "reason": "Remaining packages need terminal receipts; original whole-suite process was interrupted"
+    }
+  },
+  "buildStages": [
+    {
+      "name": "build-programs",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-programs.json",
+        "sha256": "0a490b5a81ff45a2cfc4b56395153ff4cbdfc62e78a7bc42b35f94e7bca11552"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T00:43:02.039891+00:00",
+      "finishedAt": "2026-11-24T00:49:17.485696+00:00",
+      "durationSeconds": 375.446,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-programs"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-programs-20261124T004302Z.log",
+      "recordedLogSha256": "ec5ee2e0d5b5634941dc759bd5fe40041cc4d3a3f6be93723aea6c6beb629860",
+      "observedLogSha256": "ec5ee2e0d5b5634941dc759bd5fe40041cc4d3a3f6be93723aea6c6beb629860",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-prover-server",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-prover-server.json",
+        "sha256": "0145b6e77723aa0c3747d5913661d7b3f4872a2e998ffbf7dfa3885eb9ba1723"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T00:49:17.563036+00:00",
+      "finishedAt": "2026-11-24T00:51:53.467616+00:00",
+      "durationSeconds": 155.905,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-prover-server"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-prover-server-20261124T004917Z.log",
+      "recordedLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observedLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-zolana-cli",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-zolana-cli.json",
+        "sha256": "4ce66ad1165118f7dcec959ce524a296414115e7aa001fb67c4f4655d05fd98f"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T00:51:53.597903+00:00",
+      "finishedAt": "2026-11-24T01:06:35.973966+00:00",
+      "durationSeconds": 882.376,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "zolana::build-cli"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-zolana-cli-20261124T005153Z.log",
+      "recordedLogSha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698",
+      "observedLogSha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-photon",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-photon.json",
+        "sha256": "6de5d8dad87654bb675168ffaafcc7b724124a82e580ac988b53dcc46cbcba07"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:06:36.130959+00:00",
+      "finishedAt": "2026-11-24T01:16:33.741024+00:00",
+      "durationSeconds": 597.61,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-photon"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-photon-20261124T010636Z.log",
+      "recordedLogSha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de",
+      "observedLogSha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-ring-indexer",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-indexer.json",
+        "sha256": "5a71a8d6b73c94e9eb6e20d95c2abc32049fb175c226681d3d1bce3956ceb28a"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:16:33.825553+00:00",
+      "finishedAt": "2026-11-24T01:21:31.477446+00:00",
+      "durationSeconds": 297.652,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-ring-indexer"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-indexer-20261124T011633Z.log",
+      "recordedLogSha256": "72df6d04e57e508983d97a34eb4fd75bb5d5f1a75b81c2bd42e223fa8c472a55",
+      "observedLogSha256": "72df6d04e57e508983d97a34eb4fd75bb5d5f1a75b81c2bd42e223fa8c472a55",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-ring-cli",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-cli.json",
+        "sha256": "1c4210d00d199782b944dc2d2d9106cf432c0cfcfc7536a799da8eec0c7e5d84"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:21:31.585834+00:00",
+      "finishedAt": "2026-11-24T01:27:40.992579+00:00",
+      "durationSeconds": 369.407,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-cli"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-cli-20261124T012131Z.log",
+      "recordedLogSha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75",
+      "observedLogSha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-ring-rpc",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-rpc.json",
+        "sha256": "74e3c4a667ba5f903708840e61c75d5c7545c4b58dd464205b5fe87662432553"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:42:21.946368+00:00",
+      "finishedAt": "2026-11-24T01:44:29.943676+00:00",
+      "durationSeconds": 127.996,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sameParentServices": false,
+      "command": [
+        "just",
+        "build-ring-rpc"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-ring-rpc-20261124T014221Z.log",
+      "recordedLogSha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee",
+      "observedLogSha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee",
+      "logHashMatches": true
+    },
+    {
+      "name": "build-xtask",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-stage-build-xtask.json",
+        "sha256": "b4ab9e001f1fde6bf440d0ca7b037ba449b8182823248d05d5c4d2c5f3f4597f"
+      },
+      "status": "passed",
+      "cwd": "/workspace/scratch/06977f839292/custom-rings",
+      "startedAt": "2026-11-24T01:16:29.856754+00:00",
+      "finishedAt": "2026-11-24T01:22:13.301552+00:00",
+      "durationSeconds": 343.445,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "environment": {
+        "CARGO_BUILD_JOBS": "1",
+        "CARGO_PROFILE_DEV_DEBUG": "0",
+        "CARGO_PROFILE_TEST_DEBUG": "0"
+      },
+      "artifact": {
+        "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/debug/xtask",
+        "size": 69544248,
+        "sha256": "f1da3a2fe698b805bfc91a0c5f9e88f3e146ce0a63c97893398ad6a967ecf9d7"
+      },
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "zolana/Cargo.toml",
+        "-p",
+        "xtask",
+        "--target-dir",
+        "zolana/target"
+      ],
+      "recordedStatus": "passed",
+      "exitCode": 0,
+      "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-xtask-20261124T011629Z.log",
+      "recordedLogSha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d",
+      "observedLogSha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d",
+      "logHashMatches": true
+    }
+  ],
+  "keys": {
+    "canonical-catalog": {
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-keys.json",
+        "sha256": "3402961ef7ea5c725e54bb3993c2a2fa57e72c9643a4ded6cbab812a7dbd2a21"
+      },
+      "verifiedAt": "2026-11-24T00:13:46.829704+00:00",
+      "keyCount": 28,
+      "totalBytes": 5437371692,
+      "allRecordedVerified": true,
+      "matchesPinnedLockMetadata": true,
+      "keys": [
+        {
+          "name": "custom_ring_apply_enrollments_1.key",
+          "sha256": "3d238da30b162fd46e4725b58af2ded1d25112766a1e25cc8dedd1d634e8193b",
+          "size": 7430633,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_enrollments_2.key",
+          "sha256": "5b4062c084d45b64b1c4a9bfa080173af6d43b1b5b6652a12dadd7a458913a64",
+          "size": 14851658,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_enrollments_4.key",
+          "sha256": "0ddf9a8b8bbe6089370ebb7f885001a45ea36b99a99db06614fbbaf124f5dd79",
+          "size": 29662267,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_enrollments_8.key",
+          "sha256": "25e761192caaedaf15663e5060c7ac3582de8a88589776a16e275860865312bf",
+          "size": 59282986,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_1.key",
+          "sha256": "5d1b02af6650d908c95662ad370c667ba08ac368b389573c0f920f01d94d23bb",
+          "size": 6714211,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_16.key",
+          "sha256": "fbd80a216491ce475f6fdfa96d3fb1b56833c5f5aa6b6c4b94543e3f7fab9a85",
+          "size": 106784225,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_2.key",
+          "sha256": "11ab04f10df5f39bc06fd1637a70729a7ad77e9c224d7c3100f814f5c836fbb8",
+          "size": 13399938,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_4.key",
+          "sha256": "b24358187d78532b656f3aa89fac9427f2ec97afde87d28f954a37d0a3210805",
+          "size": 26751581,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_8.key",
+          "sha256": "6109969bbef6607c3fcc8e4d884f03a3721a4479888720f78c380b96f66f47d6",
+          "size": 53437485,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_private_1.key",
+          "sha256": "192c0739123e3c4cb80587ff6d8cc8240ef8d6746d3abc2bb5272d8789799985",
+          "size": 8730945,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_private_16.key",
+          "sha256": "0462d1e07946f3741940bc35e2ab2b11cc57618634cdfff4a7f060ccb88e0b70",
+          "size": 136257965,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_private_2.key",
+          "sha256": "2f34912fd4666239d326def947587be87667af9ff33165128ef0fa71af98d07e",
+          "size": 17240117,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_private_4.key",
+          "sha256": "a057052789177e1f5dda6e307527b6144768ccfee3bf7ea6f190708eab4e3520",
+          "size": 34243920,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_apply_records_private_8.key",
+          "sha256": "b174f62ff8bf932d44d015039376528df54d8e1542508e39302b459696cb3289",
+          "size": 68253916,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_merge.key",
+          "sha256": "64a8ab474e1ad0aeb2a520cd21fab2bbef75c7b6e7a8ae506c18980bc893db2f",
+          "size": 38162616,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_register_key.key",
+          "sha256": "90d0f3a05edf2bef59de6726aa1e3c4b08abed8dd4c627f94a169752a49fcfe6",
+          "size": 17797993,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_16_in4_w4_s2.key",
+          "sha256": "7708af1286eedfc245d84641deaf6da68c932ea14418cfbac2b2c4285180c11f",
+          "size": 650892617,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_2_in24_w4_s4.key",
+          "sha256": "3921ac82248a03e9b03f836d457d636667cc0d4c96125f24fea838b4f9be8c5b",
+          "size": 285409001,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_4_in24_w4_s4.key",
+          "sha256": "c343825a5429feef491f0042c7da363ec9b288f8bc7d5f6d1b85e5cc4955a9cb",
+          "size": 330207713,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_8_in16_w4_s4.key",
+          "sha256": "61c5ab9df37df49928ef543c05afc9b5979938e6d59c027294d2a37511fba569",
+          "size": 396921639,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_entry_4_in8_w4_s8.key",
+          "sha256": "ea2b68fcffa03f93c49dd2c36ae0c41cd107589401a4d5a77655dc89c1624a44",
+          "size": 413536211,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_entry_8_in2_w4_s2.key",
+          "sha256": "cbaeda1e963a45d7741c4d63de4a402594789a45510ccd67da2d21f2467f5666",
+          "size": 426950438,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_entry_8_in5_w4_s4.key",
+          "sha256": "2072ae7d9f14c9a91831e7b289a7803688262de0870af064b4acf421b3b2d129",
+          "size": 499173553,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_entry_8_in8_w32_s8.key",
+          "sha256": "6b7ee5da650a78ed37e39fb417c352edd95396baa9af9dc299b649038458c375",
+          "size": 691202058,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_wide_2_in40_w4_s9.key",
+          "sha256": "97ea032322421e594476bd47d0d6d71fd11785ba74bf918c79cb2100094f6bee",
+          "size": 359679572,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "custom_ring_transfer_wide_8_in24_w32_s13.key",
+          "sha256": "ea0f805642fe5c2af0238628764c5ad1fc8212c9c42fb470a8965413300ef031",
+          "size": 718695694,
+          "pinnedBy": "prover/ring/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "transfer_ring_1_2.key",
+          "sha256": "22437f8f22194cb10bf8938a4c66c634d75f6d2abf4c8ed0b1f4c4e3ba9a09fe",
+          "size": 9278456,
+          "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "transfer_ring_2_2.key",
+          "sha256": "b5438902ead95e7dae05eb98d22592ba67698d99ff855e4d3b4f5bf7c4ead0a7",
+          "size": 16422284,
+          "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+          "verified": true
+        }
+      ],
+      "verificationBasis": "Recorded verification receipts and exact lock metadata; this consolidator does not rehash multi-gigabyte key files"
+    },
+    "additional-hidden-spp": {
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-hidden-spp-keys.json",
+        "sha256": "b3d991e6e96a95f56ddd7cb9a06f15ea1598e35a22be1694da21bb4b2c062edc"
+      },
+      "verifiedAt": "2026-11-24T00:27:43.395249+00:00",
+      "keyCount": 2,
+      "totalBytes": 186884503,
+      "allRecordedVerified": true,
+      "matchesPinnedLockMetadata": true,
+      "keys": [
+        {
+          "name": "transfer_eddsa_ring_1_2.key",
+          "size": 89967710,
+          "sha256": "be870f661af275e750811807628d07117a6ff353d6dd69695e16940bbea4f016",
+          "url": "https://d3gbdb0egjwcw9.cloudfront.net/proving-keys/78751f5d1c591777/transfer_eddsa_ring_1_2.key",
+          "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+          "verified": true
+        },
+        {
+          "name": "transfer_eddsa_ring_2_2.key",
+          "size": 96916793,
+          "sha256": "e8fcba9c9b940ab64d79fe78a79c356967eb54f5f556f79cdbb7ac3edf608a66",
+          "url": "https://d3gbdb0egjwcw9.cloudfront.net/proving-keys/78751f5d1c591777/transfer_eddsa_ring_2_2.key",
+          "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+          "verified": true
+        }
+      ],
+      "verificationBasis": "Recorded verification receipts and exact lock metadata; this consolidator does not rehash multi-gigabyte key files"
+    },
+    "additional-runtime-spp": {
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-runtime-extra-spp-keys.json",
+        "sha256": "1a7f9be09aba063b43c87a025337562711f827b87b579cfd7579f5132004fe96"
+      },
+      "verifiedAt": "2026-11-24T03:05:31.424337+00:00",
+      "keyCount": 1,
+      "totalBytes": 55779149,
+      "allRecordedVerified": true,
+      "matchesPinnedLockMetadata": true,
+      "keys": [
+        {
+          "name": "merge_ring_8_1.key",
+          "size": 55779149,
+          "sha256": "635f9f6d7d74447f2313264c691b818bc6a5611aedb0dcca3abd24405919d4a4",
+          "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+          "verified": true,
+          "observedModifiedAt": "2026-11-24T03:02:07.795048+00:00"
+        }
+      ],
+      "verificationBasis": "Recorded verification receipts and exact lock metadata; this consolidator does not rehash multi-gigabyte key files"
+    }
+  },
+  "toolchains": {
+    "required": {
+      "go": "1.27.3",
+      "rustc": "1.98.1"
+    },
+    "installationReceipt": {
+      "path": "/workspace/scratch/06977f839292/toolchains/installation-manifest.json",
+      "sha256": "e791b22dbdd55e5e46c6a221369a66f1078956350ff65db7cb7b1977b780e1b6"
+    },
+    "rust": {
+      "version": "1.98.1",
+      "rustup_home": "/workspace/scratch/06977f839292/toolchains/rustup",
+      "cargo_home": "/workspace/scratch/06977f839292/toolchains/cargo",
+      "components": [
+        "rustc",
+        "cargo",
+        "rust-std",
+        "clippy",
+        "rustfmt",
+        "rust-src"
+      ]
+    },
+    "releases": [
+      {
+        "tool": "just",
+        "tag": "1.59.0",
+        "url": "https://github.com/casey/just/releases/download/1.59.0/just-1.59.0-x86_64-unknown-linux-musl.tar.gz",
+        "sha256": "409044617b6f06517c1035e55ca38c8c856ff8b650e41bc2aa1ef82d5903a23e"
+      },
+      {
+        "tool": "nextest",
+        "tag": "cargo-nextest-0.9.152",
+        "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.152/cargo-nextest-0.9.152-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "d039b43c3e0958441b6ad0a39c8884d018b3d2e8fb9928f209074b1100b5e17a"
+      },
+      {
+        "tool": "agave",
+        "tag": "v4.2.2",
+        "url": "https://github.com/anza-xyz/agave/releases/download/v4.2.2/solana-release-x86_64-unknown-linux-gnu.tar.bz2",
+        "sha256": "5fc8684f7430038105fde953d4308ed56addf627f658daa61709f345448247ee"
+      },
+      {
+        "tool": "surfpool",
+        "tag": "v1.6.0-light",
+        "url": "https://github.com/Lightprotocol/surfpool/releases/download/v1.6.0-light/surfpool-linux-x64.tar.gz",
+        "sha256": "acf0ccb172ea0208bbbf3583a98ae39b39cabf43bddf30221e5ec0040db37409"
+      },
+      {
+        "tool": "cmake",
+        "tag": "v3.31.10",
+        "url": "https://github.com/Kitware/CMake/releases/download/v3.31.10/cmake-3.31.10-linux-x86_64.tar.gz",
+        "sha256": "3cb3dd247b6a1de2d0f4b20c6fd4326c9024e894cebc9dc8699758887e566ca7"
+      },
+      {
+        "tool": "ninja",
+        "tag": "v1.13.2",
+        "url": "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-linux.zip",
+        "sha256": "5749cbc4e668273514150a80e387a957f933c6ed3f5f11e03fb30955e2bbead6"
+      },
+      {
+        "tool": "protoc",
+        "tag": "v36.2",
+        "url": "https://github.com/protocolbuffers/protobuf/releases/download/v36.2/protoc-36.2-linux-x86_64.zip",
+        "sha256": "121f6c7afe1d4d0e3ea6aab9432038599250134cbf4474cb1167d2c7decd4278"
+      }
+    ],
+    "platformTools": {
+      "version": "v1.54",
+      "path": "/home/agent/.cache/solana/v1.54/platform-tools",
+      "install_only_exit": 0
+    },
+    "recordedVersionChecks": [
+      {
+        "command": [
+          "just",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/01-just.log",
+          "sha256": "9b7567d90fbce31fba37284f79c4d38cbbe20b42fa01cfa5504d27838a5e11ce"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "just 1.59.0"
+      },
+      {
+        "command": [
+          "cargo",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/02-cargo.log",
+          "sha256": "9950bbb2d5c3417b1a068f0e81f6d3cac991a363193bdf2a22d447f5acf8b503"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "cargo 1.98.1 (797e8a9bc 2026-08-05)"
+      },
+      {
+        "command": [
+          "jq",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/03-jq.log",
+          "sha256": "2292a8fb4fb7f1acaba560309e1da16b5724247cc1fd7542f6698941ff8e4579"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "jq-1.7"
+      },
+      {
+        "command": [
+          "curl",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/04-curl.log",
+          "sha256": "84e18a4933237f9f02d1a77d2ea64c83ee91681ca46646c3191237aca4ee5c33"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "curl 8.14.1 (x86_64-pc-linux-gnu) libcurl/8.14.1 OpenSSL/3.5.7 zlib/1.3.1 brotli/1.1.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.64.0 nghttp3/1.8.0 librtmp/2.3 OpenLDAP/2.6.10"
+      },
+      {
+        "command": [
+          "go",
+          "version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/05-go.log",
+          "sha256": "5707bf75dd54b4fdd5ac209444d48c9c4179ebf8510f80e2f7293dfbedc1012b"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "go version go1.27.3 linux/amd64"
+      },
+      {
+        "command": [
+          "rustc",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/06-rustc.log",
+          "sha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "rustc 1.98.1 (48a229cea 2026-09-01)"
+      },
+      {
+        "command": [
+          "cargo",
+          "nextest",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/07-cargo.log",
+          "sha256": "39c8870effd898c3cfe9409315f739638a965270f7705c63fbc03998ec840019"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "cargo-nextest 0.9.152 (26ebeda79 2026-11-13)"
+      },
+      {
+        "command": [
+          "cargo",
+          "build-sbf",
+          "--version"
+        ],
+        "exitCode": 0,
+        "log": {
+          "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/08-cargo.log",
+          "sha256": "556ccda1129f367fd20174d4ff7de3ea932573ecf0ef1a2a4c17d6c2b436859b"
+        },
+        "logMatchesReceipt": true,
+        "outputFirstLine": "cargo-build-sbf 4.1.0"
+      }
+    ]
+  },
+  "execution": {
+    "environmentReceipt": {
+      "path": "/workspace/scratch/06977f839292/context/cr01-environment.json",
+      "sha256": "eadb5221d0d463ff6c5280883a4ba8d649edef6cbebe3215ccf630c1696104a0"
+    },
+    "environment": {
+      "GOENV": "off",
+      "GOWORK": "off",
+      "GOMAXPROCS": "1",
+      "GOMEMLIMIT": "3GiB",
+      "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+      "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+      "CARGO_BUILD_JOBS": "1",
+      "CARGO_PROFILE_DEV_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG": "0",
+      "SPAWN_DISPOSABLE_LOCALNET": "1",
+      "toolchainEnvironment": "/workspace/scratch/06977f839292/toolchains/rust-env.sh"
+    },
+    "customRingPortPreflight": [
+      {
+        "port": 40899,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 40900,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 40901,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 40784,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 40786,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 43001,
+        "occupied": false,
+        "detail": ""
+      },
+      {
+        "port": 49998,
+        "occupied": false,
+        "detail": ""
+      }
+    ],
+    "stagedValidatorAttempt": {
+      "runner": "/workspace/scratch/06977f839292/context/run-cr01-validator-stages.py",
+      "runnerSha256": "fa3189073cfc4f17c9fbcbd65366d07b4e7682b2eeecf9ca8a4f2ed3ca8a49d5",
+      "sessionId": 41245,
+      "stageReceiptPattern": "/workspace/scratch/06977f839292/context/cr01-stage-*.json",
+      "status": "interrupted during RingRPC; completed stages retain verified receipts",
+      "runnerSnapshot": "/workspace/scratch/06977f839292/context/run-cr01-validator-stages-initial.py",
+      "interruptionReceipt": "/workspace/scratch/06977f839292/context/cr01-interrupted-ring-rpc-attempt.json"
+    },
+    "separateXtaskBuild": {
+      "runner": "/workspace/scratch/06977f839292/context/run-cr01-xtask.py",
+      "sessionId": 54162,
+      "jobs": 1,
+      "reason": "separate warmed target; two bounded Rust jobs total during overlap"
+    }
+  },
+  "externalDependency": {
+    "source": "https://github.com/helius-labs/zolana/releases/download/cli-v0.10.0/squads_smart_account_program-cli-v0.10.0.so",
+    "sha256": "1c95bd7be140589d2aec38a85d7ecfe70ec69639277f622c898f821ab1d636fa",
+    "size": 1651997,
+    "lockfile": "zolana/cli/release-artifacts.lock",
+    "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/squads_smart_account_program.so"
+  },
+  "previousAttempts": {
+    "originalRunner": {
+      "observedAt": "2026-11-24T00:27:39.076351+00:00",
+      "sessionId": 73977,
+      "sessionState": "Unknown process id",
+      "lastLogUpdate": "2026-11-24T00:20:08.083655+00:00",
+      "terminalOutcome": "unverified/interrupted; no Finished or exit receipt",
+      "runnerReceiptRetained": "/tmp/spawn-custom-rings-baseline-udFJ3X/receipt.json",
+      "status": "interrupted-or-unverified",
+      "receipt": {
+        "path": "/tmp/spawn-custom-rings-baseline-udFJ3X/receipt.json",
+        "sha256": "4b5ae29755da02b98aacdaad13de2b289e3172c18e93a1394130815af1914abb"
+      }
+    },
+    "defaultGoTimeout": {
+      "status": "timed-out-without-final-suite-receipt",
+      "timeoutSeconds": 600,
+      "package": "circuits/policy",
+      "test": "TestPolicySections",
+      "log": {
+        "path": "/workspace/scratch/06977f839292/context/upstream-go-tests.log",
+        "sha256": "12be11874389ca0509967b470ecced63dc61ca8f99a550abf4200231c130abcb"
+      },
+      "observedPassedPackages": [
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits",
+          "duration": "24.254s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/audit",
+          "duration": "30.810s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/registry",
+          "duration": "124.977s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/ringgadget",
+          "duration": "0.041s"
+        },
+        {
+          "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/shared",
+          "duration": "0.047s"
+        }
+      ]
+    },
+    "interruptedExtendedGoCommand": {
+      "status": "interrupted-or-unverified",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-complete-go-interrupted.json",
+        "sha256": "1daa596728dc7cc0a2f63760b1ad603de0be2fac15c79b8d39eadae6945a334c"
+      },
+      "log": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-complete-go-60m.log",
+        "sha256": "1f72b938e0247487527c597305120f467342ef5098ed460f79e613de5c07f592"
+      },
+      "wholeCommandSuccessClaimed": false
+    },
+    "killedTransferPackage": {
+      "status": "failed",
+      "receipt": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-go-failed-transfer-20261124T020317Z.json",
+        "sha256": "e1256fed5a6b5322de2371696d4403c82bdaa7982ba7563425acbf12778dcd24"
+      },
+      "log": {
+        "path": "/workspace/scratch/06977f839292/context/cr01-go-package-circuits-transfer-20261124T014430Z.jsonl",
+        "sha256": "dbfff8b10548193a1e8164f3cd1df3bb1133f0f04237df0e2b88567495a25bd6"
+      },
+      "observed": "130 passed test events, then signal: killed and package exit 1 during the wide catalog-shape compilation; cause not established by the log"
+    }
+  },
+  "limitations": [
+    "A recorded running receipt is incomplete evidence and does not prove a process is still alive.",
+    "Successful native builds and exact named validator cases do not substitute for the hermetic gate or the complete Go suite.",
+    "The original default-timeout Go result remains recorded even if the explicitly extended-timeout suite later passes.",
+    "This consolidator reads receipts and logs only. It does not rerun tests, rehash large key files, or establish application-journey success."
+  ]
+}

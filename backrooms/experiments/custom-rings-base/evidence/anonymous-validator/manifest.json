@@ -1,0 +1,16 @@
+{
+  "schema": "upstream-anonymous-validator-evidence-v1",
+  "scope": "Two required upstream cases on a real local validator; no application composition claim.",
+  "files": [
+    {
+      "file": "receipt.json",
+      "bytes": 1734,
+      "sha256": "0a544d5f75962dd87b3f99b50c35fda3db032bdb40ad6589db29584c4b6d7195"
+    },
+    {
+      "file": "command.log",
+      "bytes": 14281,
+      "sha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b"
+    }
+  ]
+}

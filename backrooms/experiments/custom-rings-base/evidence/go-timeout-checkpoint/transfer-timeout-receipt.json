@@ -1,0 +1,72 @@
+{
+  "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+  "command": [
+    "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+    "test",
+    "-json",
+    "-p",
+    "1",
+    "-parallel",
+    "1",
+    "-timeout",
+    "60m",
+    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+    "-count=1"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings/prover",
+  "status": "failed",
+  "startedAt": "2026-11-24T03:11:18.476960+00:00",
+  "sourceBefore": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-go-package-circuits-transfer-20261124T031118Z.jsonl",
+  "tests": {
+    "pass": 191,
+    "fail": 0,
+    "skip": 0
+  },
+  "environment": {
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOFLAGS": "",
+    "GOTOOLCHAIN": "local",
+    "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+    "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+    "GOMAXPROCS": "1",
+    "GOMEMLIMIT": "1GiB",
+    "GOGC": "25",
+    "REQUIRE_RING_KEYS": "1",
+    "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys"
+  },
+  "defaultOptInsUnset": [
+    "WRITE_RING_GOLDENS",
+    "REQUEST_FIXTURES",
+    "RING_RPC_ESCROW_MEMBER",
+    "STORAGE_REGISTRY",
+    "UPDATE_RING_GOLDENS",
+    "WRITE_RING_PINS",
+    "WRITE_RING_PROOF_VECTORS",
+    "WRITE_AUDIT_VECTORS",
+    "AEGLOS_FIXTURES",
+    "RING_MILLION_RECORDS"
+  ],
+  "runnerSha256": "842df583f012070afcf5391a78984311386b7750e777dbd07682688e1b91a087",
+  "maximumChildRssScope": "Cumulative maximum across all completed child processes of this resumer; not an isolated per-package peak",
+  "elapsedSeconds": 3605.007,
+  "lastTest": "TestOwnerCapacity/four_and_thirteen_owners,_plain_and_policy",
+  "heartbeatAt": "2026-11-24T04:11:12.471019+00:00",
+  "processAlive": false,
+  "logBytes": 216119,
+  "exitCode": 1,
+  "finishedAt": "2026-11-24T04:11:23.511443+00:00",
+  "packageTerminalAction": "fail",
+  "logSha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+  "maximumChildRssKiB": 1707000,
+  "sourceAfter": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  }
+}

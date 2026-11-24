@@ -1,0 +1,22 @@
+✖ Nextest progress counters preserve exact named terminal passes (145.895997ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 337.607974
+
+✖ failing tests:
+
+test at bootstrap/backrooms/experiments/custom-rings-base/execution.test.mjs:44:1
+✖ Nextest progress counters preserve exact named terminal passes (145.895997ms)
+  Error: Missing successful validator cases: anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access, anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+      at run (file:///workspace/scratch/06977f839292/bootstrap/backrooms/experiments/custom-rings-base/baseline.mjs:115:36)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/scratch/06977f839292/bootstrap/backrooms/experiments/custom-rings-base/execution.test.mjs:48:18)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    evidence: { command: '/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node', args: [ '-e', 'process.stderr.write("        PASS [   0.123s] (  1/2) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access\\n        PASS [   0.456s] (  2/2) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender\\n")' ], cwd: '/tmp/custom-rings-command-rwW9O5', startedAt: '2026-11-24T02:22:27.490Z', durationMs: 141, status: 0, signal: null, logPath: '/tmp/custom-rings-command-rwW9O5/validator.log', logSha256: '9712ec752556596bd16d922d9de48d2e8f0e04f82c39d2e4494ad9cbb4a4272e', passedCases: [], output: '        PASS [   0.123s] (  1/2) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access\n        PASS [   0.456s] (  2/2) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender\n', outputTruncated: false }
+  }

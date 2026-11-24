@@ -1,0 +1,149 @@
+{
+  "schema": "upstream-baseline-checkpoint-v1",
+  "scope": "Exact-source upstream builds, check-all, hermetic tests, key hashes and runtime artifact identities. Complete Go package coverage remains pending in this snapshot.",
+  "originalReceiptPaths": "Original absolute paths identify the recording workspace. Matching filenames in this directory hold the public copies; other referenced receipt paths are historical local records.",
+  "files": [
+    {
+      "file": "cr01-check-all-resume.json",
+      "bytes": 556,
+      "sha256": "3ab65c464b915448863895e9d3902b103cdec72433e45e90354387dfd734d7b9"
+    },
+    {
+      "file": "cr01-check-all-resume.log",
+      "bytes": 1160,
+      "sha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3"
+    },
+    {
+      "file": "cr01-hidden-spp-keys.json",
+      "bytes": 831,
+      "sha256": "b3d991e6e96a95f56ddd7cb9a06f15ea1598e35a22be1694da21bb4b2c062edc"
+    },
+    {
+      "file": "cr01-keys.json",
+      "bytes": 7223,
+      "sha256": "3402961ef7ea5c725e54bb3993c2a2fa57e72c9643a4ded6cbab812a7dbd2a21"
+    },
+    {
+      "file": "cr01-native-artifacts-readback.json",
+      "bytes": 798,
+      "sha256": "385578473792a9479a489a071a40562a8f778423db40bfbe53aad8e455e503f4"
+    },
+    {
+      "file": "cr01-native-runtime-artifacts.json",
+      "bytes": 6458,
+      "sha256": "fefe5eae955c9ed2edfb5cbd9c6dcbd01803f8b8f9853f489db16fcb9c318f5f"
+    },
+    {
+      "file": "cr01-runtime-extra-spp-keys.json",
+      "bytes": 559,
+      "sha256": "1a7f9be09aba063b43c87a025337562711f827b87b579cfd7579f5132004fe96"
+    },
+    {
+      "file": "cr01-stage-build-photon-20261124T010636Z.log",
+      "bytes": 14617,
+      "sha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de"
+    },
+    {
+      "file": "cr01-stage-build-photon.json",
+      "bytes": 908,
+      "sha256": "6de5d8dad87654bb675168ffaafcc7b724124a82e580ac988b53dcc46cbcba07"
+    },
+    {
+      "file": "cr01-stage-build-programs-20261124T004302Z.log",
+      "bytes": 14646,
+      "sha256": "ec5ee2e0d5b5634941dc759bd5fe40041cc4d3a3f6be93723aea6c6beb629860"
+    },
+    {
+      "file": "cr01-stage-build-programs.json",
+      "bytes": 913,
+      "sha256": "0a490b5a81ff45a2cfc4b56395153ff4cbdfc62e78a7bc42b35f94e7bca11552"
+    },
+    {
+      "file": "cr01-stage-build-prover-server-20261124T004917Z.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "cr01-stage-build-prover-server.json",
+      "bytes": 923,
+      "sha256": "0145b6e77723aa0c3747d5913661d7b3f4872a2e998ffbf7dfa3885eb9ba1723"
+    },
+    {
+      "file": "cr01-stage-build-ring-cli-20261124T012131Z.log",
+      "bytes": 12142,
+      "sha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75"
+    },
+    {
+      "file": "cr01-stage-build-ring-cli.json",
+      "bytes": 908,
+      "sha256": "1c4210d00d199782b944dc2d2d9106cf432c0cfcfc7536a799da8eec0c7e5d84"
+    },
+    {
+      "file": "cr01-stage-build-ring-indexer-20261124T011633Z.log",
+      "bytes": 12385,
+      "sha256": "72df6d04e57e508983d97a34eb4fd75bb5d5f1a75b81c2bd42e223fa8c472a55"
+    },
+    {
+      "file": "cr01-stage-build-ring-indexer.json",
+      "bytes": 921,
+      "sha256": "5a71a8d6b73c94e9eb6e20d95c2abc32049fb175c226681d3d1bce3956ceb28a"
+    },
+    {
+      "file": "cr01-stage-build-ring-rpc-20261124T014221Z.log",
+      "bytes": 2949,
+      "sha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee"
+    },
+    {
+      "file": "cr01-stage-build-ring-rpc.json",
+      "bytes": 1007,
+      "sha256": "74e3c4a667ba5f903708840e61c75d5c7545c4b58dd464205b5fe87662432553"
+    },
+    {
+      "file": "cr01-stage-build-xtask-20261124T011629Z.log",
+      "bytes": 11832,
+      "sha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d"
+    },
+    {
+      "file": "cr01-stage-build-xtask.json",
+      "bytes": 1244,
+      "sha256": "b4ab9e001f1fde6bf440d0ca7b037ba449b8182823248d05d5c4d2c5f3f4597f"
+    },
+    {
+      "file": "cr01-stage-build-zolana-cli-20261124T005153Z.log",
+      "bytes": 19305,
+      "sha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698"
+    },
+    {
+      "file": "cr01-stage-build-zolana-cli.json",
+      "bytes": 918,
+      "sha256": "4ce66ad1165118f7dcec959ce524a296414115e7aa001fb67c4f4655d05fd98f"
+    },
+    {
+      "file": "cr01-stage-test-hermetic-20261124T014430Z.log",
+      "bytes": 240436,
+      "sha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e"
+    },
+    {
+      "file": "cr01-stage-test-hermetic.json",
+      "bytes": 1006,
+      "sha256": "008321c51a8d9af3ec9a2836fa018424edff70d1e0b091117fa61e978a3230d0"
+    },
+    {
+      "file": "cr01-summary.json",
+      "bytes": 58653,
+      "sha256": "b7ce76f30e742a8a550dfeb9be15b1d7a8dabf657a3bd8904ae870113a2f8497"
+    },
+    {
+      "file": "toolchain-installation.json",
+      "bytes": 3169,
+      "sha256": "e791b22dbdd55e5e46c6a221369a66f1078956350ff65db7cb7b1977b780e1b6"
+    }
+  ],
+  "runtimeKeyCount": 31,
+  "runtimeKeyGroups": {
+    "canonicalFetch": 28,
+    "hiddenOwnerSpp": 2,
+    "runtimeFetchedMerge": 1
+  },
+  "applicationComposition": "separate PR39 evidence, not established by this baseline packet"
+}

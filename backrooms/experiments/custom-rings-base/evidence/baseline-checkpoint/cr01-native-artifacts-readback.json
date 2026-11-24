@@ -1,0 +1,20 @@
+{
+  "status": "verified",
+  "checkedAt": "2026-11-24T03:10:53.806884+00:00",
+  "sourceManifestSha256": "fefe5eae955c9ed2edfb5cbd9c6dcbd01803f8b8f9853f489db16fcb9c318f5f",
+  "artifactsRehashed": [
+    "target/deploy/custom_ring_program.so",
+    "target/deploy/storage_program.so",
+    "zolana/target/deploy/shielded_pool_program.so",
+    "zolana/target/deploy/spr_user_registry.so",
+    "zolana/target/deploy/squads_smart_account_program.so",
+    "target/prover-server",
+    "target/debug/photon",
+    "target/debug/ring-indexer",
+    "target/debug/ring-rpc",
+    "target/debug/zolana-ring",
+    "zolana/target/debug/zolana",
+    "zolana/target/debug/xtask"
+  ],
+  "scope": "Read-back of recorded native artifact bytes after the successful upstream validator run; not an independent code review."
+}

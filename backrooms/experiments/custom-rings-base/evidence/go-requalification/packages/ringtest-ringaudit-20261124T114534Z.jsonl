@@ -1,0 +1,8 @@
+{"Time":"2026-11-24T12:45:38.434132585+01:00","Action":"start","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit"}
+{"Time":"2026-11-24T12:45:38.464006043+01:00","Action":"run","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Test":"TestAuditEnvelopeVector"}
+{"Time":"2026-11-24T12:45:38.464135864+01:00","Action":"output","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Test":"TestAuditEnvelopeVector","Output":"=== RUN   TestAuditEnvelopeVector\n","OutputType":"frame"}
+{"Time":"2026-11-24T12:45:38.464917383+01:00","Action":"output","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Test":"TestAuditEnvelopeVector","Output":"--- PASS: TestAuditEnvelopeVector (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-24T12:45:38.464930102+01:00","Action":"pass","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Test":"TestAuditEnvelopeVector","Elapsed":0}
+{"Time":"2026-11-24T12:45:38.464939346+01:00","Action":"output","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-24T12:45:38.46552054+01:00","Action":"output","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Output":"ok  \tgithub.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit\t0.031s\n"}
+{"Time":"2026-11-24T12:45:38.465535172+01:00","Action":"pass","Package":"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit","Elapsed":0.031}

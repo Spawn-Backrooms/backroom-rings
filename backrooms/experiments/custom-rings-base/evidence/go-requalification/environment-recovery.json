@@ -1,0 +1,146 @@
+{
+  "schema": "cr01-go-environment-recovery-v1",
+  "recordedAt": "2026-11-24T11:40:31.455380+00:00",
+  "purpose": "Restore clean pinned Go-only qualification prerequisites after scratch reset; no test execution or prior-result reconstruction.",
+  "repo": {
+    "path": "/workspace/scratch/06977f839292/custom-rings-base",
+    "origin": "https://github.com/Spawn-Backrooms/custom-privacy-rings.git",
+    "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "clean": true,
+    "zolana": {
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana",
+      "origin": "https://github.com/helius-labs/zolana",
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "clean": true
+    }
+  },
+  "toolchain": {
+    "version": "go version go1.27.3 linux/amd64",
+    "goExecutable": "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+    "officialRelease": {
+      "version": "go1.27.3",
+      "stable": true,
+      "file": {
+        "filename": "go1.27.3.linux-amd64.tar.gz",
+        "os": "linux",
+        "arch": "amd64",
+        "version": "go1.27.3",
+        "sha256": "65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40",
+        "size": 70588678,
+        "kind": "archive",
+        "url": "https://go.dev/dl/go1.27.3.linux-amd64.tar.gz"
+      }
+    },
+    "archive": {
+      "path": "context/restore-go-environment/go1.27.3.linux-amd64.tar.gz",
+      "bytes": 70588678,
+      "sha256": "65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40"
+    },
+    "executable": {
+      "path": "toolchains/go1.27.3/go/bin/go",
+      "bytes": 17164222,
+      "sha256": "5f5eb6d0b2fb6aa0bb5d5f8c5f1c944e0de955c925f0111af92a9d8f79680b5b"
+    }
+  },
+  "explicitEnvironment": {
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOFLAGS": "",
+    "GOTOOLCHAIN": "local",
+    "GOCACHE": "/workspace/scratch/06977f839292/toolchains/go-cache",
+    "GOPATH": "/workspace/scratch/06977f839292/toolchains/go-path",
+    "GOMAXPROCS": "1"
+  },
+  "commands": [
+    {
+      "argv": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "list",
+        "-mod=readonly",
+        "-deps",
+        "-test",
+        "./..."
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-base/prover",
+      "exitCode": 0,
+      "stdout": {
+        "path": "context/restore-go-environment/dependency-catalog.txt",
+        "bytes": 26575,
+        "sha256": "3cbbd151f3ebcfa1205069ddea4f38c91745809cecb5e23539769da95feacfb3"
+      },
+      "stderr": {
+        "path": "context/restore-go-environment/dependency-download.log",
+        "bytes": 2616,
+        "sha256": "06b7fc81e5054880a0e9bb66be49fdc06347a6054db137816e96a1976a920a74"
+      },
+      "executesTests": false
+    },
+    {
+      "argv": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "list",
+        "./..."
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-base/prover",
+      "exitCode": 0,
+      "stdout": {
+        "path": "context/restore-go-environment/package-catalog.txt",
+        "bytes": 1190,
+        "sha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc"
+      },
+      "packageCount": 18
+    },
+    {
+      "argv": [
+        "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+        "mod",
+        "verify"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-base/prover",
+      "exitCode": 0,
+      "stdout": {
+        "path": "context/restore-go-environment/module-verification.txt",
+        "bytes": 21,
+        "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+      }
+    }
+  ],
+  "locks": [
+    {
+      "path": "custom-rings-base/prover/go.mod",
+      "bytes": 2783,
+      "sha256": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750"
+    },
+    {
+      "path": "custom-rings-base/prover/go.sum",
+      "bytes": 13524,
+      "sha256": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527"
+    },
+    {
+      "path": "custom-rings-base/zolana/prover/server/go.mod",
+      "bytes": 2664,
+      "sha256": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4"
+    },
+    {
+      "path": "custom-rings-base/zolana/prover/server/go.sum",
+      "bytes": 13524,
+      "sha256": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527"
+    }
+  ],
+  "testsStarted": false,
+  "proofsStarted": false,
+  "sourceChanges": false,
+  "provingKeysIncludedInThisReceipt": false,
+  "limitations": [
+    "Dependency discovery and checksum verification do not establish compilation or test success.",
+    "Previously lost logs and terminal receipts have not been recreated.",
+    "Native services and the completed application journey were not rebuilt or rerun."
+  ]
+}
