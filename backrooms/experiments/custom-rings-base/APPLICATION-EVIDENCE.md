@@ -170,28 +170,28 @@ reported `credits_exhausted` and no Cloud environment containing this repository
 overlay, rather than treating a scan of the unmodified base as review of this
 profile. This checkpoint carries no final independent sign-off or merge approval.
 
-CR01 also remains incomplete. Fifteen of 18 upstream Go packages have retained
-terminal coverage: nine test packages passed and six explicitly reported no
-test files. Transfer, ring and ringtest remain incomplete.
+CR01 still needs complete fresh Go package coverage. The [fresh qualification packet](https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md)
+contains verified terminal evidence for **14/18 whole packages**: 8
+passing test packages and 6 packages explicitly reporting no test files.
+The [machine-readable summary](https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json) records every exact unfiltered
+command, complete raw-log digest, terminal exit and unchanged clean source pins.
+Default fixture/service/population opt-ins remain unset, with named skips retained.
 
-The latest completed transfer attempt reached the actual Go one-hour timeout
-and exited 1 after 3,605.007 seconds. It recorded 191 passing test/subtest events,
-zero failed-test events and zero skips, with 28 of 44 top-level tests completed.
-The package result is **failed/incomplete**, despite those partial passes; source
-pins and cleanliness remained unchanged. The complete JSONL log SHA-256 is
+The [recovery checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/30ea1a297f74934a5d46186072c4c8953c403ff8/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md) preserves the prior history. Public
+summaries had recorded 15/18 and later local observations reached 17/18, but the
+unpublished working files became unavailable before the final ring result was
+observed. The final old ring attempt has no recovered terminal receipt. Those
+historical summaries receive no credit in the fresh qualification. Each completed
+package is now checkpointed before the next long package.
+
+The actual one-hour transfer timeout remains preserved with full JSONL SHA-256
 `eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234`.
-The earlier transfer attempt killed after 130 passing events, original
-default-timeout run and interrupted extended whole-suite attempt remain in the
-history. The earlier kill's underlying cause is not established.
-
-A new unfiltered sequential attempt uses the recorded 180-minute ceiling in
-the order **ring → ringtest → transfer**. Only ring is active at this checkpoint;
-ringtest and transfer are queued. `GOMAXPROCS=1`, `GOMEMLIMIT=1GiB`, `GOGC=25`
-and bounded test parallelism are unchanged. The longer ceiling is not a runtime
-estimate or a passing result. Coverage remains 15/18 until terminal results are
-verified. [APPLICATION-EVIDENCE.json](APPLICATION-EVIDENCE.json) retains the
-timeout, adjustment and new runner identities. Neither partial results nor
-completed builds establish a whole-suite pass.
+The larger proof packages retain the recorded 180-minute ceiling, two already-
+allowed CPUs, `GOMAXPROCS=1`, `GOMEMLIMIT=1GiB`, `GOGC=25` and bounded test
+parallelism. The ceiling is not a runtime estimate. Earlier interrupted and killed
+attempts remain historical; the underlying cause of the earlier kills is not
+established. This qualification does not close independent review, broader CR04
+acceptance or native activation gates.
 
 Both exact upstream
 anonymous-validator cases passed at unchanged clean source pins. The hidden-sender
