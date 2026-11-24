@@ -1,0 +1,126 @@
+    Finished `release` profile [optimized] target(s) in 0.79s
+    Finished `release` profile [optimized] target(s) in 0.73s
+    Finished `release` profile [optimized] target(s) in 0.71s
+    Finished `release` profile [optimized] target(s) in 0.09s
+    Finished `release` profile [optimized] target(s) in 0.74s
+    Finished `release` profile [optimized] target(s) in 0.49s
+    Finished `dev` profile [unoptimized] target(s) in 1.18s
+    Finished `dev` profile [unoptimized] target(s) in 1.24s
+    Finished `dev` profile [unoptimized] target(s) in 0.80s
+    Finished `dev` profile [unoptimized] target(s) in 1.04s
+warning: ignoring --test-threads because --no-capture is specified
+    Finished `test` profile [unoptimized] target(s) in 0.71s
+────────────
+ Nextest run ID b3f79c49-e580-4b05-b64f-0e0e8f25ab8a with nextest profile: default
+    Starting 2 tests across 1 binary (59 tests skipped)
+       START [         ] (1/2) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+
+running 1 test
+Starting local validator
+Starting surfpool: /workspace/scratch/06977f839292/toolchains/bin/surfpool start --offline --no-tui --no-deploy --no-studio --port 40899 --host 127.0.0.1 --ws-port 40900 --studio-port 40901 --bpf-program regy3WAeRXMYuMYxr5iK3Bf9Arr3PcxGxyzAddbiqDQ /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/spr_user_registry.so --bpf-program SMRTzfY6DfH5ik3TKiyLFfXexV8uSG3d2UksSCYdunG /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/squads_smart_account_program.so --bpf-program rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL /workspace/scratch/06977f839292/custom-rings/target/deploy/storage_program.so --upgradeable-program ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/shielded_pool_program.so EdMSvMoHfsemd2s7eHCrRnuM1dzPu2CpUrHJN98XYC9y --upgradeable-program B1zanwd8AzCHfDWUX5kyar8LUcek6R8qSS1xuz2EyQoF /workspace/scratch/06977f839292/custom-rings/target/deploy/custom_ring_program.so 9zMkLAYRge5SMUQo55Ef1nbc7UwpKcxbfskNgKdU4emX --account-dir /tmp/zolana-custom-ring-smart-accounts-967
+Writing surfpool logs to /tmp/zolana-ring-tests.uYlVhB/logs/surfpool.log
+Starting Photon: /workspace/scratch/06977f839292/custom-rings/target/debug/photon --rpc-url http://127.0.0.1:40899 --port 40784 --start-slot latest --max-concurrent-block-fetches 8
+Writing photon logs to /tmp/zolana-ring-tests.uYlVhB/logs/photon.log
+Photon indexer is ready at http://127.0.0.1:40784
+Local validator environment is ready
+Starting prover: /workspace/scratch/06977f839292/custom-rings/target/prover-server start --keys-dir /workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys/ --prover-address 0.0.0.0:43001 --metrics-address 0.0.0.0:49998 --auto-download=true
+Prover indexer: http://127.0.0.1:40786
+Writing prover-server logs to /tmp/zolana-ring-tests.uYlVhB/logs/prover-server.log
+Prover proving keys match (162 keys)
+Prover started successfully
+        SLOW [> 60.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+test anonymous::an_anonymous_policy_ring_screens_its_hidden_sender has been running for over 60 seconds
+RING_APPLY_KEY writes=1 mutation_refused=true settled=true
+RING_APPLY_KEY writes=1 mutation_refused=true settled=true
+        SLOW [>120.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+test anonymous::an_anonymous_policy_ring_screens_its_hidden_sender ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 60 filtered out; finished in 137.68s
+
+        PASS [ 137.717s] (1/2) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+       START [         ] (2/2) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+
+running 1 test
+Starting local validator
+Starting surfpool: /workspace/scratch/06977f839292/toolchains/bin/surfpool start --offline --no-tui --no-deploy --no-studio --port 40899 --host 127.0.0.1 --ws-port 40900 --studio-port 40901 --bpf-program regy3WAeRXMYuMYxr5iK3Bf9Arr3PcxGxyzAddbiqDQ /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/spr_user_registry.so --bpf-program SMRTzfY6DfH5ik3TKiyLFfXexV8uSG3d2UksSCYdunG /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/squads_smart_account_program.so --bpf-program rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL /workspace/scratch/06977f839292/custom-rings/target/deploy/storage_program.so --upgradeable-program ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW /workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/shielded_pool_program.so EdMSvMoHfsemd2s7eHCrRnuM1dzPu2CpUrHJN98XYC9y --upgradeable-program B1zanwd8AzCHfDWUX5kyar8LUcek6R8qSS1xuz2EyQoF /workspace/scratch/06977f839292/custom-rings/target/deploy/custom_ring_program.so 71tgGWpM97Aq3iwm9Vu1LUfhEBcjatjCC895VLy8Zq6k --account-dir /tmp/zolana-custom-ring-smart-accounts-1131
+Writing surfpool logs to /tmp/zolana-ring-tests.uYlVhB/logs/surfpool.log
+Starting Photon: /workspace/scratch/06977f839292/custom-rings/target/debug/photon --rpc-url http://127.0.0.1:40899 --port 40784 --start-slot latest --max-concurrent-block-fetches 8
+Writing photon logs to /tmp/zolana-ring-tests.uYlVhB/logs/photon.log
+Photon indexer is ready at http://127.0.0.1:40784
+Local validator environment is ready
+        SLOW [> 60.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+test anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access has been running for over 60 seconds
+        SLOW [>120.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+        SLOW [>180.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+        SLOW [>240.000s] (───) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+test anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 60 filtered out; finished in 270.49s
+
+        PASS [ 270.612s] (2/2) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+────────────
+     Summary [ 408.334s] 2 tests run: 2 passed (2 slow), 59 skipped
+        SKIP [         ] (───) custom-ring-test-validator::ring anonymous::cli_pays_an_anonymous_ring_address_end_to_end
+        SKIP [         ] (───) custom-ring-test-validator::ring exemptions::an_exempt_withdrawal_settles_without_the_co_signer_on_a_policy_ring
+        SKIP [         ] (───) custom-ring-test-validator::ring exemptions::an_exempt_withdrawal_settles_without_the_co_signer_on_an_audit_only_ring
+        SKIP [         ] (───) custom-ring-test-validator::ring forester_stall::a_stalled_forester_stops_a_dummy_input_transfer_and_no_deposit
+        SKIP [         ] (───) custom-ring-test-validator::ring lifecycle::a_recipient_receives_before_registration_then_registers_and_spends
+        SKIP [         ] (───) custom-ring-test-validator::ring lifecycle::auditor_key_is_released_only_to_the_ring_authority
+        SKIP [         ] (───) custom-ring-test-validator::ring lifecycle::cli_init_names_the_roles_and_reruns_from_the_chain
+        SKIP [         ] (───) custom-ring-test-validator::ring lifecycle::localnet_bring_up_is_live
+        SKIP [         ] (───) custom-ring-test-validator::ring merge::cli_caps_anonymous_merge_at_supported_width
+        SKIP [         ] (───) custom-ring-test-validator::ring merge::cli_merges_fragmented_custom_ring_notes
+        SKIP [         ] (───) custom-ring-test-validator::ring merge::cli_merges_twenty_four_custom_ring_utxos
+        SKIP [         ] (───) custom-ring-test-validator::ring migration::an_old_tree_note_migrates_into_the_active_tree
+        SKIP [         ] (───) custom-ring-test-validator::ring policy::a_relayer_pays_a_confidential_policy_transfer_its_owner_signs_in_the_proof
+        SKIP [         ] (───) custom-ring-test-validator::ring policy::an_outflow_limit_ring_bounds_each_transfer
+        SKIP [         ] (───) custom-ring-test-validator::ring policy::the_key_enrollment_lifecycle_ends_in_a_delegate_move
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_managed_merge_pass_settles_the_wallet_toward_its_target
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_relayed_anonymous_payment_reaches_its_recipient
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_relayed_authority_transfer_moves_the_enrolled_members_note
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_relayed_confidential_transfer_signed_in_the_proof_reaches_its_recipient
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_relayed_deposit_lands_the_note_the_auditor_recovers
+        SKIP [         ] (───) custom-ring-test-validator::ring relay::a_relayed_user_merge_lands_one_note_of_the_merged_value
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity::a_zero_key_payment_settles_for_a_registered_and_an_unregistered_owner_without_a_salted_read
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity::compact_output_suffix_settles_under_a_larger_key
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity::every_apply_capacity_settles_and_refuses_an_altered_root
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity::viewing_key_rotation_survives_restart_and_a_wallet_wipe
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity_deposits::an_sdk_batch_deposit_settles_through_a_transfer
+        SKIP [         ] (───) custom-ring-test-validator::ring sanity_mixed_owners::public_co_owner_receives_payment_under_each_owners_net_debit_cap
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::anonymous_widest_eight_output_transfer_settles
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_anonymous_and_entry_keys
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_anonymous_wide_keys
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_confidential_keys
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_confidential_wide_keys
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_in_proof_and_delegate_modes
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_salted_keys
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sanity_wide_withdrawal_heap_sentinel
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::spl_anonymous_policy_withdrawals_settle
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::spl_confidential_policy_withdrawals_settle
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_anonymous
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_anonymous_policy
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_confidential
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_confidential_policy
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_delegate
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_full_capacity_anonymous_policy
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_full_capacity_confidential
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_full_capacity_confidential_policy
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_full_capacity_salted
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_salted
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_widest_frames_anonymous
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_widest_frames_anonymous_entry
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_widest_frames_confidential_in_proof
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::sweep_widest_frames_confidential_signer
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::wide_anonymous_policy_withdrawals_settle
+        SKIP [         ] (───) custom-ring-test-validator::ring shapes::wide_confidential_policy_withdrawals_settle
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::an_audit_only_ring_audits_a_relayer_paid_transfer_its_owner_signs_in_the_proof
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::an_audit_only_ring_audits_every_transfer
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::auditor_sees_every_ring_transfer
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::ring_value_leaves_and_enters_through_audited_transfers
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::the_auditor_rebuilds_a_data_bearing_output_from_its_slot
+        SKIP [         ] (───) custom-ring-test-validator::ring transfers::usdc_crosses_the_ring_boundary_and_withdraws_through_a_ring_transact
+        SLOW [ 137.717s] (1/2) custom-ring-test-validator::ring anonymous::an_anonymous_policy_ring_screens_its_hidden_sender
+        SLOW [ 270.612s] (2/2) custom-ring-test-validator::ring anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access
+Stopping local validator environment
+Local validator environment stopped
+Ring test logs: /tmp/zolana-ring-tests.uYlVhB

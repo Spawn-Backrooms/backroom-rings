@@ -1,0 +1,31 @@
+✔ accepts clean exact root and gitlink (459.356023ms)
+✔ rejects a different upstream revision (356.622601ms)
+✔ rejects a different submodule pin (193.038849ms)
+✔ rejects dirty tracked content (458.48051ms)
+✔ rejects dirty submodule (321.770908ms)
+✔ rejects ignored dotenv files (285.891825ms)
+✔ includes both concrete hidden-owner validator cases (0.588235ms)
+✔ zero-exit command with no executed cases is rejected (196.334828ms)
+✔ filter echo, skipped and wrong-binary cases cannot count as success (240.724775ms)
+✔ both exact named passes on stdout and stderr are retained and hashed (271.324192ms)
+✔ Nextest progress counters preserve exact named terminal passes (148.930948ms)
+✔ nonzero exit rejects even when the child prints both pass records (156.871859ms)
+✔ a previous log cannot satisfy a new run or be overwritten (267.48173ms)
+✔ refuses inherited ZOLANA_PREBUILT that can redirect or skip source tests (0.514019ms)
+✔ refuses inherited ZOLANA_NEXTEST_ARCHIVE_DIR that can redirect or skip source tests (0.457083ms)
+✔ refuses inherited GOFLAGS that can redirect or skip source tests (0.125439ms)
+✔ refuses inherited GOWORK that can redirect or skip source tests (0.117867ms)
+✔ permits empty controls and explicit module-only workspace selection (0.177603ms)
+✔ requires the actual Go compiler and exact module-selected version (0.798904ms)
+✔ requires the Rust version pinned by the checked-out submodule (0.390502ms)
+✔ children cannot inherit persisted Go flags or just recipe/dotenv overrides (177.940982ms)
+✔ short filesystem writes still retain all log bytes and the matching digest (100.606158ms)
+✔ a capture failure rejects the run instead of escaping its promise (245.939771ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2373.392074

@@ -1,0 +1,204 @@
+{
+  "verifiedAt": "2026-11-24T00:13:46.829704+00:00",
+  "root": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys",
+  "keyCount": 28,
+  "totalBytes": 5437371692,
+  "keys": [
+    {
+      "name": "custom_ring_apply_enrollments_1.key",
+      "sha256": "3d238da30b162fd46e4725b58af2ded1d25112766a1e25cc8dedd1d634e8193b",
+      "size": 7430633,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_enrollments_2.key",
+      "sha256": "5b4062c084d45b64b1c4a9bfa080173af6d43b1b5b6652a12dadd7a458913a64",
+      "size": 14851658,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_enrollments_4.key",
+      "sha256": "0ddf9a8b8bbe6089370ebb7f885001a45ea36b99a99db06614fbbaf124f5dd79",
+      "size": 29662267,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_enrollments_8.key",
+      "sha256": "25e761192caaedaf15663e5060c7ac3582de8a88589776a16e275860865312bf",
+      "size": 59282986,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_1.key",
+      "sha256": "5d1b02af6650d908c95662ad370c667ba08ac368b389573c0f920f01d94d23bb",
+      "size": 6714211,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_16.key",
+      "sha256": "fbd80a216491ce475f6fdfa96d3fb1b56833c5f5aa6b6c4b94543e3f7fab9a85",
+      "size": 106784225,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_2.key",
+      "sha256": "11ab04f10df5f39bc06fd1637a70729a7ad77e9c224d7c3100f814f5c836fbb8",
+      "size": 13399938,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_4.key",
+      "sha256": "b24358187d78532b656f3aa89fac9427f2ec97afde87d28f954a37d0a3210805",
+      "size": 26751581,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_8.key",
+      "sha256": "6109969bbef6607c3fcc8e4d884f03a3721a4479888720f78c380b96f66f47d6",
+      "size": 53437485,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_private_1.key",
+      "sha256": "192c0739123e3c4cb80587ff6d8cc8240ef8d6746d3abc2bb5272d8789799985",
+      "size": 8730945,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_private_16.key",
+      "sha256": "0462d1e07946f3741940bc35e2ab2b11cc57618634cdfff4a7f060ccb88e0b70",
+      "size": 136257965,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_private_2.key",
+      "sha256": "2f34912fd4666239d326def947587be87667af9ff33165128ef0fa71af98d07e",
+      "size": 17240117,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_private_4.key",
+      "sha256": "a057052789177e1f5dda6e307527b6144768ccfee3bf7ea6f190708eab4e3520",
+      "size": 34243920,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_apply_records_private_8.key",
+      "sha256": "b174f62ff8bf932d44d015039376528df54d8e1542508e39302b459696cb3289",
+      "size": 68253916,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_merge.key",
+      "sha256": "64a8ab474e1ad0aeb2a520cd21fab2bbef75c7b6e7a8ae506c18980bc893db2f",
+      "size": 38162616,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_register_key.key",
+      "sha256": "90d0f3a05edf2bef59de6726aa1e3c4b08abed8dd4c627f94a169752a49fcfe6",
+      "size": 17797993,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_16_in4_w4_s2.key",
+      "sha256": "7708af1286eedfc245d84641deaf6da68c932ea14418cfbac2b2c4285180c11f",
+      "size": 650892617,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_2_in24_w4_s4.key",
+      "sha256": "3921ac82248a03e9b03f836d457d636667cc0d4c96125f24fea838b4f9be8c5b",
+      "size": 285409001,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_4_in24_w4_s4.key",
+      "sha256": "c343825a5429feef491f0042c7da363ec9b288f8bc7d5f6d1b85e5cc4955a9cb",
+      "size": 330207713,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_8_in16_w4_s4.key",
+      "sha256": "61c5ab9df37df49928ef543c05afc9b5979938e6d59c027294d2a37511fba569",
+      "size": 396921639,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_entry_4_in8_w4_s8.key",
+      "sha256": "ea2b68fcffa03f93c49dd2c36ae0c41cd107589401a4d5a77655dc89c1624a44",
+      "size": 413536211,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in2_w4_s2.key",
+      "sha256": "cbaeda1e963a45d7741c4d63de4a402594789a45510ccd67da2d21f2467f5666",
+      "size": 426950438,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in5_w4_s4.key",
+      "sha256": "2072ae7d9f14c9a91831e7b289a7803688262de0870af064b4acf421b3b2d129",
+      "size": 499173553,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in8_w32_s8.key",
+      "sha256": "6b7ee5da650a78ed37e39fb417c352edd95396baa9af9dc299b649038458c375",
+      "size": 691202058,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_wide_2_in40_w4_s9.key",
+      "sha256": "97ea032322421e594476bd47d0d6d71fd11785ba74bf918c79cb2100094f6bee",
+      "size": 359679572,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "custom_ring_transfer_wide_8_in24_w32_s13.key",
+      "sha256": "ea0f805642fe5c2af0238628764c5ad1fc8212c9c42fb470a8965413300ef031",
+      "size": 718695694,
+      "pinnedBy": "prover/ring/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "transfer_ring_1_2.key",
+      "sha256": "22437f8f22194cb10bf8938a4c66c634d75f6d2abf4c8ed0b1f4c4e3ba9a09fe",
+      "size": 9278456,
+      "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "transfer_ring_2_2.key",
+      "sha256": "b5438902ead95e7dae05eb98d22592ba67698d99ff855e4d3b4f5bf7c4ead0a7",
+      "size": 16422284,
+      "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+      "verified": true
+    }
+  ]
+}

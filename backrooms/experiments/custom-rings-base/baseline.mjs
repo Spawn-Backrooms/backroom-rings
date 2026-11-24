@@ -63,7 +63,7 @@ export async function run(command, args, cwd, { logPath, requiredPasses = [], qu
   let output = '', outputTruncated = false;
   const pending = { stdout: '', stderr: '' };
   const checkLine = line => {
-    const match = stripVTControlCharacters(line).match(/^\s*PASS\s+\[[^\]\r\n]+\]\s+custom-ring-test-validator::ring\s+(\S+)\s*$/);
+    const match = stripVTControlCharacters(line).match(/^\s*PASS\s+\[[^\]\r\n]+\]\s+(?:\(\s*\d+\/\d+\)\s+)?custom-ring-test-validator::ring\s+(\S+)\s*$/);
     if (match && requiredPasses.includes(match[1])) passed.add(match[1]);
   };
   const receive = (stream, chunk) => {

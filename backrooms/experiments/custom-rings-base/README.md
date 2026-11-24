@@ -38,13 +38,38 @@ Each execution creates a fresh private temporary evidence directory and prints i
 node --test backrooms/experiments/custom-rings-base/baseline.test.mjs backrooms/experiments/custom-rings-base/execution.test.mjs
 ```
 
-The bootstrap suite exercises real temporary Git repositories/submodules and actual child processes emitting controlled fixture output. Twenty-two tests passed under Node 24.22.3, including regression cases first observed failing for missing validator evidence, ignored build/test overrides, short log writes and capture errors. These tests qualify the bootstrap behavior only. No upstream circuit compilation, key download or validator execution was possible in the current authoring workspace: the actual Go/Rust/Solana toolchains and package-download access are unavailable. [RUNNER-REVIEW.md](RUNNER-REVIEW.md) records the independent source review and the author's verified fixes. CR01 remains open for real execution and artifact evidence. The parser requires plain terminal PASS records; compatibility with progress-prefixed nextest output remains a documented minor qualification item and fails closed if no plain final records appear.
+The bootstrap suite exercises real temporary Git repositories/submodules and actual child processes emitting controlled fixture output. **Twenty-three tests passed**, with zero failures/skips, under Node 24.22.3. The cases include regressions first observed failing for missing validator evidence, ignored build/test overrides, short log writes, capture errors and nextest progress counters. The parser now accepts an optional numeric `(1/2)` field while still requiring the exact binary, complete case names and a successful command exit. The latest parser run took 2.503 seconds; its complete log SHA-256 is `68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde`.
+
+These controlled child-output tests qualify bootstrap behavior only. [RUNNER-REVIEW.md](RUNNER-REVIEW.md) preserves the independent source review and distinguishes the author's later corrections from new independent sign-off.
+
+The parser regression's failing-before and passing-after logs, terminal receipt and hash manifest are in [evidence/runner-checks/](evidence/runner-checks/).
+
+## Actual execution checkpoint
+
+The pinned Go/Rust/Solana toolchains and downloaded native keys are now available, and actual source builds and tests have run. Earlier toolchain-unavailable notes describe the initial authoring environment and no longer describe this checkpoint. **CR01 remains incomplete.**
+
+| Gate | Retained result |
+| --- | --- |
+| Exact source | Custom Rings `02bca33729051798834ecbb4d94e968cdc0ef9b8` and Zolana `0fe4f952182b39464d472c52c40b3febe6cbd9ec`; source/cleanliness checks retained around completed stages. |
+| `just check-all` | Passed, exit 0, 38.226 seconds. |
+| Native builds | All eight stages passed: program SBF, prover, Zolana CLI, Photon, ring indexer, ring CLI, RingRPC and xtask. |
+| `just test-hermetic` | Passed, exit 0, 1,877.123 seconds. The three nextest groups reported 149/1,497/40 passes and 0/33/4 canonical default skips. Log SHA-256 `c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e`. |
+| Complete Go coverage | **Incomplete: 15/18 whole packages have terminal results**, comprising 9 passing test packages and 6 explicitly reported `[no test files]` packages. Transfer, ring and ringtest remain. The latest transfer attempt ended with `signal: killed` after 130 passing test events and exited 1; the kill's cause is not established. |
+| Two exact anonymous-validator cases | **Passed**, full command exit 0 at unchanged clean pins. Policy hidden sender: 137.717 seconds. Hidden owners and auditor access: 270.612 seconds. The full recipe took 495.928 seconds; the deliberate filter ran 2 cases and excluded 59 others. |
+
+Go qualification uses explicit unfiltered whole-package commands with a recorded 60-minute package timeout and bounded parallelism, preserving the source-pinned Go version and disabled persisted overrides. Terminal completed packages are retained at unchanged source; this is equivalent full package coverage only when every required package completes. It does not claim the interrupted original whole-suite command exited successfully. The original default-timeout run, interrupted extended run and killed transfer attempt remain separate failed/incomplete history.
+
+Builds and fetched keys do not substitute for the complete Go suite, hermetic tests or exact validator cases. Application proof and native journey evidence is separately maintained in [PR 39](https://github.com/Spawn-Backrooms/backroom-rings/pull/39); this runner retains its upstream-baseline-only scope.
 
 ## Boundary and next pickup
 
-- [CR02](https://github.com/Spawn-Backrooms/backroom-rings/issues/35): upstream [spec question 8](https://github.com/helius-labs/custom-privacy-rings/blob/02bca33729051798834ecbb4d94e968cdc0ef9b8/docs/spec.md#open-questions-for-the-maintainer) leaves third-party ZK program access to ring notes unresolved. The existing Backrooms bridge uses a public writer signer. Implement the smallest actual onchain composition in separate artifacts and bind the exact ordered settlement and current native authorization.
-- [CR03](https://github.com/Spawn-Backrooms/backroom-rings/issues/36): one nonfinancial room, fixed members, one accepted lesson, process restart, later reuse. No fallback to the existing confidential path.
-- [CR04](https://github.com/Spawn-Backrooms/backroom-rings/issues/37): independently verify the application and ring proof linkage, state transition and public visibility; publish a reproducible conformance pack.
+- [CR02](https://github.com/Spawn-Backrooms/backroom-rings/issues/35): the separate application overlay implements a combined application/ring relation, strict prover and dedicated SBF profile with real proof interoperability. Its complete 25-step application validator journey passed, including both hidden updates. Final independent review and full acceptance reconciliation remain open; see [PR 39](https://github.com/Spawn-Backrooms/backroom-rings/pull/39). The original public-writer Backrooms bridge and artifacts are unchanged.
+- [CR03](https://github.com/Spawn-Backrooms/backroom-rings/issues/36): the real local-validator run settled a bounded lesson, recovered it in fresh native processes, retried a controlled interrupted confirmation and settled a later task that used the retained lesson. The coordinator stayed running. Private native host/UI activation remains a separate handoff.
+- [CR04](https://github.com/Spawn-Backrooms/backroom-rings/issues/37): the named live corpus passed 15 ledger-confirmed refusal checks with unchanged accepted state. Final independent review remains blocked, and the named corpus does not establish every variant in the broader acceptance requirements.
 - [CR05](https://github.com/Spawn-Backrooms/spawn/issues/78): native developer-preview integration after real composition; no production activation.
 
 Upstream anonymous transactions do not hide public enrollment, all transaction metadata, or activity from the designated auditor. See [privacy by mode](https://github.com/helius-labs/custom-privacy-rings/blob/02bca33729051798834ecbb4d94e968cdc0ef9b8/docs/design/privacy.md). This tool checks a baseline, not an anonymity guarantee. Production, stronger confidentiality, and dynamic membership retain their separate release gates.
+
+The exact anonymous-validator terminal receipt, full command log and hash manifest are in [evidence/anonymous-validator/](evidence/anonymous-validator/). The earlier interrupted attempts remain recorded separately and are not counted as passes.
+
+The [baseline evidence packet](evidence/baseline-checkpoint/) contains the complete check-all, native build and hermetic command logs, terminal receipts, source/toolchain pins, and recorded key/program identities. The successful validator run used 31 cached keys: 28 from the canonical fetch, two hidden-owner SPP keys, and one additional pinned `merge_ring_8_1.key` fetched by the canonical test recipe. The packet records all key digests and a read-back of the 12 native runtime artifacts. No full SPP catalog download was required.

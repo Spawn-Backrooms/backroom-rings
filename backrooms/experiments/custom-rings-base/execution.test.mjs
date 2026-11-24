@@ -41,6 +41,16 @@ test('both exact named passes on stdout and stderr are retained and hashed', asy
   assert.ok(readFileSync(options.logPath, 'utf8').includes(policy));
 });
 
+test('Nextest progress counters preserve exact named terminal passes', async t => {
+  const { root, options } = fixture(t);
+  // Format observed in the actual pinned-suite run with Nextest 0.9.152.
+  const output = `        PASS [   0.123s] (  1/2) custom-ring-test-validator::ring ${owner}\n        PASS [   0.456s] (  2/2) custom-ring-test-validator::ring ${policy}\n`;
+  const result = await run(process.execPath, ['-e', `process.stderr.write(${JSON.stringify(output)})`], root, options);
+  assert.deepEqual(result.passedCases, [owner, policy]);
+  assert.equal(result.status, 0);
+  assert.equal(result.logSha256, createHash('sha256').update(readFileSync(options.logPath)).digest('hex'));
+});
+
 test('nonzero exit rejects even when the child prints both pass records', async t => {
   const { root, options } = fixture(t);
   await assert.rejects(async () => run(process.execPath, ['-e', `process.stderr.write(${JSON.stringify(pass(owner) + pass(policy))});process.exitCode=7`], root, options), /failed: 7/);

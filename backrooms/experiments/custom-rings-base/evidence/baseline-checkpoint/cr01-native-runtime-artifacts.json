@@ -1,0 +1,126 @@
+{
+  "schema": "spawn-cr01-native-runtime-artifacts-v1",
+  "capturedAt": "2026-11-24T03:04:42.175345+00:00",
+  "source": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "terminalValidatorReceipt": "/workspace/scratch/06977f839292/context/cr01-stage-anonymous-validator.json",
+  "terminalLogSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+  "scope": "native programs and service executables present immediately after the successful canonical anonymous command; app artifacts excluded",
+  "artifacts": {
+    "target/deploy/custom_ring_program.so": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/deploy/custom_ring_program.so",
+      "bytes": 522328,
+      "sha256": "386bdd609656ae163b02923ee198d95fba846883474a396efce24f39636f9869",
+      "modifiedAt": "2026-11-24T00:49:17.453591+00:00"
+    },
+    "target/deploy/storage_program.so": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/deploy/storage_program.so",
+      "bytes": 171824,
+      "sha256": "1fa7b2cfd808799a62e8a0b1ab107dd6eb84665a4ffb684976a065a8b36a5e5a",
+      "modifiedAt": "2026-11-24T00:48:20.769740+00:00"
+    },
+    "zolana/target/deploy/shielded_pool_program.so": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/shielded_pool_program.so",
+      "bytes": 634344,
+      "sha256": "bbcdf41cf0426fe8c661f2fd53348d0c25f8e8bf625a3f04f122712d7bc2887c",
+      "modifiedAt": "2026-11-24T00:45:58.550071+00:00"
+    },
+    "zolana/target/deploy/spr_user_registry.so": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/spr_user_registry.so",
+      "bytes": 47784,
+      "sha256": "bacf7b1d3c8f59b5c80c7a04888b561f50c4fe48847d67f75ba889729ec6756e",
+      "modifiedAt": "2026-11-24T00:44:03.262564+00:00"
+    },
+    "zolana/target/deploy/squads_smart_account_program.so": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/deploy/squads_smart_account_program.so",
+      "bytes": 1651997,
+      "sha256": "1c95bd7be140589d2aec38a85d7ecfe70ec69639277f622c898f821ab1d636fa",
+      "modifiedAt": "2026-11-24T00:06:20.698577+00:00"
+    },
+    "target/prover-server": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/prover-server",
+      "bytes": 34701436,
+      "sha256": "1f2c3e5d3c469d84b3b1337eb33c19627fb7259659d0db8bc22956158aec813d",
+      "modifiedAt": "2026-11-24T02:55:38.553354+00:00"
+    },
+    "target/debug/photon": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/debug/photon",
+      "bytes": 74253328,
+      "sha256": "58db3753b311334109fa9021504efea59861b0f39b61446f05a26af98236572f",
+      "modifiedAt": "2026-11-24T02:28:18.846731+00:00"
+    },
+    "target/debug/ring-indexer": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/debug/ring-indexer",
+      "bytes": 60240672,
+      "sha256": "70f40ed19c73024895cc32aedab78e7013824214b5a7391e836801501dea332e",
+      "modifiedAt": "2026-11-24T02:28:49.929303+00:00"
+    },
+    "target/debug/ring-rpc": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/debug/ring-rpc",
+      "bytes": 137215728,
+      "sha256": "ce24d472acc97b457e8d140478cab00f7de40b709233290dfe270c5421f0a7c2",
+      "modifiedAt": "2026-11-24T02:31:30.617873+00:00"
+    },
+    "target/debug/zolana-ring": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/target/debug/zolana-ring",
+      "bytes": 130897920,
+      "sha256": "d0c0e723595ef7c2a2718c82168252615e5e6c62bd83008db2d07963ede91503",
+      "modifiedAt": "2026-11-24T02:31:33.289749+00:00"
+    },
+    "zolana/target/debug/zolana": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/debug/zolana",
+      "bytes": 73992704,
+      "sha256": "d0cb573c4c0e3c3c410cddc4f797a0adea1bfbd84594e34c3fde066c575852ed",
+      "modifiedAt": "2026-11-24T02:26:24.579857+00:00"
+    },
+    "zolana/target/debug/xtask": {
+      "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/debug/xtask",
+      "bytes": 69484056,
+      "sha256": "f8e44d62d887bb9a6adfbba3682a4cac45d258101bd3f78ae73b3b494b91f052",
+      "modifiedAt": "2026-11-24T02:27:06.462051+00:00"
+    }
+  },
+  "keyDirectory": "/workspace/scratch/06977f839292/custom-rings/zolana/prover/server/proving-keys",
+  "keyFileSizes": {
+    "custom_ring_apply_enrollments_1.key": 7430633,
+    "custom_ring_apply_enrollments_2.key": 14851658,
+    "custom_ring_apply_enrollments_4.key": 29662267,
+    "custom_ring_apply_enrollments_8.key": 59282986,
+    "custom_ring_apply_records_1.key": 6714211,
+    "custom_ring_apply_records_16.key": 106784225,
+    "custom_ring_apply_records_2.key": 13399938,
+    "custom_ring_apply_records_4.key": 26751581,
+    "custom_ring_apply_records_8.key": 53437485,
+    "custom_ring_apply_records_private_1.key": 8730945,
+    "custom_ring_apply_records_private_16.key": 136257965,
+    "custom_ring_apply_records_private_2.key": 17240117,
+    "custom_ring_apply_records_private_4.key": 34243920,
+    "custom_ring_apply_records_private_8.key": 68253916,
+    "custom_ring_merge.key": 38162616,
+    "custom_ring_register_key.key": 17797993,
+    "custom_ring_transfer_16_in4_w4_s2.key": 650892617,
+    "custom_ring_transfer_2_in24_w4_s4.key": 285409001,
+    "custom_ring_transfer_4_in24_w4_s4.key": 330207713,
+    "custom_ring_transfer_8_in16_w4_s4.key": 396921639,
+    "custom_ring_transfer_entry_4_in8_w4_s8.key": 413536211,
+    "custom_ring_transfer_entry_8_in2_w4_s2.key": 426950438,
+    "custom_ring_transfer_entry_8_in5_w4_s4.key": 499173553,
+    "custom_ring_transfer_entry_8_in8_w32_s8.key": 691202058,
+    "custom_ring_transfer_wide_2_in40_w4_s9.key": 359679572,
+    "custom_ring_transfer_wide_8_in24_w32_s13.key": 718695694,
+    "merge_ring_8_1.key": 55779149,
+    "transfer_eddsa_ring_1_2.key": 89967710,
+    "transfer_eddsa_ring_2_2.key": 96916793,
+    "transfer_ring_1_2.key": 9278456,
+    "transfer_ring_2_2.key": 16422284
+  },
+  "keyHashManifests": [
+    "/workspace/scratch/06977f839292/context/cr01-keys.json",
+    "/workspace/scratch/06977f839292/context/cr01-hidden-spp-keys.json",
+    "/workspace/scratch/06977f839292/context/cr01-runtime-extra-spp-keys.json"
+  ],
+  "keyHashVerification": "canonical fetch/test recipe verified its required pinned keys before execution; separate initial manifests retain exact baseline and hidden SPP key hashes"
+}

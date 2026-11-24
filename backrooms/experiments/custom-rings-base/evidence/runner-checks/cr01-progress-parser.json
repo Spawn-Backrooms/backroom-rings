@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "command": [
+    "node",
+    "--test",
+    "bootstrap/backrooms/experiments/custom-rings-base/baseline.test.mjs",
+    "bootstrap/backrooms/experiments/custom-rings-base/execution.test.mjs"
+  ],
+  "startedAt": "2026-11-24T02:22:40.629093+00:00",
+  "finishedAt": "2026-11-24T02:22:43.132001+00:00",
+  "durationSeconds": 2.503,
+  "exitCode": 0,
+  "logSha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde",
+  "regressionPreviouslyFailed": true,
+  "scope": "Runner/parser unit tests with controlled child output; not proof or validator evidence"
+}

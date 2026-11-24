@@ -1,0 +1,23 @@
+{
+  "schema": "public-terminal-check-evidence-v1",
+  "scope": "Runner and Nextest-output parser regression evidence using controlled child output. These checks are not real proof or validator evidence.",
+  "files": [
+    {
+      "file": "cr01-progress-parser.json",
+      "bytes": 591,
+      "sha256": "1b69e60b54cce210460dad35ca3ffbf2fa059587e889b8b2c74953b5c3846425"
+    },
+    {
+      "file": "cr01-progress-parser-green.log",
+      "bytes": 1856,
+      "sha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde"
+    },
+    {
+      "file": "cr01-progress-parser-red.log",
+      "bytes": 2070,
+      "sha256": "b12dea5f3af7ac9d3204ef94bffabebf692797754294c0c4f5543fdaf2783f5f"
+    }
+  ],
+  "receiptPaths": "Absolute paths in the original receipts identify the recording workspace. Public copies use the filenames in this manifest. Original bytes are preserved.",
+  "measurementScope": "Each receipt states command wall time; test reporters may also state their narrower runtime. Timing is local-run evidence, not a production performance claim."
+}

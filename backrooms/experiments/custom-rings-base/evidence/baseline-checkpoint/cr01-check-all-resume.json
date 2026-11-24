@@ -1,0 +1,15 @@
+{
+  "command": [
+    "just",
+    "check-all"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "startedAt": "2026-11-24T00:27:30.657197+00:00",
+  "status": "passed",
+  "reason": "Original runner73977 disappeared without terminal evidence; resume from existing compiler cache.",
+  "exitCode": 0,
+  "durationSeconds": 38.226,
+  "finishedAt": "2026-11-24T00:28:08.884143+00:00",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-check-all-resume.log",
+  "logSha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3"
+}

@@ -1,0 +1,86 @@
+{
+  "rust": {
+    "version": "1.98.1",
+    "rustup_home": "/workspace/scratch/06977f839292/toolchains/rustup",
+    "cargo_home": "/workspace/scratch/06977f839292/toolchains/cargo",
+    "components": [
+      "rustc",
+      "cargo",
+      "rust-std",
+      "clippy",
+      "rustfmt",
+      "rust-src"
+    ]
+  },
+  "environment": "/workspace/scratch/06977f839292/toolchains/rust-env.sh",
+  "releases": [
+    {
+      "tool": "just",
+      "tag": "1.59.0",
+      "url": "https://github.com/casey/just/releases/download/1.59.0/just-1.59.0-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "409044617b6f06517c1035e55ca38c8c856ff8b650e41bc2aa1ef82d5903a23e"
+    },
+    {
+      "tool": "nextest",
+      "tag": "cargo-nextest-0.9.152",
+      "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.152/cargo-nextest-0.9.152-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "d039b43c3e0958441b6ad0a39c8884d018b3d2e8fb9928f209074b1100b5e17a"
+    },
+    {
+      "tool": "agave",
+      "tag": "v4.2.2",
+      "url": "https://github.com/anza-xyz/agave/releases/download/v4.2.2/solana-release-x86_64-unknown-linux-gnu.tar.bz2",
+      "sha256": "5fc8684f7430038105fde953d4308ed56addf627f658daa61709f345448247ee"
+    },
+    {
+      "tool": "surfpool",
+      "tag": "v1.6.0-light",
+      "url": "https://github.com/Lightprotocol/surfpool/releases/download/v1.6.0-light/surfpool-linux-x64.tar.gz",
+      "sha256": "acf0ccb172ea0208bbbf3583a98ae39b39cabf43bddf30221e5ec0040db37409"
+    },
+    {
+      "tool": "cmake",
+      "tag": "v3.31.10",
+      "url": "https://github.com/Kitware/CMake/releases/download/v3.31.10/cmake-3.31.10-linux-x86_64.tar.gz",
+      "sha256": "3cb3dd247b6a1de2d0f4b20c6fd4326c9024e894cebc9dc8699758887e566ca7"
+    },
+    {
+      "tool": "ninja",
+      "tag": "v1.13.2",
+      "url": "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-linux.zip",
+      "sha256": "5749cbc4e668273514150a80e387a957f933c6ed3f5f11e03fb30955e2bbead6"
+    },
+    {
+      "tool": "protoc",
+      "tag": "v36.2",
+      "url": "https://github.com/protocolbuffers/protobuf/releases/download/v36.2/protoc-36.2-linux-x86_64.zip",
+      "sha256": "121f6c7afe1d4d0e3ea6aab9432038599250134cbf4474cb1167d2c7decd4278"
+    }
+  ],
+  "platform_tools": {
+    "version": "v1.54",
+    "path": "/home/agent/.cache/solana/v1.54/platform-tools",
+    "install_only_exit": 0
+  },
+  "native_prerequisite_check": "libudev/libusb C compile + link + execute: exit0",
+  "source_changes": false,
+  "tests_or_deployments_started": false,
+  "native_packages": [
+    {
+      "file": "libudev-dev_257.13-1~deb13u1_amd64.deb",
+      "sha256": "73c3ed98a435ec420b327ef267d89ece81bf23c2c19391265bb4f261cbf5d558"
+    },
+    {
+      "file": "libudev1_257.13-1~deb13u1_amd64.deb",
+      "sha256": "5d41c284f5a93b05bc7d648b61a02dd2bb9ff05b2261ad1a8b7d96044a0cfa88"
+    },
+    {
+      "file": "libusb-1.0-0_2%3a1.0.28-1_amd64.deb",
+      "sha256": "bb6467a002915c4ac464aa1b22204907951a30e43bcb86596ebd3539e84458e9"
+    },
+    {
+      "file": "libusb-1.0-0-dev_2%3a1.0.28-1_amd64.deb",
+      "sha256": "7dfb933389ca75a950b64730e3f918805d4fc61d9dfed05160e2705eaa0ba3fc"
+    }
+  ]
+}

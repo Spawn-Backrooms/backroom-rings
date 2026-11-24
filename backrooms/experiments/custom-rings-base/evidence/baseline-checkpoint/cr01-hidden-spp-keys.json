@@ -1,0 +1,21 @@
+{
+  "verifiedAt": "2026-11-24T00:27:43.395249+00:00",
+  "keys": [
+    {
+      "name": "transfer_eddsa_ring_1_2.key",
+      "size": 89967710,
+      "sha256": "be870f661af275e750811807628d07117a6ff353d6dd69695e16940bbea4f016",
+      "url": "https://d3gbdb0egjwcw9.cloudfront.net/proving-keys/78751f5d1c591777/transfer_eddsa_ring_1_2.key",
+      "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+      "verified": true
+    },
+    {
+      "name": "transfer_eddsa_ring_2_2.key",
+      "size": 96916793,
+      "sha256": "e8fcba9c9b940ab64d79fe78a79c356967eb54f5f556f79cdbb7ac3edf608a66",
+      "url": "https://d3gbdb0egjwcw9.cloudfront.net/proving-keys/78751f5d1c591777/transfer_eddsa_ring_2_2.key",
+      "pinnedBy": "zolana/prover/server/prover/provingkeys/proving-keys.lock",
+      "verified": true
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--manifest-path",
+    "zolana/Cargo.toml",
+    "-p",
+    "xtask",
+    "--target-dir",
+    "zolana/target"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "sourceBefore": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "startedAt": "2026-11-24T01:16:29.856754+00:00",
+  "status": "passed",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-build-xtask-20261124T011629Z.log",
+  "environment": {
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "finishedAt": "2026-11-24T01:22:13.301552+00:00",
+  "durationSeconds": 343.445,
+  "exitCode": 0,
+  "logSha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d",
+  "sourceAfter": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "artifact": {
+    "path": "/workspace/scratch/06977f839292/custom-rings/zolana/target/debug/xtask",
+    "size": 69544248,
+    "sha256": "f1da3a2fe698b805bfc91a0c5f9e88f3e146ce0a63c97893398ad6a967ecf9d7"
+  }
+}

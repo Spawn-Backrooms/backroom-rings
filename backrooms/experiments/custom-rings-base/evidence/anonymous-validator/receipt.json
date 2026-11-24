@@ -1,0 +1,50 @@
+{
+  "command": [
+    "just",
+    "test-custom-ring-validator",
+    "test(an_anonymous_ring_hides_owners_and_preserves_auditor_access) | test(an_anonymous_policy_ring_screens_its_hidden_sender)",
+    "--color",
+    "never",
+    "--status-level",
+    "pass",
+    "--final-status-level",
+    "pass"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings",
+  "sourceBefore": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "startedAt": "2026-11-24T02:55:01.336064+00:00",
+  "status": "passed",
+  "logPath": "/workspace/scratch/06977f839292/context/cr01-stage-anonymous-validator-20261124T025501Z.log",
+  "environmentManifest": "/workspace/scratch/06977f839292/context/cr01-environment.json",
+  "sameParentServices": true,
+  "environmentOverrides": {
+    "CARGO_BUILD_JOBS": "1",
+    "NEXTEST_TEST_THREADS": "1",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "runnerSha256": "beede8154c4936083c771e6ebf0d04d845dd123f5b8fcdbf93e9f948e4c0e899",
+  "lastHeartbeat": {
+    "stage": "anonymous-validator",
+    "status": "running",
+    "observedAt": "2026-11-24T03:03:16.445144+00:00",
+    "elapsedSeconds": 495.1,
+    "logBytes": 6153
+  },
+  "exitCode": 0,
+  "finishedAt": "2026-11-24T03:03:17.264737+00:00",
+  "durationSeconds": 495.928,
+  "logSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+  "sourceAfter": {
+    "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "clean": true
+  },
+  "passedCases": [
+    "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access",
+    "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender"
+  ]
+}
