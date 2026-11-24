@@ -1,5 +1,7 @@
 # Independent review: Custom Rings bootstrap and initial composition
 
+> Historical design/review checkpoint. The implemented profile and current verification status are recorded in [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md), [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md) and [fork-overlay/README.md](fork-overlay/README.md). Statements below about unavailable tools or unimplemented components describe that earlier checkpoint.
+
 Reviewer: independent `review_composition` agent, 2026-11-23.
 
 Reviewed initial PR39 head `2d39aab0446ce55a8d31ecb5e669ca780839eb5c`; bootstrap source initially matched PR38 head `143f9726ce1061a13943ae5403a50ea1d9078f34`. Upstream Custom Rings pin `02bca33729051798834ecbb4d94e968cdc0ef9b8`, SPP pin `0fe4f952182b39464d472c52c40b3febe6cbd9ec`.

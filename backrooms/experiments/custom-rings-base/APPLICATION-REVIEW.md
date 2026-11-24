@@ -1,0 +1,38 @@
+# Independent application composition review
+
+Reviewed the uncommitted implementation in `custom-rings-app` against Custom Rings HEAD `02bca33729051798834ecbb4d94e968cdc0ef9b8` and Zolana `0fe4f952182b39464d472c52c40b3febe6cbd9ec` on 2026-11-24.
+
+## Findings
+
+**Critical: none established. Important: none established. Minor: no actionable implementation defect established.**
+
+This is a focused independent source/composition review, not a formal soundness proof or an assertion that the pending validator journey has passed. I did not rerun expensive proof suites. Reported successful Go/Rust full-proof verification is useful integration evidence but was not substituted for inspecting the constraints and dispatch path.
+
+## Reviewed security properties
+
+| Property | Source assessment |
+| --- | --- |
+| Mandatory application proof | `programs/custom-ring/src/lib.rs` sends all instructions through the dedicated dispatcher when the profile is enabled. `instructions/spawn_room/mod.rs` rejects generic transfer, authority transfer, merge, and delegate configuration. Only create/advance settle notes. Their keys are selected internally, not supplied by transaction data. A generic one-public-input key cannot be selected through this path. |
+| No direct SPP bootstrap bypass found | SPP's `instructions/deposit/account.rs` requires the actual ring-config/ring-auth PDA to sign even a direct `ring_deposit`; ordinary deposits do not select a custom ring. The allowed administrative and enrollment handlers use fixed CPI targets/tags and do not expose a general signed settlement call. |
+| Same notes in application and SPP relations | `spawn_room_application.go` embeds the complete transfer circuit and passes its actual first input/output wires to `SpawnRoomAdvanceWitness.Assert`. The existing transfer relation opens the same private transaction hash used by SPP. The Rust refactor reconstructs the original transfer statement from the validated frame/accounts before adding the application hash. There is no separately supplied unchecked state-note commitment. |
+| Exact advance shape | `spawn_room_advance.go` forces hidden authorization, zero public owner signers, unvouched non-entry operation, no address inputs, no withdrawals/public value, one live input and one live output, remaining slots dummy, zero amounts, same owner/enrolled nullifier key/asset, and a changed note hash. Rust also excludes cache, exit, message, public-data override, and public settlement-leg paths. Padded published input/output counts do not introduce extra live notes. |
+| State and grant binding | `spawn_room_state.go` binds input/output DataHash to full state hashes, preserves creation nonce, seed manifest, fixed membership, writer, domain, policy identity, and asset/key ownership. Revision advances exactly once without u64 overflow. Grant actor, room identity, predecessor, ordinal, memory, current epoch, and selected bounded update all reach the exact next state. Merkle membership uses a range-checked 26-bit index. |
+| Revocation | `load_config` checks owner, canonical PDA, exact size, and discriminator. Every advance uses its current root/epoch in the application public statement. Root publication requires the configured publisher's signature and expected-epoch match; checked increment rejects wraparound. A proof made against a replaced root/epoch is not replayable by changing request context. |
+| Unique visible genesis | The separate genesis key requires no live inputs, one zero-value ring output, one actual public writer signer, initial revision/memory/authorization/policy values, and nonzero seed/member/creation digests. The public creation identity binds the writer/domain/nonce and must match the permanent canonical marker PDA. Duplicate markers fail; marker creation and SPP settlement are atomic. Advances neither read nor publish that marker. |
+| Canonical digest binding | Raw 256-bit network, creation, seed/member, episode/result/candidate, and acceptance-nonce values are represented by two independently constrained 128-bit limbs. They are not reduced modulo the BN254 field. Lesson bytes, zero padding, bounded lengths/scores/feedback, and u64 counters are constrained. Strict request decoding and exact array widths preserve this representation. |
+| Public privacy boundary | The advance circuit exposes only the original transfer hash and its application hash; the latter includes deployment domain and global grant root/epoch. Room identity, writer, predecessor state, individual grant leaf, lesson, and fixed-member digest remain private. Existing public transaction metadata and the designated auditor's visibility remain outside that claim. |
+| BSB22 and generic compatibility | The application verifier uses the same commitment-aware Groth16 verifier as upstream, decompresses all proof/commitment/PoK points, requires two public inputs, and uses distinct compiled genesis/advance keys. The original prover command does not register these extensions. Existing generic key selection and proof artifacts remain unchanged; its transfer-statement refactor preserves the original fields. |
+
+## Trust and recovery limits to retain in the deliverable
+
+1. **Ciphertext authenticity is not a proof of decryptability.** SPP reconstructs `sha256(private_tx_hash || external_data_hash)` in `zolana/programs/shielded-pool/src/instructions/transact/verify.rs`; the hidden-owner circuit verifies the owner's signature over that digest. Therefore an untrusted prover or relay cannot replace ciphertext after owner authorization. An authorized writer can nevertheless deliberately sign malformed or withheld recovery bytes for its own otherwise-valid state commitment. The canonical client seals the codec output and `payload.ts` verifies its decrypted state hash and rebuilt note commitment. This is an authorized-writer recovery/liveness boundary, not an established relay substitution defect.
+
+2. **The root publisher is an admission authority.** On-chain membership proves admission of an exact grant, not independent truth of the native original or resident execution. `SpawnRoomNativeAdapter` preserves and cross-checks native original/authorization/state records, but its `checkBinding` does not authenticate resident keys against the fixed-members digest. The existing `backrooms/reference-host/residents.ts:runEpisode` checks seed manifest, fixed membership, resident IDs, and checkpoint before executing. The actual host/admission flow must retain that check; direct grants or fixture originals should not be described as resident-authenticated. This boundary was coordinated with `application_design`.
+
+3. **Deployment domain is configured.** The immutable network bytes are established by the trusted upgrade authority during configuration; the program does not derive the cluster's genesis hash itself. Operational deployment must choose the intended network identifier.
+
+4. **The included setup is deliberately insecure and local-validator-only.** The explicit test-key feature and generated setup labels are appropriate for that scope. This review does not treat a test-setup proof as production cryptographic assurance.
+
+## Remaining integration evidence
+
+The actual validator create/advance/revoke/restart journey, SBF execution/compute/heap behavior, and completed exact-output TypeScript adapter were still being exercised or implemented during this review. They are not certified by this source review. Incomplete adapter/journey files were not reported as completed-code defects.

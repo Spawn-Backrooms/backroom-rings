@@ -1,25 +1,95 @@
-# Pinned Custom Rings circuit overlay
+# Anonymous Backroom application overlay
 
-The public fork [Spawn-Backrooms/custom-privacy-rings](https://github.com/Spawn-Backrooms/custom-privacy-rings) exists and is pinned to upstream commit `02bca33729051798834ecbb4d94e968cdc0ef9b8` with Zolana gitlink `0fe4f952182b39464d472c52c40b3febe6cbd9ec`. This directory stages additive files for CR02 because the connected integration receives HTTP 403 creating a branch on the new fork. No upstream file has been edited. This is an unqualified circuit candidate, not a usable Backroom or deployable key.
+This directory carries the implemented experimental application profile for
+[Spawn-Backrooms/custom-privacy-rings](https://github.com/Spawn-Backrooms/custom-privacy-rings).
+It is published here because the active GitHub integration can read that fork
+but branch creation is denied (HTTP 403; repository metadata reports `push: false`).
+The overlay retains the upstream repository and license history and does not
+modify the existing Backrooms v0 source or artifacts.
 
-## What the source adds
+The actual combined genesis and hidden-advance proofs have been generated and
+verified in Go and Rust, and the dedicated program has built to SBF. The live
+validator create/advance/restart/reuse journey remains a separate delivery gate.
+See [APPLICATION-EVIDENCE.md](../APPLICATION-EVIDENCE.md) for the exact completed
+checks and limitations. The earlier synthetic oracle and initial two-file
+candidate are historical checkpoints; the complete patch supersedes them.
 
-`SpawnRoomAdvanceCircuit` wraps the existing pinned `TransferCircuit` and adds a separate constraint relation for one same-owner, zero-amount note advance. The original circuit still verifies the ordered settlement, audit and policy; the wrapper constrains hidden-owner mode, no public co-owners/voucher/delegate/entry path, no withdrawals or public net/gross amounts, an empty address chain, and one live input and output in the same ring, with unchanged owner, nonzero enrolled nullifier key and asset. All other slots must be dummy. The note commitments must differ. It does not assert a particular lesson, revision, owner grant, unique genesis, or useful intelligence. The dedicated onchain program must reject alternate settlement paths and all interface legs, including no-op legs, and pin a new qualified verifier. Do not register this partial circuit in the existing key catalog.
+## Apply to the pinned fork
 
-The wrapper calls the existing circuit first and reopens the exact same constrained note wires, rather than trusting separate supplied note metadata. This duplicates some constraints; measure the overhead during actual compilation. It assumes the pinned SPP empty-address chain and note semantics; qualify both using the actual submodule.
+Use a clean recursive checkout on an isolated review branch with these exact pins:
 
-The standalone Gnark tests exercise the note-pair predicate in isolation: one matching pair and 16 negative cases. They use synthetic field openings. They do not exercise the full transfer proof, state relation, settlement, or Solana. One live note does not mean one published slot: dummy padding and fixed circuit capacity are separate counts and require full-witness qualification.
+| Source | Commit |
+| --- | --- |
+| Custom Rings | `02bca33729051798834ecbb4d94e968cdc0ef9b8` |
+| Zolana / Privacy Rings submodule | `0fe4f952182b39464d472c52c40b3febe6cbd9ec` |
+| Backrooms native runtime used by integration | `08822c65254cd73c5f2dccbdf182ce1df2c7510a` |
 
-## Run on the isolated build host
-
-After CR01 reproduces the exact pins, use a clean disposable checkout of the fork. Copy the two overlay files into `prover/circuits/transfer/` only if those paths do not exist, and use a new review branch. Do not overwrite existing files. Run from `prover/`:
+`application-core.patch` includes the dedicated program dispatcher changes and
+additive Go/Rust sources. Its manifest records the patch SHA-256 and every
+resulting file's SHA-256. Apply it once to the clean base; do not copy the
+obsolete initial two-file candidate first.
 
 ```sh
-go test ./circuits/transfer -run '^TestSpawnRoomNotePair$' -count=1
+python3 backrooms/experiments/custom-rings-base/fork-overlay/apply-overlay.py /path/to/custom-privacy-rings
+python3 backrooms/experiments/custom-rings-base/fork-overlay/apply-overlay.py /path/to/custom-privacy-rings --apply
 ```
 
-Then build an actual zero-value hidden-owner transfer witness using upstream fixture builders and solve the full wrapper. Include changed rail, public legs, voucher, address-chain, extra note and unbound state negatives. Only after that implement the state codec/grant relation, explicit genesis, program dispatch and verifier/key selection, and prove the entire atomic transition on a real local validator. Do not activate the circuit on its own or reuse an upstream verifying key.
+The first command checks source pins, cleanliness, digest and applicability. The
+second performs those checks again, applies the patch, and verifies all resulting
+file hashes. It does not regenerate keys, install dependencies or run services.
 
-## Evidence
+## Implemented proof and program boundary
 
-At initial authoring, Go 1.23.2 `gofmt -e -l` reported no syntax or formatting errors on the two source files; remote Git blobs matched the formatted local files. The current Go files are unchanged. Actual Gnark compilation and tests have still not run: the current workspace lacks the pinned Go 1.27.3, upstream dependencies, Rust/Solana and package-download access. An independent source review of the initial overlay found no immediate escape in its narrowly described note-pair predicate, but identified the missing application statement, live native authorization, genesis/dispatch and public-metadata work. That review is not proof verification or integration approval. Keep CR02 and CR04 open.
+The application wraps the complete pinned transfer circuit and binds the actual
+old/new note DataHash to the private state and currently admitted grant. Hidden
+advances require one live zero-value input/output, immutable owner and room
+binding, a bounded accepted lesson, exact revision increment, and bounded policy
+score update. All other slots are dummy; public legs, visible owner signers,
+voucher/delegate/entry/address/exit paths are refused.
+
+Each new proof has two public inputs in order: the upstream transfer statement
+and the application statement. The latter binds the deployment domain and the
+live authorization root/epoch. The dedicated program reads those values from its
+canonical configuration account and selects the corresponding compiled key.
+Its restricted dispatcher excludes alternate generic settlement entrances.
+
+Visible genesis has its own key, canonical initial state and permanent unique
+marker. Hidden advances do not include that room marker, public writer or
+individual grant identifier. Enrollment, genesis, global authorization updates,
+fee payer, timing and other transaction metadata remain visible; the designated
+auditor and private native authority retain their documented access.
+
+## Local key preparation
+
+After installing the pinned toolchains and dependencies, run from the patched
+Custom Rings checkout:
+
+```sh
+tools/prepare-spawn-room-localnet.sh
+```
+
+This creates or explicitly reuses two local experimental keys, checks the full
+compiled constraint-system fingerprint on reuse, proves both circuits, exports
+Rust verifier constants and public proof vectors, builds the separate prover,
+checks Rust proof verification, and builds the dedicated SBF profile. It uses
+the upstream exporter. Cached upstream keys are reused without altering their
+catalogs. Private witness requests and large proving keys remain in ignored
+`target/` directories.
+
+The committed keys and proof vectors are from an **insecure single-party localnet
+setup**. They require the explicit `spawn-room-v1-localnet-keys` feature and must
+never authorize a production deployment. Ordinary upstream and v0 keys are
+unchanged. The profile without its explicit key feature fails closed.
+
+## Review and remaining integration
+
+[APPLICATION-REVIEW.md](../APPLICATION-REVIEW.md) records the independent core
+source review and its scope. The SDK/native runtime and full validator journey
+require their own final evidence. A native root publisher admits exact grants;
+the circuit does not prove the truth of an original external result. Owner
+authorization binds encrypted transaction data, but a malicious authorized
+writer can still withhold or corrupt its own recovery payload.
+
+Keep CR01–CR04 open until their actual acceptance gates are met. A passing local
+fixture does not establish anonymity against every host, auditor or network
+observer, and it does not qualify a production trusted setup.

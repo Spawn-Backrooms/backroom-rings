@@ -1,5 +1,7 @@
 # Anonymous Backroom application implementation handoff
 
+> Historical design/review checkpoint. The implemented profile and current verification status are recorded in [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md), [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md) and [fork-overlay/README.md](fork-overlay/README.md). Statements below about unavailable tools or unimplemented components describe that earlier checkpoint.
+
 Status: source-grounded design, not implemented or cryptographically qualified.
 Custom Rings source is pinned to `02bca33729051798834ecbb4d94e968cdc0ef9b8`;
 existing Backrooms source is pinned to `08822c65254cd73c5f2dccbdf182ce1df2c7510a`.

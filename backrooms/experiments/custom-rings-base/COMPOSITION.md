@@ -1,5 +1,7 @@
 # CR02 anonymous nonfinancial advance: first implementation boundary
 
+> Historical design/review checkpoint. The implemented profile and current verification status are recorded in [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md), [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md) and [fork-overlay/README.md](fork-overlay/README.md). Statements below about unavailable tools or unimplemented components describe that earlier checkpoint.
+
 Status: **source inspection and executable synthetic conformance only**. No onchain hook, proof, real validator run or anonymity claim. This work is independent of the CR01 bootstrap PR and does not modify v0 source, artifacts or exports.
 
 ## Pin and source observations

@@ -1,0 +1,4013 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 242c03e1e3fcd5df328e063c6fb4ba6f663aa014..01dc47b80e3e03f3fe9144738291e227654d04bf 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2129,6 +2129,7 @@ dependencies = [
+  "solana-transaction-error",
+  "spl-token-2022-interface 2.1.0",
+  "spr-account-checks",
++ "spr-client",
+  "spr-hasher",
+  "spr-interface",
+  "spr-tree",
+@@ -8427,6 +8428,7 @@ dependencies = [
+ name = "spr-account-checks"
+ version = "0.10.0"
+ dependencies = [
++ "rand 0.8.8",
+  "solana-account-view 2.0.0",
+  "solana-address 2.7.0",
+  "solana-program-error",
+diff --git a/program-libs/interface/src/accounts/spawn_room_profile.rs b/program-libs/interface/src/accounts/spawn_room_profile.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..15d1f060d1ede0fb868ff6cc6635cc409f9bf9e2
+--- /dev/null
++++ b/program-libs/interface/src/accounts/spawn_room_profile.rs
+@@ -0,0 +1,144 @@
++//! Account and instruction wire formats of the dedicated room program.
++use bytemuck::{Pod, Zeroable};
++use solana_address::Address;
++use spr_hasher::primitives::is_canonical_bn254_scalar_be;
++use wincode::{SchemaRead, SchemaWrite};
++
++use crate::CustomRingError;
++
++pub const CONFIG_SEED: &[u8] = b"spawn-room-config-v1";
++pub const GENESIS_SEED: &[u8] = b"spawn-room-genesis-v1";
++pub const GENESIS_DISCRIMINATOR: [u8; 8] = *b"SPRGEN01";
++pub const INITIALIZE_CONFIG: u8 = 0x80;
++pub const UPDATE_GRANT_ROOT: u8 = 0x81;
++pub const CREATE_ROOM: u8 = 0x82;
++pub const ADVANCE_ROOM: u8 = 0x83;
++
++#[derive(Clone, Copy, SchemaRead, SchemaWrite)]
++pub struct InitializeConfig {
++    pub network: [u8; 32],
++    /// Canonical scalar designating the deployed application.
++    pub application_id: [u8; 32],
++    pub grant_root: [u8; 32],
++}
++
++#[derive(Clone, Copy, SchemaRead, SchemaWrite)]
++pub struct UpdateGrantRoot {
++    pub expected_epoch: u64,
++    pub new_root: [u8; 32],
++}
++
++#[derive(Clone, Copy, Debug, PartialEq, Eq, Pod, Zeroable)]
++#[repr(C)]
++pub struct SpawnRoomConfig {
++    discriminator: [u8; 8],
++    pub network: [u8; 32],
++    pub application_id: [u8; 32],
++    pub publisher: Address,
++    pub grant_root: [u8; 32],
++    epoch_le: [u8; 8],
++}
++
++impl SpawnRoomConfig {
++    pub fn new(ix: InitializeConfig, publisher: Address) -> Result<Self, CustomRingError> {
++        let config = Self {
++            discriminator: *b"SPRCFG01",
++            network: ix.network,
++            application_id: ix.application_id,
++            publisher,
++            grant_root: ix.grant_root,
++            epoch_le: 0u64.to_le_bytes(),
++        };
++        config.validate()?;
++        Ok(config)
++    }
++
++    pub fn validate(&self) -> Result<(), CustomRingError> {
++        if self.discriminator != *b"SPRCFG01"
++            || self.publisher == Address::default()
++            || self.application_id == [0; 32]
++            || !is_canonical_bn254_scalar_be(&self.application_id)
++            || !is_canonical_bn254_scalar_be(&self.grant_root)
++        {
++            return Err(CustomRingError::InvalidInstructionData);
++        }
++        Ok(())
++    }
++
++    pub fn epoch(&self) -> u64 {
++        u64::from_le_bytes(self.epoch_le)
++    }
++
++    /// Called after the program checks the publisher's transaction signature.
++    pub fn update(&mut self, signer: &Address, ix: UpdateGrantRoot) -> Result<(), CustomRingError> {
++        self.validate()?;
++        if signer != &self.publisher
++            || ix.expected_epoch != self.epoch()
++            || !is_canonical_bn254_scalar_be(&ix.new_root)
++        {
++            return Err(CustomRingError::InvalidInstructionData);
++        }
++        let next = self
++            .epoch()
++            .checked_add(1)
++            .ok_or(CustomRingError::InvalidInstructionData)?;
++        self.grant_root = ix.new_root;
++        self.epoch_le = next.to_le_bytes();
++        Ok(())
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn updates_require_the_pinned_publisher_and_the_current_epoch() {
++        let owner = Address::new_from_array([3; 32]);
++        let mut cfg = SpawnRoomConfig::new(
++            InitializeConfig {
++                network: [4; 32],
++                application_id: [1; 32],
++                grant_root: [2; 32],
++            },
++            owner,
++        )
++        .unwrap();
++        let start = cfg;
++        let update = UpdateGrantRoot {
++            expected_epoch: 0,
++            new_root: [5; 32],
++        };
++        assert!(cfg
++            .update(&Address::new_from_array([8; 32]), update)
++            .is_err());
++        assert!(cfg
++            .update(
++                &owner,
++                UpdateGrantRoot {
++                    new_root: [0xff; 32],
++                    ..update
++                }
++            )
++            .is_err());
++        assert_eq!(cfg, start);
++        cfg.update(&owner, update).unwrap();
++        assert_eq!(cfg.epoch(), 1);
++        assert_eq!(cfg.grant_root, [5; 32]);
++        let committed = cfg;
++        assert!(cfg.update(&owner, update).is_err());
++        assert_eq!(cfg, committed);
++        cfg.epoch_le = u64::MAX.to_le_bytes();
++        let exhausted = cfg;
++        assert!(cfg
++            .update(
++                &owner,
++                UpdateGrantRoot {
++                    expected_epoch: u64::MAX,
++                    ..update
++                }
++            )
++            .is_err());
++        assert_eq!(cfg, exhausted);
++    }
++}
+diff --git a/program-libs/interface/src/lib.rs b/program-libs/interface/src/lib.rs
+index a1d04486338458e3f654e2d3e2cdf198e7db2bb4..fdfc6b5460e4ee505643a2e287fba7f2cbec0a3d 100644
+--- a/program-libs/interface/src/lib.rs
++++ b/program-libs/interface/src/lib.rs
+@@ -57,6 +57,10 @@ pub mod owner_signature;
+ pub mod pda_enrollment;
+ #[path = "proof/ring_keys.rs"]
+ pub mod ring_keys;
++#[path = "proof/spawn_room.rs"]
++pub mod spawn_room;
++#[path = "accounts/spawn_room_profile.rs"]
++pub mod spawn_room_profile;
+ #[path = "codec/spp.rs"]
+ pub mod spp;
+ #[path = "accounts/state.rs"]
+diff --git a/program-libs/interface/src/proof/spawn_room.rs b/program-libs/interface/src/proof/spawn_room.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..941af4c470e57d9566726e193666ae9d94041560
+--- /dev/null
++++ b/program-libs/interface/src/proof/spawn_room.rs
+@@ -0,0 +1,283 @@
++//! Public transcript and verifier for the version-one hidden room advance.
++//! The caller derives the upstream statement from the validated transfer and
++//! reads deployment and grant values from authenticated application configuration.
++
++use spr_hasher::{
++    hash_chain::create_hash_chain_4_from_slice, primitives::right_align, HasherError,
++};
++
++const APPLICATION_DOMAIN: u32 = u32::from_be_bytes(*b"SPRA");
++const CIRCUIT_VERSION: u8 = 1;
++const ELEMENT_COUNT: usize = 10;
++
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct SpawnRoomStatementV1 {
++    /// Raw 32-byte network identifier, preserved as two big-endian 128-bit limbs.
++    pub network: [u8; 32],
++    /// Canonical BN254 scalar identifying the application.
++    pub application_id: [u8; 32],
++    /// The same canonical ring identity field used by the upstream transfer.
++    pub ring_program_id: [u8; 32],
++    pub upstream_statement: [u8; 32],
++    pub grant_root: [u8; 32],
++    pub grant_epoch: u64,
++}
++
++impl SpawnRoomStatementV1 {
++    /// HashChain4 preimage in circuit order, including its exact element count.
++    pub fn elements(&self) -> [[u8; 32]; ELEMENT_COUNT] {
++        let (network, _) = self.network.as_chunks::<16>();
++        [
++            crate::domain::field(APPLICATION_DOMAIN),
++            right_align(&network[0]),
++            right_align(&network[1]),
++            self.application_id,
++            self.ring_program_id,
++            self.upstream_statement,
++            self.grant_root,
++            right_align(&self.grant_epoch.to_be_bytes()),
++            right_align(&[CIRCUIT_VERSION]),
++            right_align(&[ELEMENT_COUNT as u8]),
++        ]
++    }
++
++    pub fn hash(&self) -> Result<[u8; 32], HasherError> {
++        create_hash_chain_4_from_slice(&self.elements())
++    }
++
++    /// Public witness order of the combined circuit, with the original transfer first.
++    pub fn public_inputs(&self) -> Result<[[u8; 32]; 2], HasherError> {
++        Ok([self.upstream_statement, self.hash()?])
++    }
++}
++
++/// Visible genesis binds the marker seed and the signer of the initial note.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct SpawnRoomGenesisStatementV1 {
++    pub network: [u8; 32],
++    pub application_id: [u8; 32],
++    pub ring_program_id: [u8; 32],
++    pub upstream_statement: [u8; 32],
++    pub creation_identity: [u8; 32],
++    pub writer_owner_hash: [u8; 32],
++}
++
++impl SpawnRoomGenesisStatementV1 {
++    pub fn public_inputs(&self) -> Result<[[u8; 32]; 2], HasherError> {
++        let (network, _) = self.network.as_chunks::<16>();
++        let hash = create_hash_chain_4_from_slice(&[
++            crate::domain::field(u32::from_be_bytes(*b"SPRG")),
++            right_align(&network[0]),
++            right_align(&network[1]),
++            self.application_id,
++            self.ring_program_id,
++            self.upstream_statement,
++            self.creation_identity,
++            self.writer_owner_hash,
++            right_align(&[CIRCUIT_VERSION]),
++            right_align(&[ELEMENT_COUNT as u8]),
++        ])?;
++        Ok([self.upstream_statement, hash])
++    }
++
++    #[cfg(feature = "verifying-keys")]
++    pub fn verify(
++        &self,
++        proof: &crate::CustomRingProof,
++        key: &groth16_solana::groth16::Groth16Verifyingkey<'_>,
++    ) -> Result<(), solana_program_error::ProgramError> {
++        verify_public_inputs(
++            proof,
++            key,
++            &self.public_inputs().map_err(crate::CustomRingError::from)?,
++        )
++    }
++}
++
++/// The program must supply the pinned combined-circuit key for this operation.
++#[cfg(feature = "verifying-keys")]
++#[must_use]
++pub struct SpawnRoomProof<'a> {
++    pub proof: &'a crate::CustomRingProof,
++    pub statement: &'a SpawnRoomStatementV1,
++    pub key: &'a groth16_solana::groth16::Groth16Verifyingkey<'a>,
++}
++
++#[cfg(feature = "verifying-keys")]
++impl SpawnRoomProof<'_> {
++    #[inline(never)]
++    pub fn verify(self) -> Result<(), solana_program_error::ProgramError> {
++        verify_public_inputs(
++            self.proof,
++            self.key,
++            &self
++                .statement
++                .public_inputs()
++                .map_err(crate::CustomRingError::from)?,
++        )
++    }
++}
++
++#[cfg(feature = "verifying-keys")]
++#[inline(never)]
++fn verify_public_inputs(
++    proof: &crate::CustomRingProof,
++    key: &groth16_solana::groth16::Groth16Verifyingkey<'_>,
++    public_inputs: &[[u8; 32]; 2],
++) -> Result<(), solana_program_error::ProgramError> {
++    use crate::CustomRingError;
++    use groth16_solana::{
++        decompression::{decompress_g1, decompress_g2},
++        groth16::Groth16Verifier,
++    };
++    if key.nr_pubinputs != public_inputs.len() {
++        return Err(CustomRingError::UnsupportedCircuit.into());
++    }
++    let points = &proof.groth16;
++    let undecodable = |_| CustomRingError::InvalidRingProofPoint;
++    Groth16Verifier::new_with_commitment(
++        &decompress_g1(&points.proof_a).map_err(undecodable)?,
++        &decompress_g2(&points.proof_b).map_err(undecodable)?,
++        &decompress_g1(&points.proof_c).map_err(undecodable)?,
++        &decompress_g1(&proof.commitment).map_err(undecodable)?,
++        &decompress_g1(&proof.commitment_pok).map_err(undecodable)?,
++        public_inputs,
++        key,
++    )
++    .map_err(|_| CustomRingError::UnsupportedCircuit)?
++    .verify()
++    .map_err(|_| CustomRingError::ProofVerificationFailed)?;
++    Ok(())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    fn field_u64(n: u64) -> [u8; 32] {
++        let mut bytes = [0; 32];
++        bytes[24..].copy_from_slice(&n.to_be_bytes());
++        bytes
++    }
++
++    fn statement() -> SpawnRoomStatementV1 {
++        SpawnRoomStatementV1 {
++            network: core::array::from_fn(|i| 0x80 + i as u8),
++            application_id: field_u64(19),
++            ring_program_id: field_u64(13),
++            upstream_statement: field_u64(23),
++            grant_root: field_u64(29),
++            grant_epoch: 0x0102_0304_0506_0708,
++        }
++    }
++
++    #[test]
++    fn statement_matches_go_hash_and_public_witness_order() {
++        let s = statement();
++        let mut high = [0; 32];
++        high[16..].copy_from_slice(&s.network[..16]);
++        let mut low = [0; 32];
++        low[16..].copy_from_slice(&s.network[16..]);
++        let expected = [
++            field_u64(0x5350_5241),
++            high,
++            low,
++            field_u64(19),
++            field_u64(13),
++            field_u64(23),
++            field_u64(29),
++            field_u64(0x0102_0304_0506_0708),
++            field_u64(1),
++            field_u64(10),
++        ];
++        assert_eq!(s.elements(), expected);
++        // Generated independently by the pinned Go prover/transcript.HashChain4.
++        let mut digest = [0; 32];
++        hex::decode_to_slice(
++            "1051ac91af8bdc159a00e1d171da46f66c77eb7053620913107b59bdbe6fff4d",
++            &mut digest,
++        )
++        .unwrap();
++        assert_eq!(s.public_inputs().unwrap(), [field_u64(23), digest]);
++    }
++
++    #[test]
++    fn genesis_matches_go_and_binds_visible_writer_and_creation_identity() {
++        let a = statement();
++        let mut g = SpawnRoomGenesisStatementV1 {
++            network: a.network,
++            application_id: a.application_id,
++            ring_program_id: a.ring_program_id,
++            upstream_statement: a.upstream_statement,
++            creation_identity: field_u64(29),
++            writer_owner_hash: field_u64(31),
++        };
++        let inputs = g.public_inputs().unwrap();
++        assert_eq!(inputs[0], field_u64(23));
++        assert_eq!(
++            hex::encode(inputs[1]),
++            "23dc64c39ef7e4941011350b6318a23971a39dd8e2323c47353d0c14dcc3239d"
++        );
++        core::mem::swap(&mut g.creation_identity, &mut g.writer_owner_hash);
++        assert_ne!(g.public_inputs().unwrap(), inputs);
++    }
++
++    #[test]
++    fn rejects_noncanonical_statement_fields() {
++        let mut s = statement();
++        s.grant_root = [0xff; 32];
++        assert!(s.public_inputs().is_err());
++    }
++
++    #[cfg(feature = "verifying-keys")]
++    #[test]
++    fn rejects_a_one_input_ring_key_and_undecodable_proof_points() {
++        use crate::{key_catalog::RingCircuit, verifying_key, CustomRingError, CustomRingProof};
++        use bytemuck::Zeroable;
++
++        let key = verifying_key(RingCircuit::RegisterKey).unwrap();
++        let s = statement();
++        let proof = CustomRingProof::zeroed();
++        assert_eq!(
++            SpawnRoomProof {
++                statement: &s,
++                proof: &proof,
++                key
++            }
++            .verify(),
++            Err(CustomRingError::UnsupportedCircuit.into())
++        );
++
++        // Shape-only fixture for error paths before pairings. It cannot establish a valid proof.
++        let ic = [key.vk_ic[0]; 4];
++        let shaped = groth16_solana::groth16::Groth16Verifyingkey {
++            nr_pubinputs: 2,
++            vk_ic: &ic,
++            ..*key
++        };
++        let no_commitment = groth16_solana::groth16::Groth16Verifyingkey {
++            vk_commitment: None,
++            ..shaped
++        };
++        assert_eq!(
++            SpawnRoomProof {
++                statement: &s,
++                proof: &proof,
++                key: &no_commitment
++            }
++            .verify(),
++            Err(CustomRingError::UnsupportedCircuit.into())
++        );
++        let mut malformed = proof;
++        malformed.commitment_pok = [0x10; 32];
++        assert_eq!(
++            SpawnRoomProof {
++                statement: &s,
++                proof: &malformed,
++                key: &shaped
++            }
++            .verify(),
++            Err(CustomRingError::InvalidRingProofPoint.into())
++        );
++    }
++}
+diff --git a/programs/custom-ring/Cargo.toml b/programs/custom-ring/Cargo.toml
+index 8c1307ae9c72837465e1c5dea0a31e383fb4d89b..b053f3b4645a2815b666d7fbd0aa93c59ce1de10 100644
+--- a/programs/custom-ring/Cargo.toml
++++ b/programs/custom-ring/Cargo.toml
+@@ -11,6 +11,10 @@ crate-type = ["cdylib", "lib"]
+ [features]
+ default = []
+ bpf-entrypoint = []
++spawn-room-v1 = []
++# Development Groth16 setup, only for isolated local-validator deployments.
++spawn-room-v1-localnet-keys = ["spawn-room-v1", "insecure-test-setup"]
++insecure-test-setup = []
+ no-entrypoint = []
+ cpi = ["no-entrypoint"]
+ test-sbf = []
+@@ -32,6 +36,8 @@ spr-interface = { workspace = true, features = ["borsh"] }
+ zolana-ring-policy = { workspace = true }
+ 
+ [dev-dependencies]
++spr-client = { workspace = true }
++spr-account-checks = { workspace = true, features = ["test-only"] }
+ hex = { workspace = true }
+ litesvm = { workspace = true }
+ serde_json = { workspace = true }
+diff --git a/programs/custom-ring/src/instructions/mod.rs b/programs/custom-ring/src/instructions/mod.rs
+index 9bf969dd5f2b77b21d24560fa96e1770cb109478..0735306bd6a48eb261b33bf28bab5e5e73aa5bb3 100644
+--- a/programs/custom-ring/src/instructions/mod.rs
++++ b/programs/custom-ring/src/instructions/mod.rs
+@@ -22,6 +22,8 @@ mod set_cosigner;
+ mod set_delegate;
+ #[path = "configuration/access/set_paused.rs"]
+ mod set_paused;
++#[cfg(feature = "spawn-room-v1")]
++pub(crate) mod spawn_room;
+ mod transfer;
+ #[path = "configuration/access/update_authority.rs"]
+ mod update_authority;
+diff --git a/programs/custom-ring/src/instructions/spawn_room/keys.rs b/programs/custom-ring/src/instructions/spawn_room/keys.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..39fdc2f84fdb2e07eba904ea7461e0bbff79ee12
+--- /dev/null
++++ b/programs/custom-ring/src/instructions/spawn_room/keys.rs
+@@ -0,0 +1,31 @@
++//! The two local-validator keys were produced by an experimental single-party setup.
++//! A plain application-profile build has no settlement keys.
++use custom_ring_interface::CustomRingError;
++use groth16_solana::groth16::Groth16Verifyingkey;
++
++#[cfg(feature = "spawn-room-v1-localnet-keys")]
++mod advance;
++#[cfg(feature = "spawn-room-v1-localnet-keys")]
++mod genesis;
++
++pub(super) fn genesis() -> Result<&'static Groth16Verifyingkey<'static>, CustomRingError> {
++    #[cfg(feature = "spawn-room-v1-localnet-keys")]
++    {
++        Ok(&genesis::VERIFYINGKEY)
++    }
++    #[cfg(not(feature = "spawn-room-v1-localnet-keys"))]
++    {
++        Err(CustomRingError::UnsupportedCircuit)
++    }
++}
++
++pub(super) fn advance() -> Result<&'static Groth16Verifyingkey<'static>, CustomRingError> {
++    #[cfg(feature = "spawn-room-v1-localnet-keys")]
++    {
++        Ok(&advance::VERIFYINGKEY)
++    }
++    #[cfg(not(feature = "spawn-room-v1-localnet-keys"))]
++    {
++        Err(CustomRingError::UnsupportedCircuit)
++    }
++}
+diff --git a/programs/custom-ring/src/instructions/spawn_room/keys/advance.rs b/programs/custom-ring/src/instructions/spawn_room/keys/advance.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..7819aea0cb463923f2782faabc7c80ed9e06b031
+--- /dev/null
++++ b/programs/custom-ring/src/instructions/spawn_room/keys/advance.rs
+@@ -0,0 +1,136 @@
++// This file is generated by groth16_solana::vk::gnark.
++// Do not edit by hand.
++
++// INSECURE TEST SETUP: the secret setup randomness is public or
++// untrusted. Whoever knows it can make this verifying key accept a
++// proof for any public inputs without a valid witness. Do not deploy
++// it to devnet or mainnet.
++
++use groth16_solana::groth16::{CommitmentVerifyingKey, Groth16Verifyingkey};
++
++static VERIFYINGKEY_VK_IC: &[[u8; 64]] = &[
++    [
++        45u8, 74u8, 58u8, 31u8, 83u8, 225u8, 50u8, 237u8, 16u8, 237u8, 26u8, 138u8, 238u8, 7u8,
++        255u8, 95u8, 231u8, 53u8, 37u8, 206u8, 227u8, 84u8, 149u8, 208u8, 127u8, 75u8, 185u8,
++        255u8, 148u8, 191u8, 96u8, 57u8, 15u8, 36u8, 69u8, 224u8, 119u8, 77u8, 149u8, 39u8, 131u8,
++        170u8, 187u8, 69u8, 178u8, 136u8, 82u8, 238u8, 255u8, 36u8, 188u8, 186u8, 133u8, 162u8,
++        15u8, 191u8, 152u8, 119u8, 14u8, 138u8, 179u8, 8u8, 147u8, 176u8,
++    ],
++    [
++        28u8, 121u8, 46u8, 216u8, 246u8, 192u8, 89u8, 171u8, 4u8, 245u8, 59u8, 27u8, 164u8, 29u8,
++        225u8, 62u8, 156u8, 27u8, 153u8, 116u8, 96u8, 18u8, 143u8, 180u8, 118u8, 11u8, 115u8,
++        138u8, 92u8, 4u8, 189u8, 0u8, 39u8, 57u8, 227u8, 88u8, 130u8, 216u8, 239u8, 27u8, 43u8,
++        191u8, 190u8, 44u8, 91u8, 144u8, 71u8, 122u8, 63u8, 159u8, 228u8, 229u8, 6u8, 14u8, 24u8,
++        112u8, 79u8, 5u8, 133u8, 157u8, 140u8, 4u8, 139u8, 68u8,
++    ],
++    [
++        44u8, 38u8, 173u8, 200u8, 237u8, 99u8, 250u8, 183u8, 84u8, 244u8, 207u8, 249u8, 247u8,
++        130u8, 43u8, 221u8, 217u8, 42u8, 32u8, 226u8, 54u8, 161u8, 124u8, 184u8, 225u8, 167u8,
++        249u8, 48u8, 253u8, 121u8, 148u8, 92u8, 27u8, 116u8, 62u8, 216u8, 123u8, 135u8, 143u8,
++        10u8, 170u8, 238u8, 198u8, 70u8, 147u8, 45u8, 194u8, 113u8, 164u8, 206u8, 186u8, 25u8,
++        241u8, 160u8, 245u8, 119u8, 233u8, 189u8, 136u8, 101u8, 158u8, 161u8, 21u8, 80u8,
++    ],
++    [
++        24u8, 124u8, 27u8, 102u8, 181u8, 168u8, 10u8, 229u8, 217u8, 130u8, 34u8, 180u8, 117u8, 1u8,
++        110u8, 151u8, 192u8, 56u8, 74u8, 207u8, 144u8, 23u8, 185u8, 243u8, 112u8, 213u8, 215u8,
++        26u8, 113u8, 240u8, 23u8, 205u8, 46u8, 201u8, 49u8, 202u8, 54u8, 7u8, 106u8, 199u8, 249u8,
++        243u8, 201u8, 58u8, 245u8, 132u8, 238u8, 60u8, 73u8, 223u8, 107u8, 45u8, 197u8, 181u8,
++        119u8, 249u8, 79u8, 0u8, 93u8, 0u8, 49u8, 94u8, 124u8, 78u8,
++    ],
++];
++
++pub const VERIFYINGKEY: Groth16Verifyingkey = Groth16Verifyingkey {
++    nr_pubinputs: 2,
++    vk_alpha_g1: [
++        1u8, 158u8, 100u8, 192u8, 107u8, 67u8, 209u8, 43u8, 195u8, 165u8, 39u8, 80u8, 234u8, 247u8,
++        218u8, 37u8, 197u8, 238u8, 248u8, 118u8, 78u8, 162u8, 226u8, 59u8, 151u8, 73u8, 237u8,
++        230u8, 19u8, 116u8, 100u8, 88u8, 43u8, 128u8, 107u8, 190u8, 17u8, 185u8, 186u8, 42u8, 36u8,
++        62u8, 237u8, 78u8, 5u8, 19u8, 208u8, 24u8, 159u8, 159u8, 55u8, 135u8, 99u8, 39u8, 57u8,
++        240u8, 172u8, 15u8, 150u8, 203u8, 223u8, 251u8, 246u8, 168u8,
++    ],
++    vk_beta_g2: [
++        36u8, 2u8, 85u8, 79u8, 219u8, 234u8, 37u8, 134u8, 150u8, 13u8, 223u8, 62u8, 81u8, 188u8,
++        84u8, 5u8, 115u8, 112u8, 19u8, 144u8, 129u8, 240u8, 56u8, 20u8, 254u8, 75u8, 111u8, 179u8,
++        224u8, 152u8, 24u8, 6u8, 17u8, 127u8, 11u8, 69u8, 56u8, 100u8, 219u8, 0u8, 72u8, 255u8,
++        253u8, 195u8, 230u8, 206u8, 244u8, 4u8, 6u8, 41u8, 203u8, 165u8, 93u8, 235u8, 13u8, 239u8,
++        224u8, 75u8, 144u8, 224u8, 195u8, 70u8, 63u8, 200u8, 30u8, 173u8, 229u8, 76u8, 21u8, 111u8,
++        42u8, 18u8, 86u8, 161u8, 193u8, 155u8, 140u8, 76u8, 145u8, 184u8, 94u8, 0u8, 40u8, 135u8,
++        60u8, 91u8, 167u8, 123u8, 182u8, 119u8, 159u8, 154u8, 181u8, 138u8, 122u8, 18u8, 14u8,
++        191u8, 171u8, 66u8, 226u8, 247u8, 159u8, 50u8, 246u8, 164u8, 103u8, 121u8, 132u8, 196u8,
++        35u8, 55u8, 237u8, 57u8, 215u8, 45u8, 146u8, 148u8, 143u8, 234u8, 151u8, 84u8, 122u8,
++        118u8, 114u8, 222u8, 178u8, 52u8,
++    ],
++    vk_gamma_g2: [
++        17u8, 43u8, 150u8, 141u8, 124u8, 163u8, 69u8, 218u8, 135u8, 187u8, 61u8, 3u8, 6u8, 55u8,
++        93u8, 145u8, 37u8, 23u8, 174u8, 15u8, 54u8, 239u8, 95u8, 83u8, 254u8, 226u8, 104u8, 85u8,
++        187u8, 187u8, 42u8, 105u8, 7u8, 206u8, 238u8, 31u8, 110u8, 86u8, 209u8, 154u8, 242u8,
++        228u8, 97u8, 157u8, 75u8, 32u8, 33u8, 48u8, 56u8, 12u8, 66u8, 100u8, 123u8, 151u8, 112u8,
++        198u8, 20u8, 53u8, 0u8, 207u8, 150u8, 244u8, 93u8, 166u8, 43u8, 181u8, 218u8, 242u8, 162u8,
++        252u8, 96u8, 185u8, 43u8, 199u8, 0u8, 184u8, 115u8, 13u8, 43u8, 223u8, 95u8, 2u8, 163u8,
++        216u8, 124u8, 92u8, 2u8, 63u8, 161u8, 86u8, 36u8, 18u8, 70u8, 49u8, 10u8, 49u8, 30u8, 87u8,
++        159u8, 196u8, 112u8, 133u8, 109u8, 218u8, 141u8, 12u8, 172u8, 150u8, 229u8, 33u8, 170u8,
++        244u8, 72u8, 133u8, 8u8, 36u8, 150u8, 142u8, 173u8, 25u8, 131u8, 70u8, 189u8, 47u8, 61u8,
++        242u8, 45u8, 35u8,
++    ],
++    vk_delta_g2: [
++        16u8, 20u8, 82u8, 31u8, 138u8, 65u8, 6u8, 199u8, 189u8, 115u8, 161u8, 68u8, 167u8, 162u8,
++        101u8, 172u8, 83u8, 205u8, 106u8, 35u8, 116u8, 130u8, 64u8, 246u8, 70u8, 81u8, 156u8, 60u8,
++        46u8, 103u8, 176u8, 194u8, 38u8, 236u8, 19u8, 160u8, 246u8, 108u8, 76u8, 119u8, 171u8,
++        175u8, 150u8, 18u8, 134u8, 69u8, 255u8, 114u8, 148u8, 177u8, 107u8, 75u8, 170u8, 94u8,
++        168u8, 210u8, 71u8, 217u8, 86u8, 52u8, 54u8, 25u8, 140u8, 170u8, 18u8, 248u8, 76u8, 41u8,
++        182u8, 192u8, 60u8, 228u8, 175u8, 225u8, 39u8, 119u8, 22u8, 59u8, 248u8, 145u8, 89u8,
++        107u8, 194u8, 137u8, 237u8, 76u8, 151u8, 165u8, 82u8, 197u8, 181u8, 48u8, 123u8, 113u8,
++        96u8, 208u8, 18u8, 210u8, 106u8, 116u8, 206u8, 175u8, 97u8, 45u8, 18u8, 196u8, 234u8, 66u8,
++        104u8, 169u8, 44u8, 138u8, 218u8, 221u8, 92u8, 98u8, 229u8, 179u8, 198u8, 210u8, 167u8,
++        196u8, 214u8, 142u8, 233u8, 101u8, 27u8, 0u8,
++    ],
++    vk_ic: VERIFYINGKEY_VK_IC,
++    vk_commitment: Some(CommitmentVerifyingKey {
++        g2: [
++            1u8, 21u8, 169u8, 27u8, 56u8, 98u8, 52u8, 186u8, 117u8, 237u8, 152u8, 107u8, 56u8,
++            88u8, 189u8, 86u8, 35u8, 55u8, 109u8, 172u8, 185u8, 47u8, 150u8, 202u8, 178u8, 37u8,
++            67u8, 126u8, 182u8, 75u8, 101u8, 21u8, 37u8, 5u8, 143u8, 42u8, 97u8, 245u8, 215u8,
++            35u8, 213u8, 90u8, 71u8, 190u8, 182u8, 213u8, 90u8, 253u8, 95u8, 15u8, 71u8, 66u8,
++            235u8, 234u8, 242u8, 104u8, 238u8, 137u8, 60u8, 203u8, 125u8, 160u8, 237u8, 177u8,
++            40u8, 252u8, 159u8, 240u8, 80u8, 245u8, 128u8, 23u8, 104u8, 195u8, 102u8, 245u8, 147u8,
++            216u8, 116u8, 105u8, 250u8, 58u8, 231u8, 208u8, 180u8, 136u8, 66u8, 176u8, 81u8, 223u8,
++            222u8, 19u8, 81u8, 187u8, 94u8, 241u8, 31u8, 242u8, 253u8, 71u8, 81u8, 216u8, 64u8,
++            205u8, 177u8, 158u8, 168u8, 124u8, 206u8, 255u8, 91u8, 226u8, 242u8, 44u8, 157u8,
++            156u8, 83u8, 228u8, 45u8, 59u8, 126u8, 31u8, 58u8, 30u8, 14u8, 14u8, 40u8, 31u8,
++        ],
++        g_sigma_neg_g2: [
++            13u8, 138u8, 40u8, 218u8, 90u8, 106u8, 170u8, 87u8, 1u8, 73u8, 88u8, 100u8, 173u8,
++            175u8, 113u8, 25u8, 56u8, 20u8, 221u8, 107u8, 64u8, 129u8, 32u8, 93u8, 226u8, 212u8,
++            25u8, 68u8, 247u8, 230u8, 47u8, 186u8, 36u8, 131u8, 237u8, 239u8, 71u8, 252u8, 152u8,
++            151u8, 238u8, 180u8, 193u8, 182u8, 41u8, 17u8, 233u8, 44u8, 12u8, 188u8, 241u8, 244u8,
++            76u8, 91u8, 192u8, 167u8, 88u8, 206u8, 66u8, 218u8, 209u8, 255u8, 131u8, 196u8, 0u8,
++            50u8, 41u8, 51u8, 212u8, 25u8, 95u8, 94u8, 250u8, 103u8, 85u8, 252u8, 35u8, 247u8,
++            193u8, 127u8, 129u8, 129u8, 49u8, 158u8, 150u8, 153u8, 113u8, 189u8, 32u8, 126u8, 82u8,
++            230u8, 19u8, 150u8, 210u8, 222u8, 42u8, 157u8, 236u8, 82u8, 216u8, 65u8, 28u8, 168u8,
++            115u8, 204u8, 152u8, 93u8, 178u8, 205u8, 172u8, 129u8, 74u8, 14u8, 173u8, 9u8, 140u8,
++            63u8, 24u8, 161u8, 58u8, 50u8, 177u8, 181u8, 159u8, 97u8, 27u8, 159u8,
++        ],
++    }),
++};
++
++/// SHA-256 of the proving key file this verifying key was generated with.
++#[allow(dead_code)]
++#[rustfmt::skip]
++pub const VERIFYINGKEY_PROVING_KEY_SHA256: [u8; 32] = [182u8, 218u8, 131u8, 126u8, 125u8, 71u8, 108u8, 161u8, 237u8, 0u8, 122u8, 174u8, 101u8, 77u8, 131u8, 39u8, 85u8, 106u8, 150u8, 75u8, 41u8, 251u8, 173u8, 220u8, 149u8, 17u8, 190u8, 214u8, 152u8, 253u8, 248u8, 34u8];
++
++/// `true` for a test setup whose secret randomness is public or untrusted:
++/// whoever knows it can make this key accept a proof for any public
++/// inputs without a valid witness. Must not be deployed to devnet or
++/// mainnet.
++#[allow(dead_code)]
++pub const VERIFYINGKEY_INSECURE_TEST_SETUP: bool = true;
++
++/// The two consts above as a delimited string, exported so it stays in
++/// the program binary; read it back with
++/// `groth16_solana::vk::setup::find_setup_txts`.
++#[unsafe(export_name = "groth16_solana_vk_setup_1fb2fc8837dd74bc")]
++#[rustfmt::skip]
++pub static VERIFYINGKEY_SETUP_TXT: &str = "=======BEGIN GROTH16 VK SETUP V1=======\x00name\x00VERIFYINGKEY\x00insecure_test_setup\x00true\x00proving_key_sha256\x00b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822\x00=======END GROTH16 VK SETUP V1=======\x00";
++
++#[cfg(not(feature = "insecure-test-setup"))]
++compile_error!("VERIFYINGKEY comes from an insecure test setup: whoever knows its setup randomness can make it accept a proof for any public inputs. Enable the `insecure-test-setup` feature only in test builds, not for a devnet or mainnet deployment.");
+diff --git a/programs/custom-ring/src/instructions/spawn_room/keys/genesis.rs b/programs/custom-ring/src/instructions/spawn_room/keys/genesis.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..6595d61b2fbe0d006fc68a5c6eacbac4438f07b3
+--- /dev/null
++++ b/programs/custom-ring/src/instructions/spawn_room/keys/genesis.rs
+@@ -0,0 +1,136 @@
++// This file is generated by groth16_solana::vk::gnark.
++// Do not edit by hand.
++
++// INSECURE TEST SETUP: the secret setup randomness is public or
++// untrusted. Whoever knows it can make this verifying key accept a
++// proof for any public inputs without a valid witness. Do not deploy
++// it to devnet or mainnet.
++
++use groth16_solana::groth16::{CommitmentVerifyingKey, Groth16Verifyingkey};
++
++static VERIFYINGKEY_VK_IC: &[[u8; 64]] = &[
++    [
++        32u8, 205u8, 80u8, 136u8, 59u8, 222u8, 92u8, 52u8, 126u8, 78u8, 134u8, 203u8, 37u8, 19u8,
++        112u8, 42u8, 102u8, 122u8, 206u8, 142u8, 209u8, 19u8, 246u8, 91u8, 144u8, 209u8, 158u8,
++        48u8, 105u8, 76u8, 77u8, 210u8, 30u8, 231u8, 201u8, 50u8, 5u8, 12u8, 118u8, 49u8, 162u8,
++        132u8, 134u8, 82u8, 37u8, 146u8, 106u8, 171u8, 22u8, 35u8, 254u8, 72u8, 138u8, 203u8,
++        124u8, 88u8, 232u8, 190u8, 155u8, 48u8, 59u8, 56u8, 203u8, 65u8,
++    ],
++    [
++        3u8, 110u8, 139u8, 95u8, 133u8, 179u8, 161u8, 188u8, 78u8, 207u8, 239u8, 22u8, 160u8, 66u8,
++        211u8, 239u8, 173u8, 187u8, 6u8, 142u8, 98u8, 91u8, 207u8, 229u8, 198u8, 237u8, 72u8, 20u8,
++        151u8, 251u8, 241u8, 62u8, 13u8, 209u8, 165u8, 222u8, 23u8, 232u8, 84u8, 181u8, 219u8,
++        150u8, 5u8, 148u8, 15u8, 19u8, 69u8, 159u8, 199u8, 198u8, 172u8, 245u8, 218u8, 29u8, 227u8,
++        180u8, 190u8, 118u8, 171u8, 213u8, 139u8, 234u8, 86u8, 202u8,
++    ],
++    [
++        30u8, 179u8, 120u8, 46u8, 242u8, 36u8, 139u8, 195u8, 228u8, 110u8, 187u8, 168u8, 227u8,
++        102u8, 145u8, 69u8, 220u8, 90u8, 46u8, 221u8, 105u8, 1u8, 187u8, 98u8, 182u8, 164u8, 56u8,
++        44u8, 111u8, 0u8, 54u8, 101u8, 1u8, 39u8, 41u8, 203u8, 240u8, 177u8, 146u8, 118u8, 183u8,
++        194u8, 219u8, 239u8, 63u8, 221u8, 72u8, 222u8, 203u8, 30u8, 141u8, 96u8, 248u8, 192u8,
++        87u8, 5u8, 12u8, 65u8, 113u8, 158u8, 182u8, 110u8, 149u8, 252u8,
++    ],
++    [
++        21u8, 172u8, 15u8, 103u8, 167u8, 206u8, 205u8, 134u8, 41u8, 156u8, 55u8, 239u8, 192u8,
++        244u8, 209u8, 183u8, 156u8, 167u8, 4u8, 46u8, 154u8, 100u8, 119u8, 171u8, 164u8, 200u8,
++        145u8, 248u8, 39u8, 69u8, 49u8, 176u8, 9u8, 23u8, 59u8, 119u8, 241u8, 115u8, 238u8, 146u8,
++        218u8, 48u8, 185u8, 224u8, 177u8, 74u8, 10u8, 57u8, 247u8, 71u8, 64u8, 4u8, 218u8, 245u8,
++        49u8, 174u8, 252u8, 182u8, 139u8, 215u8, 14u8, 108u8, 109u8, 175u8,
++    ],
++];
++
++pub const VERIFYINGKEY: Groth16Verifyingkey = Groth16Verifyingkey {
++    nr_pubinputs: 2,
++    vk_alpha_g1: [
++        26u8, 21u8, 183u8, 133u8, 232u8, 193u8, 233u8, 89u8, 120u8, 116u8, 150u8, 241u8, 132u8,
++        202u8, 37u8, 97u8, 245u8, 99u8, 165u8, 140u8, 244u8, 13u8, 68u8, 74u8, 254u8, 218u8, 48u8,
++        65u8, 211u8, 114u8, 98u8, 34u8, 23u8, 121u8, 179u8, 82u8, 72u8, 201u8, 69u8, 125u8, 183u8,
++        134u8, 48u8, 146u8, 17u8, 128u8, 31u8, 237u8, 115u8, 78u8, 52u8, 143u8, 240u8, 216u8,
++        152u8, 231u8, 70u8, 16u8, 60u8, 11u8, 149u8, 117u8, 160u8, 191u8,
++    ],
++    vk_beta_g2: [
++        4u8, 104u8, 29u8, 124u8, 160u8, 124u8, 125u8, 119u8, 77u8, 206u8, 210u8, 108u8, 80u8,
++        228u8, 41u8, 222u8, 110u8, 13u8, 152u8, 67u8, 176u8, 49u8, 19u8, 246u8, 238u8, 184u8,
++        194u8, 252u8, 128u8, 117u8, 244u8, 35u8, 4u8, 73u8, 198u8, 108u8, 143u8, 20u8, 44u8, 53u8,
++        192u8, 57u8, 113u8, 62u8, 187u8, 10u8, 176u8, 41u8, 155u8, 105u8, 144u8, 125u8, 246u8,
++        89u8, 168u8, 7u8, 234u8, 149u8, 200u8, 205u8, 55u8, 99u8, 161u8, 97u8, 37u8, 157u8, 3u8,
++        227u8, 222u8, 114u8, 81u8, 131u8, 69u8, 165u8, 225u8, 3u8, 140u8, 225u8, 177u8, 173u8,
++        38u8, 213u8, 159u8, 211u8, 22u8, 106u8, 195u8, 248u8, 63u8, 127u8, 215u8, 65u8, 37u8,
++        179u8, 207u8, 146u8, 3u8, 190u8, 183u8, 242u8, 177u8, 175u8, 117u8, 152u8, 82u8, 179u8,
++        24u8, 185u8, 181u8, 153u8, 54u8, 89u8, 32u8, 38u8, 221u8, 230u8, 208u8, 134u8, 234u8, 92u8,
++        177u8, 224u8, 223u8, 158u8, 236u8, 216u8, 24u8, 130u8,
++    ],
++    vk_gamma_g2: [
++        5u8, 60u8, 34u8, 205u8, 160u8, 164u8, 189u8, 189u8, 115u8, 149u8, 67u8, 121u8, 230u8,
++        251u8, 175u8, 27u8, 231u8, 169u8, 124u8, 44u8, 128u8, 202u8, 51u8, 104u8, 54u8, 203u8,
++        137u8, 89u8, 193u8, 55u8, 240u8, 107u8, 14u8, 72u8, 77u8, 109u8, 0u8, 232u8, 148u8, 167u8,
++        113u8, 131u8, 130u8, 139u8, 3u8, 169u8, 138u8, 5u8, 208u8, 163u8, 11u8, 79u8, 230u8, 24u8,
++        151u8, 145u8, 172u8, 50u8, 17u8, 109u8, 33u8, 15u8, 96u8, 187u8, 22u8, 55u8, 80u8, 98u8,
++        90u8, 240u8, 88u8, 108u8, 28u8, 198u8, 41u8, 160u8, 159u8, 83u8, 28u8, 241u8, 2u8, 222u8,
++        18u8, 136u8, 140u8, 100u8, 84u8, 69u8, 146u8, 121u8, 4u8, 232u8, 189u8, 86u8, 217u8, 187u8,
++        5u8, 203u8, 163u8, 84u8, 115u8, 249u8, 104u8, 160u8, 232u8, 174u8, 173u8, 186u8, 97u8,
++        90u8, 82u8, 100u8, 157u8, 0u8, 186u8, 5u8, 206u8, 151u8, 249u8, 88u8, 45u8, 204u8, 238u8,
++        16u8, 243u8, 146u8, 6u8, 97u8,
++    ],
++    vk_delta_g2: [
++        9u8, 51u8, 145u8, 57u8, 150u8, 217u8, 180u8, 242u8, 77u8, 159u8, 22u8, 43u8, 66u8, 251u8,
++        213u8, 66u8, 236u8, 157u8, 19u8, 83u8, 147u8, 71u8, 178u8, 89u8, 251u8, 93u8, 216u8, 76u8,
++        168u8, 101u8, 47u8, 63u8, 22u8, 245u8, 17u8, 63u8, 195u8, 202u8, 227u8, 181u8, 160u8,
++        183u8, 75u8, 12u8, 248u8, 71u8, 78u8, 142u8, 220u8, 24u8, 87u8, 129u8, 70u8, 123u8, 143u8,
++        119u8, 177u8, 108u8, 206u8, 162u8, 101u8, 210u8, 38u8, 203u8, 2u8, 110u8, 49u8, 147u8,
++        24u8, 142u8, 18u8, 83u8, 82u8, 65u8, 194u8, 42u8, 167u8, 115u8, 5u8, 228u8, 192u8, 85u8,
++        184u8, 208u8, 239u8, 4u8, 252u8, 174u8, 134u8, 93u8, 208u8, 21u8, 210u8, 20u8, 9u8, 24u8,
++        33u8, 96u8, 4u8, 14u8, 240u8, 116u8, 84u8, 7u8, 121u8, 219u8, 172u8, 8u8, 6u8, 174u8,
++        190u8, 144u8, 74u8, 46u8, 176u8, 199u8, 188u8, 82u8, 49u8, 37u8, 173u8, 107u8, 136u8,
++        234u8, 159u8, 207u8, 90u8, 199u8,
++    ],
++    vk_ic: VERIFYINGKEY_VK_IC,
++    vk_commitment: Some(CommitmentVerifyingKey {
++        g2: [
++            12u8, 198u8, 68u8, 106u8, 165u8, 108u8, 185u8, 101u8, 188u8, 139u8, 81u8, 131u8, 225u8,
++            142u8, 145u8, 165u8, 97u8, 7u8, 121u8, 71u8, 212u8, 120u8, 235u8, 23u8, 220u8, 113u8,
++            38u8, 69u8, 122u8, 182u8, 120u8, 251u8, 20u8, 23u8, 7u8, 115u8, 180u8, 240u8, 94u8,
++            47u8, 198u8, 97u8, 28u8, 65u8, 209u8, 165u8, 137u8, 232u8, 146u8, 123u8, 234u8, 173u8,
++            94u8, 164u8, 221u8, 22u8, 62u8, 234u8, 202u8, 161u8, 232u8, 135u8, 17u8, 167u8, 24u8,
++            222u8, 101u8, 245u8, 85u8, 203u8, 116u8, 26u8, 87u8, 80u8, 31u8, 174u8, 112u8, 235u8,
++            24u8, 22u8, 194u8, 25u8, 146u8, 158u8, 185u8, 57u8, 64u8, 29u8, 67u8, 10u8, 227u8,
++            242u8, 28u8, 231u8, 85u8, 227u8, 16u8, 191u8, 229u8, 62u8, 171u8, 179u8, 34u8, 126u8,
++            244u8, 73u8, 107u8, 194u8, 42u8, 171u8, 164u8, 172u8, 238u8, 81u8, 134u8, 140u8, 120u8,
++            155u8, 21u8, 63u8, 227u8, 114u8, 6u8, 177u8, 197u8, 166u8, 185u8, 216u8,
++        ],
++        g_sigma_neg_g2: [
++            4u8, 167u8, 133u8, 255u8, 13u8, 48u8, 164u8, 54u8, 181u8, 71u8, 144u8, 184u8, 47u8,
++            66u8, 78u8, 82u8, 34u8, 243u8, 18u8, 77u8, 25u8, 243u8, 130u8, 47u8, 91u8, 224u8,
++            247u8, 68u8, 30u8, 180u8, 223u8, 67u8, 33u8, 146u8, 177u8, 145u8, 173u8, 79u8, 196u8,
++            168u8, 174u8, 241u8, 150u8, 111u8, 210u8, 205u8, 81u8, 91u8, 161u8, 220u8, 240u8, 29u8,
++            1u8, 174u8, 35u8, 246u8, 108u8, 116u8, 0u8, 76u8, 93u8, 57u8, 230u8, 46u8, 37u8, 232u8,
++            154u8, 106u8, 149u8, 199u8, 27u8, 46u8, 25u8, 212u8, 77u8, 20u8, 169u8, 78u8, 238u8,
++            51u8, 182u8, 202u8, 247u8, 218u8, 1u8, 33u8, 163u8, 169u8, 246u8, 72u8, 189u8, 79u8,
++            254u8, 169u8, 208u8, 47u8, 25u8, 222u8, 75u8, 253u8, 214u8, 145u8, 25u8, 93u8, 200u8,
++            150u8, 224u8, 26u8, 232u8, 121u8, 14u8, 187u8, 12u8, 201u8, 203u8, 219u8, 230u8, 177u8,
++            130u8, 37u8, 143u8, 104u8, 108u8, 72u8, 233u8, 163u8, 163u8, 230u8,
++        ],
++    }),
++};
++
++/// SHA-256 of the proving key file this verifying key was generated with.
++#[allow(dead_code)]
++#[rustfmt::skip]
++pub const VERIFYINGKEY_PROVING_KEY_SHA256: [u8; 32] = [115u8, 74u8, 25u8, 12u8, 2u8, 147u8, 165u8, 97u8, 92u8, 250u8, 188u8, 135u8, 180u8, 247u8, 138u8, 151u8, 35u8, 28u8, 107u8, 9u8, 53u8, 84u8, 164u8, 255u8, 242u8, 1u8, 117u8, 75u8, 8u8, 136u8, 254u8, 87u8];
++
++/// `true` for a test setup whose secret randomness is public or untrusted:
++/// whoever knows it can make this key accept a proof for any public
++/// inputs without a valid witness. Must not be deployed to devnet or
++/// mainnet.
++#[allow(dead_code)]
++pub const VERIFYINGKEY_INSECURE_TEST_SETUP: bool = true;
++
++/// The two consts above as a delimited string, exported so it stays in
++/// the program binary; read it back with
++/// `groth16_solana::vk::setup::find_setup_txts`.
++#[unsafe(export_name = "groth16_solana_vk_setup_d0be7dfa70bb71bc")]
++#[rustfmt::skip]
++pub static VERIFYINGKEY_SETUP_TXT: &str = "=======BEGIN GROTH16 VK SETUP V1=======\x00name\x00VERIFYINGKEY\x00insecure_test_setup\x00true\x00proving_key_sha256\x00734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57\x00=======END GROTH16 VK SETUP V1=======\x00";
++
++#[cfg(not(feature = "insecure-test-setup"))]
++compile_error!("VERIFYINGKEY comes from an insecure test setup: whoever knows its setup randomness can make it accept a proof for any public inputs. Enable the `insecure-test-setup` feature only in test builds, not for a devnet or mainnet deployment.");
+diff --git a/programs/custom-ring/src/instructions/spawn_room/mod.rs b/programs/custom-ring/src/instructions/spawn_room/mod.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..87a45dc8fd24d0196ee7fcc2f7cccb9c28dc5d02
+--- /dev/null
++++ b/programs/custom-ring/src/instructions/spawn_room/mod.rs
+@@ -0,0 +1,284 @@
++//! Dedicated application entrypoints. Only CreateRoom and AdvanceRoom can settle notes.
++mod keys;
++
++use super::{
++    instruction_runtime::{check_system_program, parse, Pda, PdaAllocation},
++    loader::UpgradeAuthorityCheck,
++    transfer::process_room_transfer,
++};
++use custom_ring_interface::{
++    key_catalog::RingCircuit,
++    spawn_room::{SpawnRoomGenesisStatementV1, SpawnRoomProof, SpawnRoomStatementV1},
++    spawn_room_profile::{self as profile, InitializeConfig, SpawnRoomConfig, UpdateGrantRoot},
++    CheckedAuthorization, CustomRingError, CustomRingProof, InitializeIxData, InstructionTag,
++    ParsedTransact, RingKind, RingMode, RingPolicy,
++};
++use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
++use spr_account_checks::AccountIterator;
++use spr_hasher::primitives::{is_canonical_bn254_scalar_be, solana_owner_identity};
++
++pub(crate) fn dispatch(
++    program: &Address,
++    accounts: &mut [AccountView],
++    tag: u8,
++    data: &[u8],
++) -> ProgramResult {
++    match tag {
++        profile::INITIALIZE_CONFIG => initialize(program, accounts, data),
++        profile::UPDATE_GRANT_ROOT => update(program, accounts, data),
++        profile::CREATE_ROOM => create(program, accounts, data),
++        profile::ADVANCE_ROOM => {
++            let (config, settlement) = accounts
++                .split_first_mut()
++                .ok_or(ProgramError::NotEnoughAccountKeys)?;
++            let config = load_config(program, config)?;
++            process_room_transfer(program, settlement, data, Operation::Advance(config))
++        }
++        other => {
++            let tag = InstructionTag::try_from(other)?;
++            match tag {
++                InstructionTag::Initialize => {
++                    let ix: InitializeIxData = parse(data)?;
++                    if ix.kind != RingKind::AnonymousPolicy {
++                        return Err(ProgramError::InvalidInstructionData);
++                    }
++                }
++                InstructionTag::EnrollBatch
++                | InstructionTag::UpdatePolicy
++                | InstructionTag::SetPaused
++                | InstructionTag::SetCoSigner
++                | InstructionTag::ClearCoSigner
++                | InstructionTag::UpdateAuthority => {}
++                _ => return Err(ProgramError::InvalidInstructionData),
++            }
++            crate::generic_instruction(program, accounts, tag, data)
++        }
++    }
++}
++
++fn load_config(program: &Address, account: &AccountView) -> Result<SpawnRoomConfig, ProgramError> {
++    if !account.owned_by(program)
++        || (Pda {
++            program_id: program,
++            seeds: &[profile::CONFIG_SEED],
++        })
++        .canonical(account.address())
++        .is_none()
++    {
++        return Err(ProgramError::InvalidAccountData);
++    }
++    let bytes = account.try_borrow()?;
++    let config = bytemuck::try_pod_read_unaligned::<SpawnRoomConfig>(&bytes)
++        .map_err(|_| ProgramError::InvalidAccountData)?;
++    config.validate()?;
++    Ok(config)
++}
++
++fn allocate<const N: usize>(
++    pda: Pda<'_, N>,
++    payer: &AccountView,
++    account: &mut AccountView,
++    bytes: &[u8],
++) -> ProgramResult {
++    let bump = pda
++        .canonical(account.address())
++        .ok_or(ProgramError::InvalidSeeds)?;
++    if account.data_len() != 0 {
++        return Err(ProgramError::AccountAlreadyInitialized);
++    }
++    pda.allocate(PdaAllocation {
++        payer,
++        account,
++        space: bytes.len(),
++        bump,
++    })?;
++    account.try_borrow_mut()?.copy_from_slice(bytes);
++    Ok(())
++}
++
++fn initialize(program: &Address, accounts: &mut [AccountView], data: &[u8]) -> ProgramResult {
++    let ix: InitializeConfig = parse(data)?;
++    let [payer, authority, publisher, config, system, executable, program_data] = accounts else {
++        return Err(ProgramError::InvalidArgument);
++    };
++    if !payer.is_writable() || !config.is_writable() {
++        return Err(ProgramError::InvalidAccountData);
++    }
++    if !payer.is_signer() || !authority.is_signer() || !publisher.is_signer() {
++        return Err(ProgramError::MissingRequiredSignature);
++    }
++    check_system_program(system)?;
++    UpgradeAuthorityCheck {
++        program_id: program,
++        authority,
++        program: executable,
++        program_data,
++    }
++    .verify()?;
++    let state = SpawnRoomConfig::new(ix, *publisher.address())?;
++    allocate(
++        Pda {
++            program_id: program,
++            seeds: &[profile::CONFIG_SEED],
++        },
++        payer,
++        config,
++        bytemuck::bytes_of(&state),
++    )
++}
++
++fn update(program: &Address, accounts: &mut [AccountView], data: &[u8]) -> ProgramResult {
++    let ix: UpdateGrantRoot = parse(data)?;
++    let [publisher, account] = accounts else {
++        return Err(ProgramError::InvalidArgument);
++    };
++    if !publisher.is_signer() {
++        return Err(ProgramError::MissingRequiredSignature);
++    }
++    if !account.is_writable() {
++        return Err(ProgramError::InvalidAccountData);
++    }
++    let mut state = load_config(program, account)?;
++    state.update(publisher.address(), ix)?;
++    account
++        .try_borrow_mut()?
++        .copy_from_slice(bytemuck::bytes_of(&state));
++    Ok(())
++}
++
++// CREATE_ROOM = visible canonical identity || ordinary anonymous-public transfer frame.
++// Accounts: config, writer signer, permanent marker, marker-rent payer, system program,
++// then the unmodified upstream transfer account window.
++fn create(program: &Address, accounts: &mut [AccountView], data: &[u8]) -> ProgramResult {
++    let (identity, frame) = data
++        .split_first_chunk::<32>()
++        .ok_or(ProgramError::InvalidInstructionData)?;
++    if *identity == [0; 32] || !is_canonical_bn254_scalar_be(identity) {
++        return Err(ProgramError::InvalidInstructionData);
++    }
++    let mut iter = AccountIterator::new(accounts);
++    let config = load_config(program, iter.next_account("room config")?)?;
++    let writer = *iter.next_signer("initial room writer")?.address();
++    let marker = iter.next_mut("permanent creation marker")?;
++    let payer = iter.next_signer_mut("marker rent payer")?;
++    check_system_program(iter.next_account("system program")?)?;
++    let pda = Pda {
++        program_id: program,
++        seeds: &[profile::GENESIS_SEED, identity],
++    };
++    if pda.canonical(marker.address()).is_none() {
++        return Err(ProgramError::InvalidSeeds);
++    }
++    if marker.data_len() != 0 {
++        return Err(ProgramError::AccountAlreadyInitialized);
++    }
++    process_room_transfer(
++        program,
++        iter.remaining_unchecked_mut()?,
++        frame,
++        Operation::Genesis {
++            config,
++            identity: *identity,
++            writer,
++        },
++    )?;
++    // A failure to create the marker rolls back the preceding SPP call in this instruction.
++    allocate(pda, payer, marker, &profile::GENESIS_DISCRIMINATOR)
++}
++
++pub(super) enum Operation {
++    Advance(SpawnRoomConfig),
++    Genesis {
++        config: SpawnRoomConfig,
++        identity: [u8; 32],
++        writer: Address,
++    },
++}
++
++impl Operation {
++    pub(super) fn check_frame(
++        &self,
++        tx: &ParsedTransact<'_>,
++        spp: &[AccountView],
++        ring: &RingPolicy,
++    ) -> ProgramResult {
++        let f = tx.data();
++        if ring.mode()? != RingMode::Anonymous
++            || ring.policy_hash == [0; 32]
++            || f.policy.is_none()
++            || f.entry
++            || f.vouched
++            || !f.interface_transfers.is_empty()
++            || f.outputs.iter().any(|output| output.is_exit())
++            || f.extensions.data_hash.is_some()
++            || f.extensions.ring_data_hash.is_some()
++            || !f.extensions.messages.is_empty()
++            || f.extensions.cache.is_some()
++            || f.transfer_circuit(0)?
++                != (RingCircuit::Transfer {
++                    outputs: 2,
++                    inputs: 24,
++                    withdrawals: 4,
++                    owners: 4,
++                    entry: false,
++                    wide: false,
++                })
++        {
++            return Err(ProgramError::InvalidInstructionData);
++        }
++        // No settlement legs or cache accounts are present. Check the actual SPP
++        // owner window, including its raw length. The upstream statement hashed
++        // these same signer addresses through solana_owner_identity.
++        let owners = f.owner_signers(spp, 0)?;
++        match (self, tx.authorization(), owners) {
++            (Self::Advance(_), CheckedAuthorization::AnonymousHidden(proof), [])
++                if !f.no_spend && proof.default_owner_tag.is_none() =>
++            {
++                Ok(())
++            }
++            (Self::Genesis { writer, .. }, CheckedAuthorization::AnonymousPublic, [owner])
++                if f.no_spend && owner.address() == writer =>
++            {
++                Ok(())
++            }
++            _ => Err(ProgramError::InvalidInstructionData),
++        }
++    }
++
++    pub(super) fn verify(
++        &self,
++        ring_program_id: [u8; 32],
++        upstream_statement: [u8; 32],
++        proof: &CustomRingProof,
++    ) -> ProgramResult {
++        match self {
++            Self::Advance(cfg) => SpawnRoomProof {
++                statement: &SpawnRoomStatementV1 {
++                    network: cfg.network,
++                    application_id: cfg.application_id,
++                    ring_program_id,
++                    upstream_statement,
++                    grant_root: cfg.grant_root,
++                    grant_epoch: cfg.epoch(),
++                },
++                proof,
++                key: keys::advance()?,
++            }
++            .verify(),
++            Self::Genesis {
++                config,
++                identity,
++                writer,
++            } => SpawnRoomGenesisStatementV1 {
++                network: config.network,
++                application_id: config.application_id,
++                ring_program_id,
++                upstream_statement,
++                creation_identity: *identity,
++                writer_owner_hash: solana_owner_identity(writer.as_array())
++                    .map_err(CustomRingError::from)?,
++            }
++            .verify(proof, keys::genesis()?),
++        }
++    }
++}
+diff --git a/programs/custom-ring/src/instructions/transfer/mod.rs b/programs/custom-ring/src/instructions/transfer/mod.rs
+index 99e9b70a3c3ed9afe8d024f8e95ff0e5556939df..ca43050317bcfac24939ab578405cad2defbf8ba 100644
+--- a/programs/custom-ring/src/instructions/transfer/mod.rs
++++ b/programs/custom-ring/src/instructions/transfer/mod.rs
+@@ -7,3 +7,6 @@ mod processor;
+ mod verify;
+ 
+ pub(crate) use processor::process_transfer_ix;
++
++#[cfg(feature = "spawn-room-v1")]
++pub(super) use processor::process_room_transfer;
+diff --git a/programs/custom-ring/src/instructions/transfer/processor.rs b/programs/custom-ring/src/instructions/transfer/processor.rs
+index cf2f6387bfd07c75b749963851ee5b66616bc000..de4191a627d43535998a92ed7ba275d2472742aa 100644
+--- a/programs/custom-ring/src/instructions/transfer/processor.rs
++++ b/programs/custom-ring/src/instructions/transfer/processor.rs
+@@ -29,6 +29,39 @@ pub fn process_transfer_ix(
+     accounts: &mut [AccountView],
+     data: &[u8],
+     tag: InstructionTag,
++) -> ProgramResult {
++    process_checked(program_id, accounts, data, tag, Proof::Ring)
++}
++
++enum Proof {
++    Ring,
++    #[cfg(feature = "spawn-room-v1")]
++    Room(crate::instructions::spawn_room::Operation),
++}
++
++#[cfg(feature = "spawn-room-v1")]
++pub(in crate::instructions) fn process_room_transfer(
++    program_id: &Address,
++    accounts: &mut [AccountView],
++    data: &[u8],
++    operation: crate::instructions::spawn_room::Operation,
++) -> ProgramResult {
++    process_checked(
++        program_id,
++        accounts,
++        data,
++        InstructionTag::Transfer,
++        Proof::Room(operation),
++    )
++}
++
++#[inline(never)]
++fn process_checked(
++    program_id: &Address,
++    accounts: &mut [AccountView],
++    data: &[u8],
++    tag: InstructionTag,
++    proof: Proof,
+ ) -> ProgramResult {
+     let slot = Clock::get()?.slot;
+     // 1. The ring's mode and delegate fix the rail and the signer it trusts.
+@@ -49,22 +82,31 @@ pub fn process_transfer_ix(
+         slot,
+     }
+     .validate(accounts)?;
++    let spp = accounts
++        .get(validated.spp..)
++        .ok_or(ProgramError::NotEnoughAccountKeys)?;
+     // 4. A bad SPP proof point is refused before either pairing.
+     let spp_data = data.spp_instruction_data(&ring)?;
+     // 5. The ring proof verifies the frame's approval mask and spend bit before the SPP call.
+     // Step 3 demanded co-signers from those bits, the demand holds only because the proof fixes them.
+-    RingStatements {
++    let statements = RingStatements {
+         program_id,
+         ring: &ring,
+         transfer: &transfer,
+         accounts: &validated,
++    };
++    match proof {
++        Proof::Ring => statements.verify()?,
++        #[cfg(feature = "spawn-room-v1")]
++        Proof::Room(op) => {
++            let ring_id = zolana_ring_policy::ring_id_field(program_id.as_array())
++                .map_err(custom_ring_interface::CustomRingError::from)?;
++            op.check_frame(&transfer, spp, &ring)?;
++            op.verify(ring_id, statements.hash(&ring_id)?, data.proof)?;
++        }
+     }
+-    .verify()?;
+     // 6. SPP verifies its own proof over the expanded data the ring PDA signs. The ring proof and
+     // the SPP proof meet at the values `lib.rs` names, a refusal by SPP reverts the whole transfer.
+-    let spp = accounts
+-        .get(validated.spp..)
+-        .ok_or(ProgramError::NotEnoughAccountKeys)?;
+     validate_spp_program(spp)?;
+     validated.ring_auth.invoke(spp, &spp_data)
+ }
+diff --git a/programs/custom-ring/src/instructions/transfer/verify.rs b/programs/custom-ring/src/instructions/transfer/verify.rs
+index 89db05fa661de451a6eb1141b0ed2f0b28d4c7dd..088219a8ed714207b538debde3e59bee526f972a 100644
+--- a/programs/custom-ring/src/instructions/transfer/verify.rs
++++ b/programs/custom-ring/src/instructions/transfer/verify.rs
+@@ -27,7 +27,7 @@
+ //! Read after `instructions/transfer/accounts.rs`, `instructions/verification/public_legs.rs`. Read before `program-libs/interface/src/proof/statement.rs`, `instructions/runtime/instruction_runtime.rs`.
+ 
+ use custom_ring_interface::{CustomRingError, ParsedTransact, RingPolicy, TransferBinding};
+-use pinocchio::{Address, ProgramResult};
++use pinocchio::{error::ProgramError, Address, ProgramResult};
+ use zolana_ring_policy::ring_id_field;
+ 
+ use super::accounts::TransactAccounts;
+@@ -43,9 +43,7 @@ pub(super) struct RingStatements<'a> {
+ 
+ impl RingStatements<'_> {
+     #[inline(never)]
+-    pub fn verify(self) -> ProgramResult {
+-        let ring_id = ring_id_field(self.program_id.as_array()).map_err(CustomRingError::from)?;
+-        let data = self.transfer.data();
++    pub(super) fn hash(&self, ring_id: &[u8; 32]) -> Result<[u8; 32], ProgramError> {
+         let slots = &self.accounts.public_slots;
+         let public_assets = slots.asset_fields().map_err(CustomRingError::from)?;
+         let public_amounts = slots.amount_fields().map_err(CustomRingError::from)?;
+@@ -53,10 +51,9 @@ impl RingStatements<'_> {
+         let withdrawal_hash =
+             custom_ring_interface::policy_withdrawal_hash(&self.accounts.withdrawals)
+                 .map_err(CustomRingError::from)?;
+-        let statement = self
+-            .transfer
++        self.transfer
+             .transfer_statement(TransferBinding {
+-                ring_id: &ring_id,
++                ring_id,
+                 auditor_pubkey: &self.ring.auditor_pubkey,
+                 sender: &self.accounts.sender,
+                 delegate_asset: &self.accounts.delegate_asset,
+@@ -69,7 +66,14 @@ impl RingStatements<'_> {
+                 withdrawal_hash: &withdrawal_hash,
+             })?
+             .hash()
+-            .map_err(CustomRingError::from)?;
++            .map_err(|error| CustomRingError::from(error).into())
++    }
++
++    #[inline(never)]
++    pub fn verify(self) -> ProgramResult {
++        let data = self.transfer.data();
++        let ring_id = ring_id_field(self.program_id.as_array()).map_err(CustomRingError::from)?;
++        let statement = self.hash(&ring_id)?;
+         // The frame and the screened withdrawal count select the key, each catalog key compiles `TransferCircuit` at one shape.
+         RingProof {
+             proof: data.proof,
+diff --git a/programs/custom-ring/src/lib.rs b/programs/custom-ring/src/lib.rs
+index cf56ea6948f7384ff3f518425c7bd18ee9fa6f25..ad0f8222529e66fbc84fe996ec149f3e286f2dd9 100644
+--- a/programs/custom-ring/src/lib.rs
++++ b/programs/custom-ring/src/lib.rs
+@@ -72,8 +72,25 @@ pub fn process_instruction(
+     let (ix_tag, ix_data) = instruction_data
+         .split_first()
+         .ok_or(ProgramError::InvalidInstructionData)?;
+-    let ix_tag = InstructionTag::try_from(*ix_tag)?;
++    #[cfg(feature = "spawn-room-v1")]
++    {
++        return instructions::spawn_room::dispatch(program_id, accounts, *ix_tag, ix_data);
++    }
++    #[cfg(not(feature = "spawn-room-v1"))]
++    generic_instruction(
++        program_id,
++        accounts,
++        InstructionTag::try_from(*ix_tag)?,
++        ix_data,
++    )
++}
+ 
++fn generic_instruction(
++    program_id: &Address,
++    accounts: &mut [AccountView],
++    ix_tag: InstructionTag,
++    ix_data: &[u8],
++) -> ProgramResult {
+     match ix_tag {
+         InstructionTag::Initialize => process_initialize_ix(program_id, accounts, ix_data),
+         InstructionTag::Transfer | InstructionTag::AuthorityTransfer => {
+diff --git a/programs/custom-ring/tests/spawn_room.rs b/programs/custom-ring/tests/spawn_room.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..166703f1fdf1d411b8569a7834435ad45859f1f3
+--- /dev/null
++++ b/programs/custom-ring/tests/spawn_room.rs
+@@ -0,0 +1,145 @@
++#![cfg(feature = "spawn-room-v1")]
++
++use custom_ring_interface::{instruction::tag, spawn_room_profile::*};
++use custom_ring_program::process_instruction;
++use pinocchio::{error::ProgramError, AccountView, Address};
++use spr_account_checks::account_info::test_account_info::get_account_view;
++
++fn fixture(
++    address: Address,
++    owner: Address,
++    signer: bool,
++    writable: bool,
++    data: &[u8],
++) -> AccountView {
++    get_account_view(
++        address.to_bytes(),
++        owner.to_bytes(),
++        signer,
++        writable,
++        false,
++        data.to_vec(),
++    )
++}
++
++fn pda(program: &Address, seeds: &[&[u8]]) -> Address {
++    Address::find_program_address(seeds, program).0
++}
++
++fn config(publisher: Address) -> SpawnRoomConfig {
++    SpawnRoomConfig::new(
++        InitializeConfig {
++            network: [7; 32],
++            application_id: [1; 32],
++            grant_root: [2; 32],
++        },
++        publisher,
++    )
++    .unwrap()
++}
++
++#[test]
++fn generic_settlement_and_delegate_tags_are_refused_at_the_entrypoint() {
++    let p = Address::new_from_array([7; 32]);
++    for tag in [
++        tag::TRANSFER,
++        tag::AUTHORITY_TRANSFER,
++        tag::MERGE,
++        tag::SET_DELEGATE,
++        255,
++    ] {
++        assert!(process_instruction(&p, &mut [], &[tag]).is_err());
++    }
++    for tag in [
++        tag::TRANSFER,
++        tag::AUTHORITY_TRANSFER,
++        tag::MERGE,
++        tag::SET_DELEGATE,
++    ] {
++        assert_eq!(
++            process_instruction(&p, &mut [], &[tag]),
++            Err(ProgramError::InvalidInstructionData)
++        );
++    }
++}
++
++#[test]
++fn grant_update_checks_the_real_signer_owner_and_config_address_before_mutation() {
++    let program = Address::new_from_array([7; 32]);
++    let publisher = Address::new_from_array([9; 32]);
++    let other = Address::new_from_array([4; 32]);
++    let address = pda(&program, &[CONFIG_SEED]);
++    let config = config(publisher);
++    let bytes = bytemuck::bytes_of(&config);
++    let mut ix = vec![UPDATE_GRANT_ROOT];
++    ix.extend(
++        wincode::serialize(&UpdateGrantRoot {
++            expected_epoch: 0,
++            new_root: [3; 32],
++        })
++        .unwrap(),
++    );
++    for (signer, signed, owner, address, writable) in [
++        (other, true, program, address, true),
++        (publisher, false, program, address, true),
++        (publisher, true, other, address, true),
++        (publisher, true, program, other, true),
++        (publisher, true, program, address, false),
++    ] {
++        let mut accounts = [
++            fixture(signer, Address::default(), signed, false, &[]),
++            fixture(address, owner, false, writable, bytes),
++        ];
++        assert!(process_instruction(&program, &mut accounts, &ix).is_err());
++        assert_eq!(&*accounts[1].try_borrow().unwrap(), bytes);
++    }
++    let mut accounts = [
++        fixture(publisher, Address::default(), true, false, &[]),
++        fixture(address, program, false, true, bytes),
++    ];
++    process_instruction(&program, &mut accounts, &ix).unwrap();
++    let saved = accounts[1].try_borrow().unwrap().to_vec();
++    let updated: SpawnRoomConfig = bytemuck::pod_read_unaligned(&saved);
++    assert_eq!((updated.epoch(), updated.grant_root), (1, [3; 32]));
++    assert!(process_instruction(&program, &mut accounts, &ix).is_err());
++    assert_eq!(&*accounts[1].try_borrow().unwrap(), &saved);
++}
++
++#[test]
++fn duplicate_genesis_refuses_the_permanent_marker_before_settlement() {
++    let program = Address::new_from_array([7; 32]);
++    let writer = Address::new_from_array([9; 32]);
++    let identity = [1; 32];
++    let mut accounts = [
++        fixture(
++            pda(&program, &[CONFIG_SEED]),
++            program,
++            false,
++            false,
++            bytemuck::bytes_of(&config(writer)),
++        ),
++        fixture(writer, Address::default(), true, false, &[]),
++        fixture(
++            pda(&program, &[GENESIS_SEED, &identity]),
++            program,
++            false,
++            true,
++            &GENESIS_DISCRIMINATOR,
++        ),
++        fixture(
++            Address::new_from_array([6; 32]),
++            Address::default(),
++            true,
++            true,
++            &[],
++        ),
++        fixture(pinocchio_system::ID, Address::default(), false, false, &[]),
++    ];
++    let mut ix = vec![CREATE_ROOM];
++    ix.extend(identity);
++    assert_eq!(
++        process_instruction(&program, &mut accounts, &ix),
++        Err(ProgramError::AccountAlreadyInitialized)
++    );
++    assert_eq!(&*accounts[2].try_borrow().unwrap(), &GENESIS_DISCRIMINATOR);
++}
+diff --git a/programs/custom-ring/tests/spawn_room_proofs.rs b/programs/custom-ring/tests/spawn_room_proofs.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..f36dc96fc4a6f0884b4fe60bf2258533824c2824
+--- /dev/null
++++ b/programs/custom-ring/tests/spawn_room_proofs.rs
+@@ -0,0 +1,133 @@
++//! Round trips the full Go circuits' localnet Groth16 proofs through the program's verifier.
++#![cfg(feature = "spawn-room-v1-localnet-keys")]
++
++use custom_ring_interface::{
++    key_catalog::RingCircuit,
++    spawn_room::{SpawnRoomGenesisStatementV1, SpawnRoomProof, SpawnRoomStatementV1},
++    verifying_key, CustomRingProof, PlainGroth16Proof,
++};
++use serde_json::Value;
++use spr_client::prover::{Proof, ProofCompressed};
++
++mod advance_vk {
++    include!(concat!(
++        env!("CARGO_MANIFEST_DIR"),
++        "/src/instructions/spawn_room/keys/advance.rs"
++    ));
++}
++mod genesis_vk {
++    include!(concat!(
++        env!("CARGO_MANIFEST_DIR"),
++        "/src/instructions/spawn_room/keys/genesis.rs"
++    ));
++}
++
++fn field(v: &Value) -> [u8; 32] {
++    let mut bytes = [0; 32];
++    hex::decode_to_slice(v.as_str().unwrap().strip_prefix("0x").unwrap(), &mut bytes).unwrap();
++    bytes
++}
++fn decode(v: &Value) -> CustomRingProof {
++    let encoded = Proof::from_gnark_json(&v["proof"].to_string()).unwrap();
++    let compact = ProofCompressed::try_from(encoded).unwrap();
++    let commitment = compact.commitment.unwrap();
++    CustomRingProof {
++        groth16: PlainGroth16Proof {
++            proof_a: compact.a,
++            proof_b: compact.compressed_b().unwrap(),
++            proof_c: compact.c,
++        },
++        commitment: commitment.commitment,
++        commitment_pok: commitment.commitment_pok,
++    }
++}
++
++#[test]
++fn real_advance_proof_binds_both_public_inputs_and_current_config() {
++    let v: Value = serde_json::from_str(include_str!(
++        "../../../test-vectors/proof/spawn-room-advance-v1.json"
++    ))
++    .unwrap();
++    let receipt = v["publicInputs"].as_array().unwrap();
++    assert_eq!(receipt.len(), 2);
++    let proof = decode(&v);
++    let s = SpawnRoomStatementV1 {
++        network: field(&v["network"]),
++        application_id: field(&v["applicationId"]),
++        ring_program_id: field(&v["ringProgramId"]),
++        upstream_statement: field(&receipt[0]),
++        grant_root: field(&v["grantRoot"]),
++        grant_epoch: v["grantEpoch"].as_u64().unwrap(),
++    };
++    assert_eq!(
++        s.public_inputs().unwrap(),
++        [field(&receipt[0]), field(&receipt[1])]
++    );
++    let verify = |st: &SpawnRoomStatementV1| {
++        SpawnRoomProof {
++            proof: &proof,
++            statement: st,
++            key: &advance_vk::VERIFYINGKEY,
++        }
++        .verify()
++    };
++    verify(&s).unwrap();
++    for mutate in [
++        |s: &mut SpawnRoomStatementV1| s.grant_root[31] ^= 1,
++        |s: &mut SpawnRoomStatementV1| s.grant_epoch ^= 1,
++        |s: &mut SpawnRoomStatementV1| s.network[0] ^= 0x80,
++        |s: &mut SpawnRoomStatementV1| s.application_id[31] ^= 1,
++        |s: &mut SpawnRoomStatementV1| s.ring_program_id[31] ^= 1,
++        |s: &mut SpawnRoomStatementV1| s.upstream_statement[31] ^= 1,
++    ] {
++        let mut changed = s;
++        mutate(&mut changed);
++        assert!(verify(&changed).is_err());
++    }
++    assert!(SpawnRoomProof {
++        proof: &proof,
++        statement: &s,
++        key: verifying_key(RingCircuit::RegisterKey).unwrap()
++    }
++    .verify()
++    .is_err());
++    assert!(SpawnRoomProof {
++        proof: &proof,
++        statement: &s,
++        key: &genesis_vk::VERIFYINGKEY
++    }
++    .verify()
++    .is_err());
++}
++#[test]
++fn real_genesis_proof_binds_marker_identity_and_writer() {
++    let v: Value = serde_json::from_str(include_str!(
++        "../../../test-vectors/proof/spawn-room-genesis-v1.json"
++    ))
++    .unwrap();
++    let receipt = v["publicInputs"].as_array().unwrap();
++    assert_eq!(receipt.len(), 2);
++    let proof = decode(&v);
++    let s = SpawnRoomGenesisStatementV1 {
++        network: field(&v["network"]),
++        application_id: field(&v["applicationId"]),
++        ring_program_id: field(&v["ringProgramId"]),
++        upstream_statement: field(&receipt[0]),
++        creation_identity: field(&v["creationIdentity"]),
++        writer_owner_hash: field(&v["writerOwnerHash"]),
++    };
++    assert_eq!(
++        s.public_inputs().unwrap(),
++        [field(&receipt[0]), field(&receipt[1])]
++    );
++    s.verify(&proof, &genesis_vk::VERIFYINGKEY).unwrap();
++    let mut stale = s;
++    stale.creation_identity[31] ^= 1;
++    assert!(stale.verify(&proof, &genesis_vk::VERIFYINGKEY).is_err());
++    let mut wrong_writer = s;
++    wrong_writer.writer_owner_hash[31] ^= 1;
++    assert!(wrong_writer
++        .verify(&proof, &genesis_vk::VERIFYINGKEY)
++        .is_err());
++    assert!(s.verify(&proof, &advance_vk::VERIFYINGKEY).is_err());
++}
+diff --git a/prover/circuits/transfer/spawn_room_advance.go b/prover/circuits/transfer/spawn_room_advance.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..df99526e5869e57d3972915cc6d29b812eb013ab
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_advance.go
+@@ -0,0 +1,84 @@
++package transfer
++
++import (
++	"errors"
++
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
++	"github.com/helius-labs/zolana/prover/server/circuits/gadget"
++	transaction "github.com/helius-labs/zolana/prover/server/circuits/spp_transaction/shared"
++)
++
++// SpawnRoomAdvanceCircuit is a separate experimental key family. It must never
++// be accepted as a room application proof without the state and grant relation.
++// The original transfer key family is unchanged.
++type SpawnRoomAdvanceCircuit struct {
++	TransferCircuit
++}
++
++func NewSpawnRoomAdvanceCircuit(shape Shape) (*SpawnRoomAdvanceCircuit, error) {
++	if shape.Entry {
++		return nil, errors.New("room advances cannot spend default-ring notes")
++	}
++	base, err := NewTransferCircuit(shape)
++	if err != nil {
++		return nil, err
++	}
++	return &SpawnRoomAdvanceCircuit{TransferCircuit: *base}, nil
++}
++
++func (c *SpawnRoomAdvanceCircuit) Define(api frontend.API) error {
++	if c.Shape.Entry {
++		return errors.New("room advances cannot use entry keys")
++	}
++	if err := c.TransferCircuit.Define(api); err != nil {
++		return err
++	}
++	api.AssertIsEqual(c.Hidden, 1)
++	api.AssertIsEqual(c.InProof, 0)
++	api.AssertIsEqual(c.Delegate, 0)
++	api.AssertIsEqual(c.SignerCount, 0)
++	api.AssertIsEqual(c.Shape.Stream().AssertLayout(api, c.Layout), 0)
++	api.AssertIsEqual(api.IsZero(c.PolicyHash), 0)
++	api.AssertIsEqual(api.IsZero(c.TrackingRoot), 0)
++	api.AssertIsEqual(c.WithdrawalCount, 0)
++	for i := range c.PublicAmounts {
++		api.AssertIsEqual(c.PublicAmounts[i], 0)
++		api.AssertIsEqual(c.PublicGross[i], 0)
++	}
++	// The base proof already binds these exact wires to the ordered SPP
++	// transaction. Reopening them here cannot introduce a second witness.
++	for _, input := range c.Inputs[1:] {
++		api.AssertIsEqual(input.Domain, transaction.DummyDomain)
++	}
++	for _, output := range c.Outputs[1:] {
++		api.AssertIsEqual(output.Output.Domain, transaction.DummyDomain)
++	}
++	emptyAddresses := make([]frontend.Variable, len(c.Inputs))
++	for i := range emptyAddresses {
++		emptyAddresses[i] = 0
++	}
++	api.AssertIsEqual(c.AddressChain, gadget.NonZeroHashChain(api, emptyAddresses))
++	assertSpawnRoomNotePair(api, c.RingProgramID, c.Inputs[0].OpenSlot(api), c.Outputs[0].Output.OpenSlot(api))
++	return nil
++}
++
++// This relation deliberately does not choose a state codec, grant verifier,
++// or public-input encoding. It is only the nonfinancial note-shape boundary.
++func assertSpawnRoomNotePair(api frontend.API, ringID frontend.Variable, old, next shared.Output) {
++	api.AssertIsEqual(api.IsZero(ringID), 0)
++	for _, note := range []shared.Output{old, next} {
++		api.AssertIsEqual(note.Utxo, 1)
++		api.AssertIsEqual(note.Ring, 1)
++		api.AssertIsEqual(note.Exit, 0)
++		api.AssertIsEqual(note.RingProgramID, ringID)
++		api.AssertIsEqual(note.Amount, 0)
++		api.AssertIsEqual(api.IsZero(note.OwnerPkHash), 0)
++		api.AssertIsEqual(api.IsZero(note.NullifierPk), 0)
++		api.AssertIsEqual(api.IsZero(api.Sub(note.NullifierPk, shared.ZeroNullifierPk)), 0)
++	}
++	api.AssertIsEqual(old.OwnerPkHash, next.OwnerPkHash)
++	api.AssertIsEqual(old.NullifierPk, next.NullifierPk)
++	api.AssertIsEqual(old.Asset, next.Asset)
++	api.AssertIsEqual(api.IsZero(api.Sub(old.Hash, next.Hash)), 0)
++}
+diff --git a/prover/circuits/transfer/spawn_room_advance_test.go b/prover/circuits/transfer/spawn_room_advance_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc9cbae4e023a2f86a53f2cebc3b74de3c5b0e50
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_advance_test.go
+@@ -0,0 +1,70 @@
++package transfer
++
++import (
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/test"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
++)
++
++type roomNotePairCircuit struct {
++	RingID    frontend.Variable
++	Old, Next shared.Output
++}
++
++func (c *roomNotePairCircuit) Define(api frontend.API) error {
++	assertSpawnRoomNotePair(api, c.RingID, c.Old, c.Next)
++	return nil
++}
++
++func roomNotePairWitness() *roomNotePairCircuit {
++	note := func(hash int) shared.Output {
++		return shared.Output{
++			UtxoWires: shared.UtxoWires{
++				Domain: 0, TreeID: 0, OwnerPkHash: 7, NullifierPk: 9,
++				Asset: 11, Amount: 0, Blinding: 0, DataHash: 0,
++				RingDataHash: 0, RingProgramID: 13,
++			},
++			Hash: hash, Utxo: 1, Ring: 1, Exit: 0,
++		}
++	}
++	return &roomNotePairCircuit{RingID: 13, Old: note(17), Next: note(19)}
++}
++
++func TestSpawnRoomNotePair(t *testing.T) {
++	if err := test.IsSolved(&roomNotePairCircuit{}, roomNotePairWitness(), ecc.BN254.ScalarField()); err != nil {
++		t.Fatal(err)
++	}
++	cases := map[string]func(*roomNotePairCircuit){
++		"zero ring":           func(c *roomNotePairCircuit) { c.RingID = 0 },
++		"input dummy":         func(c *roomNotePairCircuit) { c.Old.Utxo = 0 },
++		"output dummy":        func(c *roomNotePairCircuit) { c.Next.Utxo = 0 },
++		"input default ring":  func(c *roomNotePairCircuit) { c.Old.Ring = 0 },
++		"output default ring": func(c *roomNotePairCircuit) { c.Next.Ring = 0 },
++		"exit":                func(c *roomNotePairCircuit) { c.Next.Exit = 1 },
++		"other ring":          func(c *roomNotePairCircuit) { c.Next.RingProgramID = 23 },
++		"input value":         func(c *roomNotePairCircuit) { c.Old.Amount = 1 },
++		"output value":        func(c *roomNotePairCircuit) { c.Next.Amount = 1 },
++		"zero owner":          func(c *roomNotePairCircuit) { c.Old.OwnerPkHash = 0; c.Next.OwnerPkHash = 0 },
++		"other owner":         func(c *roomNotePairCircuit) { c.Next.OwnerPkHash = 23 },
++		"literal zero key":    func(c *roomNotePairCircuit) { c.Old.NullifierPk = 0; c.Next.NullifierPk = 0 },
++		"public zero secret": func(c *roomNotePairCircuit) {
++			c.Old.NullifierPk = shared.ZeroNullifierPk
++			c.Next.NullifierPk = shared.ZeroNullifierPk
++		},
++		"other key":       func(c *roomNotePairCircuit) { c.Next.NullifierPk = 23 },
++		"other asset":     func(c *roomNotePairCircuit) { c.Next.Asset = 23 },
++		"same commitment": func(c *roomNotePairCircuit) { c.Next.Hash = c.Old.Hash },
++	}
++	for name, change := range cases {
++		t.Run(name, func(t *testing.T) {
++			w := roomNotePairWitness()
++			change(w)
++			if err := test.IsSolved(&roomNotePairCircuit{}, w, ecc.BN254.ScalarField()); err == nil {
++				t.Fatal("invalid note pair satisfied the constraints")
++			}
++		})
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_application.go b/prover/circuits/transfer/spawn_room_application.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..c14be6bc7cc0960d8f82761b1c24102dc627370a
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_application.go
+@@ -0,0 +1,53 @@
++package transfer
++
++import (
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana/prover/server/circuits/gadget"
++)
++
++const SpawnRoomApplicationDomain = 0x53505241 // SPRA
++
++// SpawnRoomApplicationCircuit is a distinct two-public-input circuit family.
++// It must never be registered under an upstream transfer key or a v0 room key.
++type SpawnRoomApplicationCircuit struct {
++	SpawnRoomAdvanceCircuit
++	ApplicationStatementHash frontend.Variable `gnark:",public"`
++	Context                  SpawnRoomContext
++	Advance                  SpawnRoomAdvanceWitness
++}
++
++func NewSpawnRoomApplicationCircuit(shape Shape) (*SpawnRoomApplicationCircuit, error) {
++	base, err := NewSpawnRoomAdvanceCircuit(shape)
++	if err != nil {
++		return nil, err
++	}
++	return &SpawnRoomApplicationCircuit{SpawnRoomAdvanceCircuit: *base}, nil
++}
++
++func (c *SpawnRoomApplicationCircuit) Define(api frontend.API) error {
++	if err := c.SpawnRoomAdvanceCircuit.Define(api); err != nil {
++		return err
++	}
++	// Use the exact note wires and statement already constrained by the ring.
++	// The second statement binds the authenticated live application context;
++	// there is no caller-supplied independent upstream-statement witness.
++	api.AssertIsEqual(c.Context.RingProgramID, c.RingProgramID)
++	c.Advance.Assert(api, c.Context, c.Inputs[0], c.Outputs[0].Output)
++	api.AssertIsEqual(c.ApplicationStatementHash,
++		SpawnRoomApplicationStatement(api, c.PublicInputHash, c.Context))
++	return nil
++}
++
++// SpawnRoomApplicationStatement mirrors SpawnRoomStatementV1 in the Rust
++// interface. Network bytes occupy two bounded 128-bit limbs, as constrained by
++// Advance.Assert. The closing 10 includes itself and fixes the transcript shape.
++// No room, writer or individual grant commitment is a public input.
++func SpawnRoomApplicationStatement(api frontend.API, upstream frontend.Variable, context SpawnRoomContext) frontend.Variable {
++	return gadget.HashChain4(api, []frontend.Variable{
++		SpawnRoomApplicationDomain,
++		context.Network[0], context.Network[1],
++		context.ApplicationID, context.RingProgramID,
++		upstream, context.GrantRoot, context.GrantEpoch,
++		SpawnRoomSchema, 10,
++	})
++}
+diff --git a/prover/circuits/transfer/spawn_room_application_test.go b/prover/circuits/transfer/spawn_room_application_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..80d22158a8ef34cfd80e3d65567ed6e06aedce8d
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_application_test.go
+@@ -0,0 +1,107 @@
++package transfer_test
++
++import (
++	"math/big"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark-crypto/ecc/bn254/fr"
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/test"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest"
++	"github.com/helius-labs/zolana/prover/server/prover-test/spp/spptest"
++)
++
++func spawnApplicationHash(t testing.TB, c *transfer.SpawnRoomApplicationCircuit) *big.Int {
++	t.Helper()
++	x := c.Context
++	return spptest.MustHashChain4(t, ringtest.ToBigInts([]frontend.Variable{
++		0x53505241, x.Network[0], x.Network[1], x.ApplicationID, x.RingProgramID,
++		c.PublicInputHash, x.GrantRoot, x.GrantEpoch, 1, 10,
++	}))
++}
++
++func spawnCombined(t testing.TB) *transfer.SpawnRoomApplicationCircuit {
++	t.Helper()
++	w, app := spawnApplicationFixture(t)
++	b := w.Build(t)
++	c := &transfer.SpawnRoomApplicationCircuit{
++		SpawnRoomAdvanceCircuit: transfer.SpawnRoomAdvanceCircuit{TransferCircuit: *b.Circuit},
++		Context:                 app.Context, Advance: app.Advance,
++	}
++	c.ApplicationStatementHash = spawnApplicationHash(t, c)
++	return c
++}
++
++func TestSpawnRoomApplicationHonestAndBoundStatements(t *testing.T) {
++	for _, mutation := range []string{"honest", "changed application hash", "revoked grant root", "different network"} {
++		t.Run(mutation, func(t *testing.T) {
++			c := spawnCombined(t)
++			switch mutation {
++			case "changed application hash":
++				c.ApplicationStatementHash = new(big.Int).Add(ringtest.AsBigInt(c.ApplicationStatementHash), big.NewInt(1))
++			case "revoked grant root":
++				c.Context.GrantRoot = new(big.Int).Add(ringtest.AsBigInt(c.Context.GrantRoot), big.NewInt(1))
++				c.ApplicationStatementHash = spawnApplicationHash(t, c)
++			case "different network":
++				c.Context.Network[1] = 997
++				c.ApplicationStatementHash = spawnApplicationHash(t, c)
++			}
++			err := test.IsSolved(c, c, ecc.BN254.ScalarField())
++			if mutation == "honest" && err != nil {
++				t.Fatal(err)
++			}
++			if mutation != "honest" && err == nil {
++				t.Fatal("accepted unbound application authorization")
++			}
++		})
++	}
++}
++
++func TestSpawnRoomApplicationPublicWitnessHasOnlyTwoHashes(t *testing.T) {
++	c := spawnCombined(t)
++	witness, err := frontend.NewWitness(c, ecc.BN254.ScalarField())
++	if err != nil {
++		t.Fatal(err)
++	}
++	public, err := witness.Public()
++	if err != nil {
++		t.Fatal(err)
++	}
++	values := public.Vector().(fr.Vector)
++	if len(values) != 2 {
++		t.Fatalf("public fields=%d, want exactly two hashes", len(values))
++	}
++	for i, want := range []frontend.Variable{c.PublicInputHash, c.ApplicationStatementHash} {
++		if values[i].BigInt(new(big.Int)).Cmp(ringtest.AsBigInt(want)) != 0 {
++			t.Fatalf("wrong public input at %d", i)
++		}
++	}
++}
++
++type spawnStatementCircuit struct {
++	Hash     frontend.Variable `gnark:",public"`
++	Upstream frontend.Variable
++	Context  transfer.SpawnRoomContext
++}
++
++func (c *spawnStatementCircuit) Define(api frontend.API) error {
++	api.AssertIsEqual(c.Hash, transfer.SpawnRoomApplicationStatement(api, c.Upstream, c.Context))
++	return nil
++}
++
++func TestSpawnRoomApplicationStatementMatchesRustVector(t *testing.T) {
++	network := make([]byte, 32)
++	for i := range network {
++		network[i] = byte(0x80 + i)
++	}
++	want, _ := new(big.Int).SetString("1051ac91af8bdc159a00e1d171da46f66c77eb7053620913107b59bdbe6fff4d", 16)
++	c := &spawnStatementCircuit{Hash: want, Upstream: 23, Context: transfer.SpawnRoomContext{
++		Network:       transfer.SpawnDigest{new(big.Int).SetBytes(network[:16]), new(big.Int).SetBytes(network[16:])},
++		ApplicationID: 19, RingProgramID: 13, GrantRoot: 29, GrantEpoch: uint64(0x0102030405060708),
++	}}
++	if err := test.IsSolved(&spawnStatementCircuit{}, c, ecc.BN254.ScalarField()); err != nil {
++		t.Fatal(err)
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_full_test.go b/prover/circuits/transfer/spawn_room_full_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..188503e31f11b2d453837b21f463612829bc48ae
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_full_test.go
+@@ -0,0 +1,66 @@
++package transfer_test
++
++import (
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark/test"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer"
++)
++
++// This uses the actual upstream audit, policy, tracking and transaction builders.
++// It solves the full ring constraint system, not a proof or a validator transaction.
++func spawnZeroValueWorld(t testing.TB) ringtransfer.Anonymous {
++	t.Helper()
++	shape := transfer.Shape{Inputs: 24, Outputs: 2, Withdrawals: 4, Owners: 4}
++	a := ringaudit.NewAudit(t, shape.Stream())
++	w := ringtransfer.Hidden(shape)
++	w.Omitted = 1
++	w.Inputs = []ringaudit.Input{{
++		Utxo: ringaudit.SpentUtxo(t, ringtransfer.Sender(t), ringtransfer.SenderNullifierPk(t), a.RingProgramID, 0, 51),
++		OwnerKey: ringtransfer.SenderKey(), Mint: ringaudit.FixtureMint,
++	}}
++	w.Outputs = map[int]func(*ringaudit.Slot){0: func(slot *ringaudit.Slot) {
++		slot.Utxo.Amount = 0
++		slot.Utxo.OwnerPkHash = ringtransfer.Sender(t)
++		slot.Utxo.NullifierPk = ringtransfer.SenderNullifierPk(t)
++		slot.OwnerKey = ringtransfer.SenderKey()
++	}}
++	return w
++}
++
++func TestSpawnRoomFullHiddenZeroValueWitness(t *testing.T) {
++	b := spawnZeroValueWorld(t).Build(t)
++	c := &transfer.SpawnRoomAdvanceCircuit{TransferCircuit: *b.Circuit}
++	if err := test.IsSolved(c, c, ecc.BN254.ScalarField()); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestSpawnRoomFullRejectsOtherwiseValidPublicOwnerRail(t *testing.T) {
++	w := spawnZeroValueWorld(t)
++	w.Rail = ringtransfer.PublicOwners
++	b := w.Build(t)
++	if err := test.IsSolved(b.Circuit, b.Circuit, ecc.BN254.ScalarField()); err != nil {
++		t.Fatalf("invalid upstream control witness: %v", err)
++	}
++	c := &transfer.SpawnRoomAdvanceCircuit{TransferCircuit: *b.Circuit}
++	if err := test.IsSolved(c, c, ecc.BN254.ScalarField()); err == nil {
++		t.Fatal("accepted public-owner rail")
++	}
++}
++
++func TestSpawnRoomFullRejectsOtherwiseValidOwnerChange(t *testing.T) {
++	w := spawnZeroValueWorld(t)
++	w.Outputs[0] = func(slot *ringaudit.Slot) { slot.Utxo.Amount = 0 }
++	b := w.Build(t)
++	if err := test.IsSolved(b.Circuit, b.Circuit, ecc.BN254.ScalarField()); err != nil {
++		t.Fatalf("invalid upstream control witness: %v", err)
++	}
++	c := &transfer.SpawnRoomAdvanceCircuit{TransferCircuit: *b.Circuit}
++	if err := test.IsSolved(c, c, ecc.BN254.ScalarField()); err == nil {
++		t.Fatal("accepted a different successor owner")
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_genesis.go b/prover/circuits/transfer/spawn_room_genesis.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..1c2bf588d70a8d82f9588a67796c7876cc4a1609
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_genesis.go
+@@ -0,0 +1,110 @@
++package transfer
++
++import (
++	"errors"
++
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
++	"github.com/helius-labs/zolana/prover/server/circuits/gadget"
++	transaction "github.com/helius-labs/zolana/prover/server/circuits/spp_transaction/shared"
++)
++
++const SpawnRoomGenesisDomain = 0x53505247 // SPRG
++
++type SpawnRoomGenesisContext struct {
++	Network                      SpawnDigest
++	ApplicationID, RingProgramID frontend.Variable
++}
++
++// SpawnRoomGenesisCircuit is a distinct visible creation operation. The program
++// must atomically create a permanent marker for State.Identity and settle this
++// exact frame. Subsequent hidden advances do not read or publish that marker.
++type SpawnRoomGenesisCircuit struct {
++	TransferCircuit
++	GenesisStatementHash frontend.Variable `gnark:",public"`
++	Context              SpawnRoomGenesisContext
++	State                SpawnRoomState
++}
++
++func NewSpawnRoomGenesisCircuit(shape Shape) (*SpawnRoomGenesisCircuit, error) {
++	if shape.Entry {
++		return nil, errors.New("room genesis cannot use entry keys")
++	}
++	base, err := NewTransferCircuit(shape)
++	if err != nil {
++		return nil, err
++	}
++	return &SpawnRoomGenesisCircuit{TransferCircuit: *base}, nil
++}
++
++func (c *SpawnRoomGenesisCircuit) Define(api frontend.API) error {
++	if c.Shape.Entry {
++		return errors.New("room genesis cannot use entry keys")
++	}
++	if err := c.TransferCircuit.Define(api); err != nil {
++		return err
++	}
++	api.AssertIsEqual(c.Hidden, 0)
++	api.AssertIsEqual(c.InProof, 0)
++	api.AssertIsEqual(c.Delegate, 0)
++	api.AssertIsEqual(c.SignerCount, 1)
++	api.AssertIsEqual(c.Signers[0], c.State.Writer)
++	api.AssertIsEqual(c.Shape.Stream().AssertLayout(api, c.Layout), 0)
++	api.AssertIsEqual(api.IsZero(c.PolicyHash), 0)
++	api.AssertIsEqual(api.IsZero(c.TrackingRoot), 0)
++	api.AssertIsEqual(c.WithdrawalCount, 0)
++	for i := range c.PublicAmounts {
++		api.AssertIsEqual(c.PublicAmounts[i], 0)
++		api.AssertIsEqual(c.PublicGross[i], 0)
++	}
++	emptyAddresses := make([]frontend.Variable, len(c.Inputs))
++	for i := range c.Inputs {
++		api.AssertIsEqual(c.Inputs[i].Domain, transaction.DummyDomain)
++		emptyAddresses[i] = 0
++	}
++	api.AssertIsEqual(c.AddressChain, gadget.NonZeroHashChain(api, emptyAddresses))
++	for _, output := range c.Outputs[1:] {
++		api.AssertIsEqual(output.Output.Domain, transaction.DummyDomain)
++	}
++	output := c.Outputs[0].Output.OpenSlot(api)
++	api.AssertIsEqual(output.Utxo, 1)
++	api.AssertIsEqual(output.Ring, 1)
++	api.AssertIsEqual(output.Amount, 0)
++	api.AssertIsEqual(output.RingDataHash, 0)
++	api.AssertIsEqual(output.RingProgramID, c.RingProgramID)
++	api.AssertIsEqual(api.IsZero(output.NullifierPk), 0)
++	api.AssertIsEqual(api.IsZero(api.Sub(output.NullifierPk, shared.ZeroNullifierPk)), 0)
++	api.AssertIsEqual(output.OwnerPkHash, c.State.Writer)
++	api.AssertIsEqual(c.Context.RingProgramID, c.RingProgramID)
++	api.AssertIsEqual(api.IsZero(c.Context.ApplicationID), 0)
++	api.AssertIsEqual(api.IsZero(c.Context.RingProgramID), 0)
++	c.State.Binding.Network.assertEqual(api, c.Context.Network)
++	api.AssertIsEqual(c.State.Binding.ApplicationID, c.Context.ApplicationID)
++	api.AssertIsEqual(c.State.Binding.RingProgramID, c.Context.RingProgramID)
++	for _, digest := range []SpawnDigest{c.State.Binding.CreationNonce, c.State.SeedManifest, c.State.FixedMembers} {
++		api.AssertIsEqual(api.Mul(api.IsZero(digest[0]), api.IsZero(digest[1])), 0)
++	}
++	api.AssertIsEqual(c.State.Revision, 0)
++	api.AssertIsEqual(c.State.Predecessor, 0)
++	api.AssertIsEqual(c.State.Authorization, 0)
++	api.AssertIsEqual(c.State.LastAuthorizationEpoch, 0)
++	api.AssertIsEqual(c.State.Memory.Length, 0)
++	for _, digest := range []SpawnDigest{c.State.Memory.Episode, c.State.Memory.OriginalResult, c.State.Memory.Candidate} {
++		for _, limb := range digest {
++			api.AssertIsEqual(limb, 0)
++		}
++	}
++	for _, score := range c.State.Policy.Scores {
++		api.AssertIsEqual(score, 50)
++	}
++	api.AssertIsEqual(output.DataHash, c.State.Hash(api))
++	api.AssertIsEqual(c.GenesisStatementHash, SpawnRoomGenesisStatement(api, c.PublicInputHash, c.Context, c.State.Identity(api), c.State.Writer))
++	return nil
++}
++
++func SpawnRoomGenesisStatement(api frontend.API, upstream frontend.Variable, context SpawnRoomGenesisContext, identity, writer frontend.Variable) frontend.Variable {
++	return gadget.HashChain4(api, []frontend.Variable{
++		SpawnRoomGenesisDomain, context.Network[0], context.Network[1], context.ApplicationID, context.RingProgramID,
++		upstream, identity, writer, SpawnRoomSchema, 10,
++	})
++}
+diff --git a/prover/circuits/transfer/spawn_room_genesis_test.go b/prover/circuits/transfer/spawn_room_genesis_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..dc40e9f9b039058dd5cc2c7293e971ae674e9d8b
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_genesis_test.go
+@@ -0,0 +1,80 @@
++package transfer_test
++
++import (
++	"math/big"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/test"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer"
++	"github.com/helius-labs/zolana/prover/server/prover-test/spp/spptest"
++)
++
++func spawnGenesis(t testing.TB, mutation string) *transfer.SpawnRoomGenesisCircuit {
++	t.Helper()
++	w := spawnZeroValueWorld(t)
++	w.Rail = ringtransfer.PublicOwners
++	if mutation != "live input" {
++		w.Inputs = []ringaudit.Input{}
++	}
++	context := transfer.SpawnRoomGenesisContext{
++		Network: transfer.SpawnDigest{11, 17}, ApplicationID: 19,
++		RingProgramID: ringaudit.NewAudit(t, w.Shape.Stream()).RingProgramID,
++	}
++	state := spawnFixture(t).Advance.Old
++	state.Binding.Network = context.Network
++	state.Binding.ApplicationID = context.ApplicationID
++	state.Binding.RingProgramID = context.RingProgramID
++	state.Writer = ringtransfer.Sender(t)
++	state.Revision, state.Predecessor, state.Authorization, state.LastAuthorizationEpoch = 0, 0, 0, 0
++	state.Memory = spawnMemory("", 0)
++	state.Memory.Episode = transfer.SpawnDigest{0, 0}
++	state.Memory.OriginalResult = transfer.SpawnDigest{0, 0}
++	state.Memory.Candidate = transfer.SpawnDigest{0, 0}
++	state.Policy.Scores = [2]frontend.Variable{50, 50}
++	switch mutation {
++	case "nonzero revision":
++		state.Revision = 1
++	case "preloaded memory":
++		state.Memory = spawnMemory("unapproved", 5)
++	case "missing seed":
++		state.SeedManifest = transfer.SpawnDigest{0, 0}
++	case "different network":
++		context.Network[1] = 997
++	case "second live output":
++		w.Omitted = 0
++		w.Outputs[1] = func(slot *ringaudit.Slot) { slot.Utxo.Amount = 0 }
++	}
++	base := w.Outputs[0]
++	w.Outputs[0] = func(slot *ringaudit.Slot) {
++		base(slot)
++		slot.Utxo.DataHash = spawnStateHash(t, state)
++		slot.Utxo.RingDataHash = big.NewInt(0)
++	}
++	b := w.Build(t)
++	c := &transfer.SpawnRoomGenesisCircuit{TransferCircuit: *b.Circuit, Context: context, State: state}
++	c.GenesisStatementHash = spptest.MustHashChain4(t, ringtest.ToBigInts([]frontend.Variable{
++		0x53505247, context.Network[0], context.Network[1], context.ApplicationID, context.RingProgramID,
++		c.PublicInputHash, spawnIdentity(t, state), state.Writer, 1, 10,
++	}))
++	return c
++}
++
++func TestSpawnRoomGenesisRelation(t *testing.T) {
++	for _, mutation := range []string{"honest", "nonzero revision", "preloaded memory", "missing seed", "different network", "second live output", "live input"} {
++		t.Run(mutation, func(t *testing.T) {
++			c := spawnGenesis(t, mutation)
++			err := test.IsSolved(c, c, ecc.BN254.ScalarField())
++			if mutation == "honest" && err != nil {
++				t.Fatal(err)
++			}
++			if mutation != "honest" && err == nil {
++				t.Fatal("accepted invalid room genesis")
++			}
++		})
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_proof_test.go b/prover/circuits/transfer/spawn_room_proof_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..8e0739ff0cfc9f317300c6ece3fc13c47373fac5
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_proof_test.go
+@@ -0,0 +1,191 @@
++package transfer_test
++
++import (
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"io"
++	"math/big"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark-crypto/ecc/bn254/fr"
++	"github.com/consensys/gnark/backend/groth16"
++	"github.com/consensys/gnark/constraint"
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringkey"
++	"github.com/helius-labs/zolana/prover/server/prover/common"
++)
++
++// This explicit integration test performs a fresh local single-party setup and
++// generates a real proof for the full ring+application relation. It is not an
++// SPP signature proof or a validator transaction. Its experimental keys must
++// never be installed in the upstream or v0 catalogs.
++func TestSpawnRoomApplicationGroth16Proof(t *testing.T) {
++	directory := os.Getenv("SPAWN_ROOM_PROOF_DIR")
++	if directory == "" {
++		t.Skip("set SPAWN_ROOM_PROOF_DIR to generate and verify the distinct localnet key")
++	}
++	circuit, err := transfer.NewSpawnRoomApplicationCircuit(transfer.Shape{Inputs: 24, Outputs: 2, Withdrawals: 4, Owners: 4})
++	if err != nil {
++		t.Fatal(err)
++	}
++	assignment := spawnCombined(t)
++	context := assignment.Context
++	metadata := map[string]any{
++		"network":       "0x" + hex.EncodeToString(append(ringtest.AsBigInt(context.Network[0]).FillBytes(make([]byte, 16)), ringtest.AsBigInt(context.Network[1]).FillBytes(make([]byte, 16))...)),
++		"applicationId": common.ToHex(ringtest.AsBigInt(context.ApplicationID)),
++		"ringProgramId": common.ToHex(ringtest.AsBigInt(context.RingProgramID)),
++		"grantRoot":     common.ToHex(ringtest.AsBigInt(context.GrantRoot)),
++		"grantEpoch":    ringtest.AsBigInt(context.GrantEpoch).Uint64(),
++	}
++	spawnProveAndExport(t, directory, "spawn-room-advance-v1", circuit, assignment, metadata)
++}
++
++func TestSpawnRoomGenesisGroth16Proof(t *testing.T) {
++	directory := os.Getenv("SPAWN_ROOM_PROOF_DIR")
++	if directory == "" {
++		t.Skip("set SPAWN_ROOM_PROOF_DIR to generate and verify the distinct localnet key")
++	}
++	circuit, err := transfer.NewSpawnRoomGenesisCircuit(transfer.Shape{Inputs: 24, Outputs: 2, Withdrawals: 4, Owners: 4})
++	if err != nil {
++		t.Fatal(err)
++	}
++	assignment := spawnGenesis(t, "honest")
++	context := assignment.Context
++	metadata := map[string]any{
++		"network":          "0x" + hex.EncodeToString(append(ringtest.AsBigInt(context.Network[0]).FillBytes(make([]byte, 16)), ringtest.AsBigInt(context.Network[1]).FillBytes(make([]byte, 16))...)),
++		"applicationId":    common.ToHex(ringtest.AsBigInt(context.ApplicationID)),
++		"ringProgramId":    common.ToHex(ringtest.AsBigInt(context.RingProgramID)),
++		"creationIdentity": common.ToHex(spawnIdentity(t, assignment.State)),
++		"writerOwnerHash":  common.ToHex(ringtest.AsBigInt(assignment.State.Writer)),
++	}
++	spawnProveAndExport(t, directory, "spawn-room-genesis-v1", circuit, assignment, metadata)
++}
++
++func spawnProveAndExport(t testing.TB, directory, name string, circuit, assignment frontend.Circuit, metadata map[string]any) {
++	t.Helper()
++	if err := os.MkdirAll(directory, 0700); err != nil {
++		t.Fatal(err)
++	}
++	t.Log("compiling full", name)
++	cs := ringkey.Compile(t, circuit)
++	if got := cs.GetNbPublicVariables() - 1; got != 2 {
++		t.Fatalf("public inputs=%d, want2", got)
++	}
++	commitments, ok := cs.GetCommitments().(constraint.Groth16Commitments)
++	if !ok || len(commitments) != 1 || commitments[0].NbPublicCommitted != 0 {
++		t.Fatalf("unexpected commitment configuration: %v", cs.GetCommitments())
++	}
++	keyPath := filepath.Join(directory, name+".key")
++	system := &common.ExtensionProofSystem{CircuitType: common.CircuitType(name), ConstraintSystem: cs}
++	if os.Getenv("SPAWN_ROOM_REUSE_LOCAL_KEY") == "1" {
++		t.Log("reloading explicitly requested local key and comparing the complete constraint system")
++		file, err := os.Open(keyPath)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if _, err := system.UnsafeReadFrom(file); err != nil {
++			t.Fatal(err)
++		}
++		if err := file.Close(); err != nil {
++			t.Fatal(err)
++		}
++		compiledHash, loadedHash := sha256.New(), sha256.New()
++		if _, err := cs.WriteTo(compiledHash); err != nil {
++			t.Fatal(err)
++		}
++		if _, err := system.ConstraintSystem.WriteTo(loadedHash); err != nil {
++			t.Fatal(err)
++		}
++		if hex.EncodeToString(compiledHash.Sum(nil)) != hex.EncodeToString(loadedHash.Sum(nil)) {
++			t.Fatal("local key constraint system differs from the current compiled circuit")
++		}
++	} else {
++		t.Logf("compiled %d constraints; performing local single-party setup", cs.GetNbConstraints())
++		var err error
++		system.ProvingKey, system.VerifyingKey, err = groth16.Setup(cs)
++		if err != nil {
++			t.Fatal(err)
++		}
++		writeSpawnArtifact(t, keyPath, system)
++		writeSpawnArtifact(t, filepath.Join(directory, name+".vk.bin"), rawKey{system.VerifyingKey})
++	}
++	pk, vk := system.ProvingKey, system.VerifyingKey
++	keyFile, err := os.Open(keyPath)
++	if err != nil {
++		t.Fatal(err)
++	}
++	h := sha256.New()
++	if _, err := io.Copy(h, keyFile); err != nil {
++		t.Fatal(err)
++	}
++	if err := keyFile.Close(); err != nil {
++		t.Fatal(err)
++	}
++	copy(system.ProvingKeySha256[:], h.Sum(nil))
++	t.Log("proving full", name)
++	full, err := frontend.NewWitness(assignment, ecc.BN254.ScalarField())
++	if err != nil {
++		t.Fatal(err)
++	}
++	proof, err := groth16.Prove(cs, pk, full)
++	if err != nil {
++		t.Fatal(err)
++	}
++	public, err := full.Public()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := groth16.Verify(proof, vk, public); err != nil {
++		t.Fatalf("honest proof refused: %v", err)
++	}
++	inputs := public.Vector().(fr.Vector)
++	metadata["publicInputs"] = []string{common.ToHex(inputs[0].BigInt(new(big.Int))), common.ToHex(inputs[1].BigInt(new(big.Int)))}
++	metadata["constraints"] = cs.GetNbConstraints()
++	metadata["circuit"] = name
++	metadata["proof"] = &common.Proof{Proof: proof, ProvingKeySha256: system.ProvingKeySha256}
++	metadata["setup"] = "experimental localnet single-party setup; no production authorization"
++	encoded, err := json.MarshalIndent(metadata, "", "  ")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(directory, name+".proof.json"), append(encoded, '\n'), 0600); err != nil {
++		t.Fatal(err)
++	}
++	one := fr.One()
++	for i := range inputs {
++		original := inputs[i]
++		inputs[i].Add(&inputs[i], &one)
++		if groth16.Verify(proof, vk, public) == nil {
++			t.Fatalf("proof verified under modified public input%d", i)
++		}
++		inputs[i] = original
++	}
++	t.Logf("verified real proof, rejected both changed public inputs; key SHA256 %x", system.ProvingKeySha256)
++}
++
++type rawKey struct{ groth16.VerifyingKey }
++
++func (k rawKey) WriteTo(w io.Writer) (int64, error) { return k.WriteRawTo(w) }
++
++func writeSpawnArtifact(t testing.TB, path string, value io.WriterTo) {
++	t.Helper()
++	// Never silently replace a key generated by a different setup.
++	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
++	if err != nil {
++		t.Fatal(err)
++	}
++	_, writeErr := value.WriteTo(f)
++	closeErr := f.Close()
++	if writeErr != nil {
++		t.Fatal(writeErr)
++	}
++	if closeErr != nil {
++		t.Fatal(closeErr)
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_state.go b/prover/circuits/transfer/spawn_room_state.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..17376b0b9286f74c07f383d2f6dcbb368b2a661b
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_state.go
+@@ -0,0 +1,245 @@
++package transfer
++
++import (
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/std/rangecheck"
++
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/registry"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
++	"github.com/helius-labs/zolana/prover/server/circuits/gadget"
++)
++
++const (
++	SpawnRoomSchema            = 1
++	SpawnRoomLessonCapacity    = 96
++	SpawnRoomIdentityDomain    = 0x5350524944303031 // SPRID001
++	SpawnRoomStateDomain       = 0x5350525354303031 // SPRST001
++	SpawnAcceptedMemoryDomain  = 0x5350524d454d3031 // SPRMEM01
++	SpawnAcceptanceGrantDomain = 0x5350524752303031 // SPRGR001
++)
++
++// SpawnDigest is the big-endian high and low 128-bit limbs of a 32-byte digest.
++// Keeping both limbs preserves all 256 bits; reducing a digest modulo q does not.
++type SpawnDigest [2]frontend.Variable
++
++func (d SpawnDigest) validate(rc frontend.Rangechecker) {
++	for _, limb := range d {
++		rc.Check(limb, 128)
++	}
++}
++
++func (d SpawnDigest) assertEqual(api frontend.API, other SpawnDigest) {
++	for i := range d {
++		api.AssertIsEqual(d[i], other[i])
++	}
++}
++
++// SpawnRoomContext must be bound by the combined circuit's application statement.
++// The program supplies these values from its actual deployment and current,
++// authenticated authorization configuration. A private caller-selected context
++// alone establishes no authorization. The grant tree is separate from policy and
++// tracking registries even though its membership path reuses their 4-ary gadget.
++type SpawnRoomContext struct {
++	Network                                             SpawnDigest
++	ApplicationID, RingProgramID, GrantRoot, GrantEpoch frontend.Variable
++}
++
++// SpawnRoomBinding is private and remains unchanged after visible genesis.
++// ApplicationID and RingProgramID use the program's canonical field derivations.
++type SpawnRoomBinding struct {
++	Network                      SpawnDigest
++	ApplicationID, RingProgramID frontend.Variable
++	CreationNonce                SpawnDigest
++}
++
++type SpawnAcceptedMemory struct {
++	Lesson                             [SpawnRoomLessonCapacity]frontend.Variable
++	Length, Scope                      frontend.Variable
++	Episode, OriginalResult, Candidate SpawnDigest
++}
++
++type SpawnLearnedPolicy struct {
++	ID     frontend.Variable
++	Scores [2]frontend.Variable
++}
++
++// SpawnRoomState is a new commitment format, not the v0 state or encryption codec.
++// A codec must emit these exact typed values, refuse trailing bytes and noncanonical
++// scalar encodings, and preserve the full digest limbs before building a witness.
++type SpawnRoomState struct {
++	Binding                                            SpawnRoomBinding
++	SeedManifest, FixedMembers                         SpawnDigest
++	Writer, Revision                                   frontend.Variable
++	Memory                                             SpawnAcceptedMemory
++	Policy                                             SpawnLearnedPolicy
++	Predecessor, Authorization, LastAuthorizationEpoch frontend.Variable
++}
++
++// Identity is private on hidden advances. Publishing it, or a per-room account
++// derived from it, would link advances to the visible genesis writer.
++func (s SpawnRoomState) Identity(api frontend.API) frontend.Variable {
++	b := s.Binding
++	return spawnHash(api, []frontend.Variable{SpawnRoomIdentityDomain, SpawnRoomSchema,
++		b.Network[0], b.Network[1], b.ApplicationID, b.RingProgramID,
++		b.CreationNonce[0], b.CreationNonce[1], s.Writer})
++}
++
++// Hash bounds every byte, limb and integer before committing the state. Memory
++// bytes pack as four big-endian 24-byte integers, each strictly below q.
++func (s SpawnRoomState) Hash(api frontend.API) frontend.Variable {
++	rc := rangecheck.New(api)
++	s.Binding.Network.validate(rc)
++	s.Binding.CreationNonce.validate(rc)
++	s.SeedManifest.validate(rc)
++	s.FixedMembers.validate(rc)
++	api.AssertIsEqual(api.IsZero(s.Writer), 0)
++	rc.Check(s.Revision, 64)
++	rc.Check(s.LastAuthorizationEpoch, 64)
++	s.Policy.validate(api, rc)
++	return spawnHash(api, []frontend.Variable{SpawnRoomStateDomain, SpawnRoomSchema,
++		s.Identity(api), s.SeedManifest[0], s.SeedManifest[1], s.FixedMembers[0], s.FixedMembers[1],
++		s.Revision, s.Memory.hash(api, rc), s.Policy.ID, s.Policy.Scores[0], s.Policy.Scores[1],
++		s.Predecessor, s.Authorization, s.LastAuthorizationEpoch})
++}
++
++func (m SpawnAcceptedMemory) hash(api frontend.API, rc frontend.Rangechecker) frontend.Variable {
++	spawnBounded(api, rc, m.Length, SpawnRoomLessonCapacity, 7)
++	api.AssertIsEqual(m.Scope, 0)
++	m.Episode.validate(rc)
++	m.OriginalResult.validate(rc)
++	m.Candidate.validate(rc)
++	fields := []frontend.Variable{SpawnAcceptedMemoryDomain, m.Length, m.Scope}
++	for start := 0; start < len(m.Lesson); start += 24 {
++		chunk := frontend.Variable(0)
++		for i := start; i < start+24; i++ {
++			rc.Check(m.Lesson[i], 8)
++			// Both operands are in 0..96; the top bit is one exactly
++			// when i+1 <= Length. Bytes outside that prefix are zero.
++			live := spawnAtMostByte(api, i+1, m.Length)
++			api.AssertIsEqual(api.Mul(api.Sub(1, live), m.Lesson[i]), 0)
++			chunk = api.Add(api.Mul(chunk, 256), m.Lesson[i])
++		}
++		fields = append(fields, chunk)
++	}
++	fields = append(fields, m.Episode[0], m.Episode[1], m.OriginalResult[0], m.OriginalResult[1], m.Candidate[0], m.Candidate[1])
++	return spawnHash(api, fields)
++}
++
++func (p SpawnLearnedPolicy) validate(api frontend.API, rc frontend.Rangechecker) {
++	api.AssertIsEqual(p.ID, 1)
++	for _, score := range p.Scores {
++		spawnBounded(api, rc, score, 100, 7)
++	}
++}
++
++// SpawnAcceptanceGrant is an exact private authorization leaf. Membership under
++// the live root authenticates it; its commitment alone is not an authorization.
++// Native authority persistence establishes the original result before admission.
++type SpawnAcceptanceGrant struct {
++	RoomIdentity, Actor, Epoch, Predecessor, Ordinal frontend.Variable
++	Memory                                           SpawnAcceptedMemory
++	SelectedProcedure, Negative, Magnitude           frontend.Variable
++	Nonce                                            SpawnDigest
++}
++
++func (g SpawnAcceptanceGrant) hash(api frontend.API, rc frontend.Rangechecker, context SpawnRoomContext) frontend.Variable {
++	rc.Check(g.Epoch, 64)
++	rc.Check(g.Ordinal, 64)
++	api.AssertIsBoolean(g.SelectedProcedure)
++	api.AssertIsBoolean(g.Negative)
++	spawnBounded(api, rc, g.Magnitude, 10, 4)
++	g.Nonce.validate(rc)
++	api.AssertIsEqual(api.Mul(api.IsZero(g.Nonce[0]), api.IsZero(g.Nonce[1])), 0)
++	// Memory.hash permits empty genesis memory; an accepted lesson does not.
++	rc.Check(api.Sub(g.Memory.Length, 1), 7)
++	return spawnHash(api, []frontend.Variable{SpawnAcceptanceGrantDomain, SpawnRoomSchema,
++		context.Network[0], context.Network[1], context.ApplicationID, context.RingProgramID,
++		g.RoomIdentity, g.Actor, g.Epoch, g.Predecessor, g.Ordinal, g.Memory.hash(api, rc),
++		g.SelectedProcedure, g.Negative, g.Magnitude, g.Nonce[0], g.Nonce[1]})
++}
++
++type SpawnRoomAdvanceWitness struct {
++	Old, Next SpawnRoomState
++	Grant     SpawnAcceptanceGrant
++	GrantPath registry.QuadPath
++}
++
++// Assert binds this application transition to the actual note wires passed to
++// TransferCircuit.Define. The caller still proves the full upstream ring/SPP
++// relation, the hidden rail, exact slot profile and the live application statement.
++// Unique genesis and exclusion of alternate settlement paths remain program duties.
++func (w SpawnRoomAdvanceWitness) Assert(api frontend.API, context SpawnRoomContext, input, output shared.UtxoWires) {
++	rc := rangecheck.New(api)
++	context.Network.validate(rc)
++	api.AssertIsEqual(api.IsZero(context.ApplicationID), 0)
++	api.AssertIsEqual(api.IsZero(context.RingProgramID), 0)
++	api.AssertIsEqual(api.IsZero(context.GrantRoot), 0)
++	rc.Check(context.GrantEpoch, 64)
++	oldNote, nextNote := input.OpenSlot(api), output.OpenSlot(api)
++	for _, note := range []shared.Output{oldNote, nextNote} {
++		api.AssertIsEqual(note.Utxo, 1)
++		api.AssertIsEqual(note.Ring, 1)
++		api.AssertIsEqual(note.RingProgramID, context.RingProgramID)
++		api.AssertIsEqual(note.Amount, 0)
++		api.AssertIsEqual(note.RingDataHash, 0)
++		api.AssertIsEqual(api.IsZero(note.NullifierPk), 0)
++		api.AssertIsEqual(api.IsZero(api.Sub(note.NullifierPk, shared.ZeroNullifierPk)), 0)
++	}
++	api.AssertIsEqual(input.OwnerPkHash, output.OwnerPkHash)
++	api.AssertIsEqual(input.NullifierPk, output.NullifierPk)
++	api.AssertIsEqual(input.Asset, output.Asset)
++	for _, state := range []SpawnRoomState{w.Old, w.Next} {
++		state.Binding.Network.assertEqual(api, context.Network)
++		api.AssertIsEqual(state.Binding.ApplicationID, context.ApplicationID)
++		api.AssertIsEqual(state.Binding.RingProgramID, context.RingProgramID)
++		api.AssertIsEqual(state.Writer, input.OwnerPkHash)
++	}
++	w.Old.Binding.CreationNonce.assertEqual(api, w.Next.Binding.CreationNonce)
++	w.Old.SeedManifest.assertEqual(api, w.Next.SeedManifest)
++	w.Old.FixedMembers.assertEqual(api, w.Next.FixedMembers)
++	api.AssertIsEqual(input.DataHash, w.Old.Hash(api))
++	api.AssertIsEqual(output.DataHash, w.Next.Hash(api))
++	// Both revisions are u64, so this field equality cannot wrap an overflow.
++	api.AssertIsEqual(w.Next.Revision, api.Add(w.Old.Revision, 1))
++	api.AssertIsEqual(w.Grant.Ordinal, w.Next.Revision)
++	api.AssertIsEqual(w.Grant.RoomIdentity, w.Old.Identity(api))
++	api.AssertIsEqual(w.Grant.Actor, input.OwnerPkHash)
++	api.AssertIsEqual(w.Grant.Predecessor, oldNote.Hash)
++	api.AssertIsEqual(w.Next.Predecessor, oldNote.Hash)
++	api.AssertIsEqual(w.Grant.Epoch, context.GrantEpoch)
++	api.AssertIsEqual(w.Next.LastAuthorizationEpoch, context.GrantEpoch)
++	// A new authority epoch may reauthorize an existing checkpoint. A rollback
++	// would produce a field difference outside the u64 range and is refused.
++	rc.Check(api.Sub(context.GrantEpoch, w.Old.LastAuthorizationEpoch), 64)
++	grant := w.Grant.hash(api, rc, context)
++	api.AssertIsEqual(w.GrantPath.Root(api, grant), context.GrantRoot)
++	api.AssertIsEqual(w.Next.Authorization, grant)
++	api.AssertIsEqual(w.Next.Memory.hash(api, rc), w.Grant.Memory.hash(api, rc))
++	w.assertLearning(api)
++}
++
++func (w SpawnRoomAdvanceWitness) assertLearning(api frontend.API) {
++	g := w.Grant
++	old := api.Select(g.SelectedProcedure, w.Old.Policy.Scores[1], w.Old.Policy.Scores[0])
++	sum := api.Add(old, g.Magnitude)
++	positive := api.Select(spawnAtMostByte(api, sum, 100), sum, 100)
++	negative := api.Select(spawnAtMostByte(api, old, g.Magnitude), 0, api.Sub(old, g.Magnitude))
++	next := api.Select(g.Negative, negative, positive)
++	api.AssertIsEqual(w.Next.Policy.Scores[0], api.Select(g.SelectedProcedure, w.Old.Policy.Scores[0], next))
++	api.AssertIsEqual(w.Next.Policy.Scores[1], api.Select(g.SelectedProcedure, next, w.Old.Policy.Scores[1]))
++}
++
++func spawnHash(api frontend.API, fields []frontend.Variable) frontend.Variable {
++	return gadget.HashChain4(api, append(fields, len(fields)+1))
++}
++
++func spawnBounded(api frontend.API, rc frontend.Rangechecker, value frontend.Variable, maximum, bits int) {
++	rc.Check(value, bits)
++	rc.Check(api.Sub(maximum, value), bits)
++}
++
++// Both caller-bounded operands are at most 110, so 256+b-a lies in 146..366.
++// Its top bit therefore gives a <= b without a field wrap or an untrusted hint.
++func spawnAtMostByte(api frontend.API, a, b frontend.Variable) frontend.Variable {
++	return api.ToBinary(api.Add(256, api.Sub(b, a)), 9)[8]
++}
+diff --git a/prover/circuits/transfer/spawn_room_state_test.go b/prover/circuits/transfer/spawn_room_state_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..1935cb6d8be156d25231763be16f9b2984779e41
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_state_test.go
+@@ -0,0 +1,454 @@
++package transfer_test
++
++import (
++	"math/big"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/frontend/cs/r1cs"
++	"github.com/consensys/gnark/test"
++
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/registry"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/shared"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit"
++	"github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringtransfer"
++	"github.com/helius-labs/zolana/prover/server/prover-test/spp/protocol"
++	"github.com/helius-labs/zolana/prover/server/prover-test/spp/spptest"
++)
++
++// This small circuit tests the application relation against actual UTXO
++// openings. Its public inputs are a test harness, not the application wire format.
++type spawnStateCircuit struct {
++	Context          transfer.SpawnRoomContext `gnark:",public"`
++	InputCommitment  frontend.Variable         `gnark:",public"`
++	OutputCommitment frontend.Variable         `gnark:",public"`
++	Input, Output    shared.UtxoWires
++	Advance          transfer.SpawnRoomAdvanceWitness
++}
++
++func (c *spawnStateCircuit) Define(api frontend.API) error {
++	api.AssertIsEqual(c.Input.OpenSlot(api).Hash, c.InputCommitment)
++	api.AssertIsEqual(c.Output.OpenSlot(api).Hash, c.OutputCommitment)
++	c.Advance.Assert(api, c.Context, c.Input, c.Output)
++	return nil
++}
++
++func spawnMemory(lesson string, seed int) transfer.SpawnAcceptedMemory {
++	m := transfer.SpawnAcceptedMemory{
++		Length: len(lesson), Scope: 0,
++		Episode:        transfer.SpawnDigest{seed, seed + 1},
++		OriginalResult: transfer.SpawnDigest{seed + 2, seed + 3},
++		Candidate:      transfer.SpawnDigest{seed + 4, seed + 5},
++	}
++	for i := range m.Lesson {
++		m.Lesson[i] = 0
++		if i < len(lesson) {
++			m.Lesson[i] = int(lesson[i])
++		}
++	}
++	return m
++}
++
++func spawnFixture(t testing.TB) *spawnStateCircuit {
++	t.Helper()
++	c := &spawnStateCircuit{Context: transfer.SpawnRoomContext{
++		Network:       transfer.SpawnDigest{new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 128), big.NewInt(1)), 17},
++		ApplicationID: 19, RingProgramID: 13, GrantEpoch: 3,
++	}}
++	old := transfer.SpawnRoomState{
++		Binding:      transfer.SpawnRoomBinding{Network: c.Context.Network, ApplicationID: 19, RingProgramID: 13, CreationNonce: transfer.SpawnDigest{23, 29}},
++		SeedManifest: transfer.SpawnDigest{31, 37}, FixedMembers: transfer.SpawnDigest{41, 43},
++		Writer: 7, Revision: 4, Memory: spawnMemory("older lesson", 47),
++		Policy:      transfer.SpawnLearnedPolicy{ID: 1, Scores: [2]frontend.Variable{50, 50}},
++		Predecessor: 79, Authorization: 83, LastAuthorizationEpoch: 2,
++	}
++	c.Advance.Old, c.Advance.Next = old, old
++	c.Advance.Grant = transfer.SpawnAcceptanceGrant{
++		Actor: 7, Epoch: 3, Ordinal: 5, Memory: spawnMemory("Use a bounded retry.", 53),
++		SelectedProcedure: 0, Negative: 0, Magnitude: 7, Nonce: transfer.SpawnDigest{89, 97},
++	}
++	c.Advance.Next.Revision = 5
++	c.Advance.Next.LastAuthorizationEpoch = 3
++	c.Advance.Next.Memory = c.Advance.Grant.Memory
++	c.Advance.Next.Policy.Scores = [2]frontend.Variable{57, 50}
++	c.Input = shared.UtxoWires{Domain: protocol.UtxoDomain, TreeID: 0, OwnerPkHash: 7, NullifierPk: 9, Asset: 11, Amount: 0, Blinding: 101, DataHash: 0, RingDataHash: 0, RingProgramID: 13}
++	c.Output = c.Input
++	c.Output.Blinding = 103
++	c.Advance.GrantPath.Index = 37
++	empty := big.NewInt(0)
++	for level := range c.Advance.GrantPath.Siblings {
++		for child := range c.Advance.GrantPath.Siblings[level] {
++			c.Advance.GrantPath.Siblings[level][child] = new(big.Int).Set(empty)
++		}
++		empty = ringtest.MustPoseidonHash(t, empty, empty, empty, empty)
++	}
++	spawnRebindInput(t, c)
++	spawnAuthorize(t, c)
++	return c
++}
++
++// Build the application state before the upstream fixture hashes any slots. The
++// fixture's real owner, enrolled key, ring and input blinding are retained.
++func spawnApplicationFixture(t testing.TB) (ringtransfer.Anonymous, *spawnStateCircuit) {
++	t.Helper()
++	w, c := spawnZeroValueWorld(t), spawnFixture(t)
++	c.Input = w.Inputs[0].Utxo.Wires()
++	c.Output = c.Input
++	c.Output.Blinding = 103 // The upstream world derives its actual output blinding.
++	c.Context.RingProgramID = c.Input.RingProgramID
++	c.Advance.Old.Binding.RingProgramID = c.Input.RingProgramID
++	c.Advance.Next.Binding.RingProgramID = c.Input.RingProgramID
++	c.Advance.Old.Writer = c.Input.OwnerPkHash
++	c.Advance.Next.Writer = c.Input.OwnerPkHash
++	c.Advance.Grant.Actor = c.Input.OwnerPkHash
++	spawnRebindInput(t, c)
++	spawnAuthorize(t, c)
++	w.Inputs[0].Utxo.DataHash = ringtest.AsBigInt(c.Input.DataHash)
++	w.Inputs[0].Utxo.RingDataHash = big.NewInt(0)
++	baseOutput := w.Outputs[0]
++	w.Outputs[0] = func(slot *ringaudit.Slot) {
++		baseOutput(slot)
++		slot.Utxo.DataHash = spawnStateHash(t, c.Advance.Next)
++		slot.Utxo.RingDataHash = big.NewInt(0)
++	}
++	return w, c
++}
++
++// These builders compute host commitments with the independent protocol
++// implementation. Mutation cases rehash changed notes and authorized grants so
++// failures exercise the transition constraints rather than a stale hash.
++func spawnClosedHash(t testing.TB, values ...frontend.Variable) *big.Int {
++	t.Helper()
++	values = append(values, len(values)+1)
++	return spptest.MustHashChain4(t, ringtest.ToBigInts(values))
++}
++
++func spawnIdentity(t testing.TB, s transfer.SpawnRoomState) *big.Int {
++	t.Helper()
++	b := s.Binding
++	return spawnClosedHash(t, transfer.SpawnRoomIdentityDomain, transfer.SpawnRoomSchema, b.Network[0], b.Network[1], b.ApplicationID, b.RingProgramID, b.CreationNonce[0], b.CreationNonce[1], s.Writer)
++}
++
++func spawnMemoryHash(t testing.TB, m transfer.SpawnAcceptedMemory) *big.Int {
++	t.Helper()
++	fields := []frontend.Variable{transfer.SpawnAcceptedMemoryDomain, m.Length, m.Scope}
++	for start := 0; start < len(m.Lesson); start += 24 {
++		chunk := big.NewInt(0)
++		for _, value := range m.Lesson[start : start+24] {
++			chunk.Mul(chunk, big.NewInt(256)).Add(chunk, ringtest.AsBigInt(value))
++		}
++		fields = append(fields, chunk)
++	}
++	fields = append(fields, m.Episode[0], m.Episode[1], m.OriginalResult[0], m.OriginalResult[1], m.Candidate[0], m.Candidate[1])
++	return spawnClosedHash(t, fields...)
++}
++
++func spawnStateHash(t testing.TB, s transfer.SpawnRoomState) *big.Int {
++	t.Helper()
++	return spawnClosedHash(t, transfer.SpawnRoomStateDomain, transfer.SpawnRoomSchema, spawnIdentity(t, s), s.SeedManifest[0], s.SeedManifest[1], s.FixedMembers[0], s.FixedMembers[1], s.Revision, spawnMemoryHash(t, s.Memory), s.Policy.ID, s.Policy.Scores[0], s.Policy.Scores[1], s.Predecessor, s.Authorization, s.LastAuthorizationEpoch)
++}
++
++func spawnGrantHash(t testing.TB, c *spawnStateCircuit) *big.Int {
++	t.Helper()
++	g, context := c.Advance.Grant, c.Context
++	return spawnClosedHash(t, transfer.SpawnAcceptanceGrantDomain, transfer.SpawnRoomSchema, context.Network[0], context.Network[1], context.ApplicationID, context.RingProgramID, g.RoomIdentity, g.Actor, g.Epoch, g.Predecessor, g.Ordinal, spawnMemoryHash(t, g.Memory), g.SelectedProcedure, g.Negative, g.Magnitude, g.Nonce[0], g.Nonce[1])
++}
++
++func spawnNoteHash(t testing.TB, note shared.UtxoWires) *big.Int {
++	t.Helper()
++	owner := ringtest.MustPoseidonHash(t, ringtest.AsBigInt(note.OwnerPkHash), ringtest.AsBigInt(note.NullifierPk))
++	return spptest.MustUtxoHash(t, protocol.Utxo{Domain: ringtest.AsBigInt(note.Domain), Owner: owner, Asset: ringtest.AsBigInt(note.Asset), Amount: ringtest.AsBigInt(note.Amount), Blinding: ringtest.AsBigInt(note.Blinding), DataHash: ringtest.AsBigInt(note.DataHash), RingDataHash: ringtest.AsBigInt(note.RingDataHash), RingProgramID: ringtest.AsBigInt(note.RingProgramID)}, ringtest.AsBigInt(note.TreeID))
++}
++
++func spawnGrantRoot(t testing.TB, path registry.QuadPath, leaf *big.Int) *big.Int {
++	t.Helper()
++	index := ringtest.AsBigInt(path.Index).Uint64()
++	for level, row := range path.Siblings {
++		position := (index >> (2 * level)) & 3
++		children := make([]*big.Int, 4)
++		sibling := 0
++		for child := range children {
++			if uint64(child) == position {
++				children[child] = leaf
++			} else {
++				children[child] = ringtest.AsBigInt(row[sibling])
++				sibling++
++			}
++		}
++		leaf = ringtest.MustPoseidonHash(t, children...)
++	}
++	return leaf
++}
++
++func spawnRebindInput(t testing.TB, c *spawnStateCircuit) {
++	t.Helper()
++	c.Input.DataHash = spawnStateHash(t, c.Advance.Old)
++	c.InputCommitment = spawnNoteHash(t, c.Input)
++	c.Advance.Grant.RoomIdentity = spawnIdentity(t, c.Advance.Old)
++	c.Advance.Grant.Predecessor = c.InputCommitment
++	c.Advance.Next.Predecessor = c.InputCommitment
++}
++
++func spawnRebindOutput(t testing.TB, c *spawnStateCircuit) {
++	t.Helper()
++	c.Output.DataHash = spawnStateHash(t, c.Advance.Next)
++	c.OutputCommitment = spawnNoteHash(t, c.Output)
++}
++
++func spawnAuthorize(t testing.TB, c *spawnStateCircuit) {
++	t.Helper()
++	leaf := spawnGrantHash(t, c)
++	c.Context.GrantRoot = spawnGrantRoot(t, c.Advance.GrantPath, leaf)
++	c.Advance.Next.Authorization = leaf
++	spawnRebindOutput(t, c)
++}
++
++func spawnSolved(t *testing.T, c *spawnStateCircuit, want bool) {
++	t.Helper()
++	err := test.IsSolved(&spawnStateCircuit{}, c, ecc.BN254.ScalarField())
++	if want && err != nil {
++		t.Fatalf("honest application relation failed: %v", err)
++	}
++	if !want && err == nil {
++		t.Fatal("invalid application relation was accepted")
++	}
++}
++
++func TestSpawnRoomStateTransitions(t *testing.T) {
++	for _, tc := range []struct {
++		name   string
++		mutate func(*spawnStateCircuit)
++	}{
++		{"bounded improvement across authority epoch", func(*spawnStateCircuit) {}},
++		{"positive saturation", func(c *spawnStateCircuit) {
++			c.Advance.Old.Policy.Scores[0] = 97
++			c.Advance.Grant.Magnitude = 10
++			c.Advance.Next.Policy.Scores[0] = 100
++		}},
++		{"negative saturation", func(c *spawnStateCircuit) {
++			c.Advance.Old.Policy.Scores[1] = 3
++			c.Advance.Grant.SelectedProcedure = 1
++			c.Advance.Grant.Negative = 1
++			c.Advance.Grant.Magnitude = 10
++			c.Advance.Next.Policy.Scores = [2]frontend.Variable{50, 0}
++		}},
++		{"zero magnitude preserves both scores", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Magnitude = 0
++			c.Advance.Next.Policy.Scores = c.Advance.Old.Policy.Scores
++		}},
++		{"maximum accepted revision", func(c *spawnStateCircuit) {
++			c.Advance.Old.Revision = uint64(^uint64(0) - 1)
++			c.Advance.Grant.Ordinal = ^uint64(0)
++			c.Advance.Next.Revision = ^uint64(0)
++		}},
++		{"maximum lesson length", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Length = 96
++			for i := range c.Advance.Grant.Memory.Lesson {
++				c.Advance.Grant.Memory.Lesson[i] = 255
++			}
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"full 256 bit digests", func(c *spawnStateCircuit) {
++			full := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 128), big.NewInt(1))
++			c.Advance.Old.SeedManifest = transfer.SpawnDigest{full, full}
++			c.Advance.Next.SeedManifest = c.Advance.Old.SeedManifest
++			c.Advance.Grant.Memory.OriginalResult = transfer.SpawnDigest{full, full}
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			c := spawnFixture(t)
++			tc.mutate(c)
++			spawnRebindInput(t, c)
++			spawnAuthorize(t, c)
++			spawnSolved(t, c, true)
++		})
++	}
++}
++
++func TestSpawnRoomStateRefusesCoherentInvalidTransitions(t *testing.T) {
++	for _, tc := range []struct {
++		name   string
++		mutate func(*spawnStateCircuit)
++	}{
++		{"changed seed manifest", func(c *spawnStateCircuit) { c.Advance.Next.SeedManifest[0] = 42 }},
++		{"changed fixed membership", func(c *spawnStateCircuit) { c.Advance.Next.FixedMembers[1] = 42 }},
++		{"changed creation nonce", func(c *spawnStateCircuit) { c.Advance.Next.Binding.CreationNonce[0] = 42 }},
++		{"changed network", func(c *spawnStateCircuit) { c.Advance.Next.Binding.Network[1] = 42 }},
++		{"changed application", func(c *spawnStateCircuit) { c.Advance.Next.Binding.ApplicationID = 42 }},
++		{"changed writer", func(c *spawnStateCircuit) { c.Advance.Next.Writer = 8; c.Output.OwnerPkHash = 8 }},
++		{"grant actor differs from input owner", func(c *spawnStateCircuit) { c.Advance.Grant.Actor = 8 }},
++		{"grant ordinal skips a revision", func(c *spawnStateCircuit) { c.Advance.Grant.Ordinal = 6; c.Advance.Next.Revision = 6 }},
++		{"revision overflows u64", func(c *spawnStateCircuit) {
++			c.Advance.Old.Revision = ^uint64(0)
++			n := new(big.Int).Lsh(big.NewInt(1), 64)
++			c.Advance.Grant.Ordinal = n
++			c.Advance.Next.Revision = n
++		}},
++		{"authorization epoch rollback", func(c *spawnStateCircuit) { c.Advance.Old.LastAuthorizationEpoch = 4 }},
++		{"grant at stale epoch", func(c *spawnStateCircuit) { c.Advance.Grant.Epoch = 2 }},
++		{"successor at wrong epoch", func(c *spawnStateCircuit) { c.Advance.Next.LastAuthorizationEpoch = 4 }},
++		{"invalid digest limb", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Candidate[0] = new(big.Int).Lsh(big.NewInt(1), 128)
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"zero acceptance nonce", func(c *spawnStateCircuit) { c.Advance.Grant.Nonce = transfer.SpawnDigest{0, 0} }},
++		{"empty accepted lesson", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory = spawnMemory("", 53)
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"lesson too long", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Length = 97
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"lesson has nonzero padding", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Lesson[95] = 1
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"lesson has a non-byte", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Lesson[0] = 256
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"unsupported memory scope", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Scope = 1
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++		}},
++		{"unsupported selected procedure", func(c *spawnStateCircuit) { c.Advance.Grant.SelectedProcedure = 2 }},
++		{"feedback sign not boolean", func(c *spawnStateCircuit) { c.Advance.Grant.Negative = 2 }},
++		{"feedback too large", func(c *spawnStateCircuit) { c.Advance.Grant.Magnitude = 11; c.Advance.Next.Policy.Scores[0] = 61 }},
++		{"wrong policy update", func(c *spawnStateCircuit) { c.Advance.Next.Policy.Scores[0] = 58 }},
++		{"unselected score changes", func(c *spawnStateCircuit) { c.Advance.Next.Policy.Scores[1] = 51 }},
++		{"old policy out of range", func(c *spawnStateCircuit) {
++			c.Advance.Old.Policy.Scores[0] = 101
++			c.Advance.Next.Policy.Scores[0] = 100
++		}},
++		{"policy substitution", func(c *spawnStateCircuit) { c.Advance.Next.Policy.ID = 2 }},
++		{"nonzero output amount", func(c *spawnStateCircuit) { c.Output.Amount = 1 }},
++		{"nonzero input amount", func(c *spawnStateCircuit) { c.Input.Amount = 1 }},
++		{"changed asset", func(c *spawnStateCircuit) { c.Output.Asset = 12 }},
++		{"changed nullifier key", func(c *spawnStateCircuit) { c.Output.NullifierPk = 10 }},
++		{"literal zero nullifier key", func(c *spawnStateCircuit) { c.Input.NullifierPk = 0; c.Output.NullifierPk = 0 }},
++		{"public zero-secret nullifier key", func(c *spawnStateCircuit) {
++			c.Input.NullifierPk = shared.ZeroNullifierPk
++			c.Output.NullifierPk = shared.ZeroNullifierPk
++		}},
++		{"unbound ring data", func(c *spawnStateCircuit) { c.Input.RingDataHash = 5; c.Output.RingDataHash = 5 }},
++		{"exit from ring", func(c *spawnStateCircuit) { c.Output.RingProgramID = 0 }},
++		{"other ring output", func(c *spawnStateCircuit) { c.Output.RingProgramID = 17 }},
++		{"zero actor", func(c *spawnStateCircuit) {
++			c.Input.OwnerPkHash = 0
++			c.Output.OwnerPkHash = 0
++			c.Advance.Old.Writer = 0
++			c.Advance.Next.Writer = 0
++			c.Advance.Grant.Actor = 0
++		}},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			c := spawnFixture(t)
++			tc.mutate(c)
++			spawnRebindInput(t, c)
++			spawnAuthorize(t, c)
++			spawnSolved(t, c, false)
++		})
++	}
++}
++
++func TestSpawnRoomStateBindsAuthorizationAndActualNotes(t *testing.T) {
++	for _, tc := range []struct {
++		name   string
++		mutate func(*spawnStateCircuit)
++	}{
++		{"revoked grant", func(c *spawnStateCircuit) {
++			c.Context.GrantRoot = spawnGrantRoot(t, c.Advance.GrantPath, big.NewInt(0))
++		}},
++		{"changed original without authority", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.OriginalResult[0] = 99
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++			c.Advance.Next.Authorization = spawnGrantHash(t, c)
++			spawnRebindOutput(t, c)
++		}},
++		{"changed candidate without authority", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Memory.Candidate[1] = 99
++			c.Advance.Next.Memory = c.Advance.Grant.Memory
++			c.Advance.Next.Authorization = spawnGrantHash(t, c)
++			spawnRebindOutput(t, c)
++		}},
++		{"grant for another room", func(c *spawnStateCircuit) { c.Advance.Grant.RoomIdentity = 99; spawnAuthorize(t, c) }},
++		{"grant for another predecessor", func(c *spawnStateCircuit) {
++			c.Advance.Grant.Predecessor = 99
++			c.Advance.Next.Predecessor = 99
++			spawnAuthorize(t, c)
++		}},
++		{"wrong grant path", func(c *spawnStateCircuit) { c.Advance.GrantPath.Siblings[0][0] = 99 }},
++		{"grant index outside tree", func(c *spawnStateCircuit) { c.Advance.GrantPath.Index = uint64(registry.Capacity) + 37 }},
++		{"old payload differs from opened state", func(c *spawnStateCircuit) {
++			c.Input.DataHash = 99
++			c.InputCommitment = spawnNoteHash(t, c.Input)
++			c.Advance.Grant.Predecessor = c.InputCommitment
++			c.Advance.Next.Predecessor = c.InputCommitment
++			spawnAuthorize(t, c)
++		}},
++		{"successor payload differs from opened state", func(c *spawnStateCircuit) { c.Output.DataHash = 99; c.OutputCommitment = spawnNoteHash(t, c.Output) }},
++		{"successor memory differs from authorized memory", func(c *spawnStateCircuit) {
++			c.Advance.Next.Memory = spawnMemory("unapproved", 101)
++			spawnRebindOutput(t, c)
++		}},
++		{"successor authorization differs", func(c *spawnStateCircuit) { c.Advance.Next.Authorization = 99; spawnRebindOutput(t, c) }},
++		{"application config differs", func(c *spawnStateCircuit) { c.Context.ApplicationID = 99; spawnAuthorize(t, c) }},
++		{"network config differs", func(c *spawnStateCircuit) { c.Context.Network[1] = 99; spawnAuthorize(t, c) }},
++		{"ring config differs", func(c *spawnStateCircuit) { c.Context.RingProgramID = 99; spawnAuthorize(t, c) }},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			c := spawnFixture(t)
++			tc.mutate(c)
++			spawnSolved(t, c, false)
++		})
++	}
++}
++
++func TestSpawnRoomStateCompiledR1CS(t *testing.T) {
++	cs, err := frontend.Compile(ecc.BN254.ScalarField(), r1cs.NewBuilder, &spawnStateCircuit{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	for _, revoked := range []bool{false, true} {
++		c := spawnFixture(t)
++		if revoked {
++			c.Context.GrantRoot = spawnGrantRoot(t, c.Advance.GrantPath, big.NewInt(0))
++		}
++		witness, err := frontend.NewWitness(c, ecc.BN254.ScalarField())
++		if err != nil {
++			t.Fatal(err)
++		}
++		err = cs.IsSolved(witness)
++		if (err == nil) == revoked {
++			t.Fatalf("compiled solver: revoked=%t, err=%v", revoked, err)
++		}
++	}
++	t.Logf("application helper compiled constraints=%d public_variables=%d", cs.GetNbConstraints(), cs.GetNbPublicVariables())
++}
++
++func TestSpawnRoomStateCommitmentVector(t *testing.T) {
++	c := spawnFixture(t)
++	for _, vector := range []struct {
++		name  string
++		value frontend.Variable
++		hex   string
++	}{
++		{"room identity", spawnIdentity(t, c.Advance.Old), "0004dcf13babfaf817fabe56ad5c79da37f1e9c69e5f3ff8c4b5e3535c2453aa"},
++		{"old state", c.Input.DataHash, "2e4305dcc6f85eb7b3785632ff5a58b9a36c586e4ba03e6f329d6ab8bc7b9e2e"},
++		{"new state", c.Output.DataHash, "0a0077d99d38d457ec84647a8617f98e4e4f53637865e39a671bdb876a00fba6"},
++		{"grant leaf", c.Advance.Next.Authorization, "1d41673a7393fb1daf7ab1405ae78183dfab22864d679265536e624c3d9c931c"},
++		{"grant root", c.Context.GrantRoot, "0f8cc20607a23f72c265a41beafa6d2bd6b6a4b08576178bb67428d8d02b7137"},
++		{"input note", c.InputCommitment, "06110d28d75875638ee363ebcdf97744e212548624e61580ad629af4a3d82bff"},
++		{"output note", c.OutputCommitment, "15d8f4e5309e1130b81762f83244fa9a7e458293776ebd21a099e0c10aef7cd0"},
++	} {
++		want, ok := new(big.Int).SetString(vector.hex, 16)
++		if !ok || want.Cmp(ringtest.AsBigInt(vector.value)) != 0 {
++			t.Fatalf("%s commitment vector changed", vector.name)
++		}
++	}
++}
+diff --git a/prover/circuits/transfer/spawn_room_wire_test.go b/prover/circuits/transfer/spawn_room_wire_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb72005293aa9d5722f75ef90511e53e94d7913f
+--- /dev/null
++++ b/prover/circuits/transfer/spawn_room_wire_test.go
+@@ -0,0 +1,182 @@
++package transfer_test
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"math/big"
++	"os"
++	"path/filepath"
++	"reflect"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark-crypto/ecc/bn254/fr"
++	"github.com/consensys/gnark/frontend"
++	"github.com/consensys/gnark/test"
++	"github.com/helius-labs/zolana-custom-rings/prover/ring"
++)
++
++// Exercise the actual strict server request assignment with the same honest
++// witnesses as the full relation tests, including every private state/grant wire.
++func TestSpawnRoomFullRequestRoundTrip(t *testing.T) {
++	for _, extension := range ring.SpawnRoomExtensions() {
++		t.Run(string(extension.Type), func(t *testing.T) {
++			var assignment frontend.Circuit
++			var params any
++			switch extension.Type {
++			case ring.SpawnRoomAdvanceType:
++				assignment, params = spawnCombined(t), new(ring.SpawnRoomAdvanceParams)
++			case ring.SpawnRoomGenesisType:
++				assignment, params = spawnGenesis(t, "honest"), new(ring.SpawnRoomGenesisParams)
++			default:
++				t.Fatal("unexpected family")
++			}
++			if err := spawnRequestValues(reflect.ValueOf(params).Elem(), reflect.ValueOf(assignment).Elem()); err != nil {
++				t.Fatal(err)
++			}
++			reflect.ValueOf(params).Elem().FieldByName("CircuitType").SetString(string(extension.Type))
++			payload, err := json.Marshal(params)
++			if err != nil {
++				t.Fatal(err)
++			}
++			request := extension.Request()
++			if err := json.Unmarshal(payload, request); err != nil {
++				t.Fatal(err)
++			}
++			decoded, err := request.Assignment()
++			if err != nil {
++				t.Fatal(err)
++			}
++			var serialized [2]bytes.Buffer
++			for i, c := range []frontend.Circuit{assignment, decoded} {
++				w, err := frontend.NewWitness(c, ecc.BN254.ScalarField())
++				if err != nil {
++					t.Fatal(err)
++				}
++				if _, err := w.WriteTo(&serialized[i]); err != nil {
++					t.Fatal(err)
++				}
++			}
++			if !bytes.Equal(serialized[0].Bytes(), serialized[1].Bytes()) {
++				t.Fatal("request changed a circuit wire")
++			}
++			if err := test.IsSolved(extension.Circuit(), decoded, ecc.BN254.ScalarField()); err != nil {
++				t.Fatal(err)
++			}
++			if directory := os.Getenv("SPAWN_ROOM_REQUEST_DIR"); directory != "" {
++				if err := os.MkdirAll(directory, 0700); err != nil {
++					t.Fatal(err)
++				}
++				if err := os.WriteFile(filepath.Join(directory, string(extension.Type)+".request.json"), append(payload, '\n'), 0600); err != nil {
++					t.Fatal(err)
++				}
++			}
++		})
++	}
++}
++
++// Cross-language integration: consume requests emitted by the real TypeScript
++// SDK staging pipeline, including its sealed audit/policy/tracking witnesses.
++// They contain private fixture openings and must stay outside tracked source.
++func TestSpawnRoomTypeScriptRequestFixtures(t *testing.T) {
++	directory := os.Getenv("SPAWN_ROOM_TYPESCRIPT_REQUEST_DIR")
++	if directory == "" {
++		t.Skip("set SPAWN_ROOM_TYPESCRIPT_REQUEST_DIR to check actual SDK fixture requests")
++	}
++	for _, extension := range ring.SpawnRoomExtensions() {
++		t.Run(string(extension.Type), func(t *testing.T) {
++			name := "typescript-advance.request.json"
++			if extension.Type == ring.SpawnRoomGenesisType {
++				name = "typescript-genesis.request.json"
++			}
++			payload, err := os.ReadFile(filepath.Join(directory, name))
++			if err != nil {
++				t.Fatal(err)
++			}
++			request := extension.Request()
++			if err := json.Unmarshal(payload, request); err != nil {
++				t.Fatalf("strict request decode: %v", err)
++			}
++			assignment, err := request.Assignment()
++			if err != nil {
++				t.Fatalf("request assignment: %v", err)
++			}
++			if err := test.IsSolved(extension.Circuit(), assignment, ecc.BN254.ScalarField()); err != nil {
++				t.Fatalf("actual SDK request violates the complete ring+application relation: %v", err)
++			}
++		})
++	}
++}
++
++// Test-only inverse of the request's named-field assignment. It is limited to
++// the transfer/application wire types; it never parses an untrusted request.
++func spawnRequestValues(dst, src reflect.Value) error {
++	if dst.Kind() == reflect.Pointer {
++		dst.Set(reflect.New(dst.Type().Elem()))
++		return spawnRequestValues(dst.Elem(), src)
++	}
++	if src.Kind() == reflect.Interface {
++		src = src.Elem()
++	}
++	field := func() (*big.Int, error) {
++		var v fr.Element
++		if _, err := v.SetInterface(src.Interface()); err != nil {
++			return nil, err
++		}
++		return v.BigInt(new(big.Int)), nil
++	}
++	switch {
++	case dst.Type() == reflect.TypeFor[ring.Field]():
++		v, err := field()
++		if err != nil {
++			return err
++		}
++		dst.Set(reflect.ValueOf(ring.Field{Int: v}))
++	case dst.Kind() == reflect.Struct:
++		for i := range dst.NumField() {
++			f := dst.Type().Field(i)
++			if f.Name == "CircuitType" {
++				continue
++			}
++			s := src
++			if !f.Anonymous {
++				s = src.FieldByName(f.Name)
++			}
++			if !s.IsValid() {
++				return fmt.Errorf("missing circuit value %s", f.Name)
++			}
++			if err := spawnRequestValues(dst.Field(i), s); err != nil {
++				return fmt.Errorf("%s: %w", f.Name, err)
++			}
++		}
++	case dst.Kind() == reflect.Slice:
++		dst.Set(reflect.MakeSlice(dst.Type(), src.Len(), src.Len()))
++		for i := range src.Len() {
++			if err := spawnRequestValues(dst.Index(i), src.Index(i)); err != nil {
++				return err
++			}
++		}
++	case dst.Kind() == reflect.Bool:
++		v, err := field()
++		if err != nil {
++			return err
++		}
++		if v.Sign() != 0 && v.Cmp(big.NewInt(1)) != 0 {
++			return fmt.Errorf("not boolean")
++		}
++		dst.SetBool(v.Sign() != 0)
++	case dst.CanUint():
++		v, err := field()
++		if err != nil {
++			return err
++		}
++		if !v.IsUint64() || dst.OverflowUint(v.Uint64()) {
++			return fmt.Errorf("integer overflow")
++		}
++		dst.SetUint(v.Uint64())
++	default:
++		return fmt.Errorf("unsupported %s", dst.Type())
++	}
++	return nil
++}
+diff --git a/prover/cmd/spawn-room-prover/main.go b/prover/cmd/spawn-room-prover/main.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..1d5d02becb0a43a9a96ad65299fcfb736c7406f5
+--- /dev/null
++++ b/prover/cmd/spawn-room-prover/main.go
+@@ -0,0 +1,39 @@
++// Command spawn-room-prover adds two experimental application circuits to the
++// pinned upstream prover. It does not alter the upstream command or its catalog.
++package main
++
++import (
++	"fmt"
++	"os"
++	"strings"
++
++	"github.com/helius-labs/zolana-custom-rings/prover/ring"
++	"github.com/helius-labs/zolana/prover/server/app"
++	"github.com/helius-labs/zolana/prover/server/prover/common"
++	"github.com/rs/zerolog"
++)
++
++func main() {
++	for _, extension := range ring.SpawnRoomExtensions() {
++		common.RegisterExtension(extension)
++	}
++	command := ""
++	for _, arg := range os.Args[1:] {
++		if !strings.HasPrefix(arg, "-") {
++			command = arg
++			break
++		}
++	}
++	// As in the pinned prover, witness errors never enter a serving/proving log.
++	if command == "start" || command == "prove" {
++		zerolog.SetGlobalLevel(zerolog.Disabled)
++	}
++	if err := app.Run(os.Args); err != nil {
++		if command == "prove" {
++			fmt.Fprintln(os.Stderr, "room proof failed; check the experimental key and witness")
++		} else {
++			fmt.Fprintf(os.Stderr, "room prover failed: %v\n", err)
++		}
++		os.Exit(1)
++	}
++}
+diff --git a/prover/ring/spawn_room.go b/prover/ring/spawn_room.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef95b39197f0b9643bc31793ab9ac6e0e081deef
+--- /dev/null
++++ b/prover/ring/spawn_room.go
+@@ -0,0 +1,113 @@
++package ring
++
++import (
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana/prover/server/prover/common"
++)
++
++const (
++	SpawnRoomAdvanceType common.CircuitType = "spawn-room-advance-v1"
++	SpawnRoomGenesisType common.CircuitType = "spawn-room-genesis-v1"
++)
++
++// SpawnRoomExtensions is deliberately not called by the upstream ring init.
++// Only cmd/spawn-room-prover opts into these separate experimental key families.
++// Existing ring keys, request shapes, registry and lockfile stay unchanged.
++func SpawnRoomExtensions() []common.ExtensionCircuit {
++	shape := transfer.Shape{Inputs: 24, Outputs: 2, Withdrawals: 4, Owners: 4}
++	return []common.ExtensionCircuit{
++		bindPolicy[SpawnRoomAdvanceParams](Key{Circuit: SpawnRoomAdvanceType}, transfer.NewSpawnRoomApplicationCircuit, shape),
++		bindPolicy[SpawnRoomGenesisParams](Key{Circuit: SpawnRoomGenesisType}, transfer.NewSpawnRoomGenesisCircuit, shape),
++	}
++}
++
++type SpawnRoomContextParams struct {
++	Network       []Field `json:"network"`
++	ApplicationID Field   `json:"applicationId"`
++	RingProgramID Field   `json:"ringProgramId"`
++	GrantRoot     Field   `json:"grantRoot"`
++	GrantEpoch    uint64  `json:"grantEpoch"`
++}
++
++type SpawnRoomGenesisContextParams struct {
++	Network       []Field `json:"network"`
++	ApplicationID Field   `json:"applicationId"`
++	RingProgramID Field   `json:"ringProgramId"`
++}
++
++type SpawnRoomBindingParams struct {
++	Network       []Field `json:"network"`
++	ApplicationID Field   `json:"applicationId"`
++	RingProgramID Field   `json:"ringProgramId"`
++	CreationNonce []Field `json:"creationNonce"`
++}
++
++type SpawnRoomMemoryParams struct {
++	Lesson         Bytes   `json:"lesson"`
++	Length         uint8   `json:"length"`
++	Scope          uint8   `json:"scope"`
++	Episode        []Field `json:"episode"`
++	OriginalResult []Field `json:"originalResult"`
++	Candidate      []Field `json:"candidate"`
++}
++
++type SpawnRoomPolicyParams struct {
++	ID uint64 `json:"id"`
++	// uint16 keeps encoding/json's wire an integer array, not a base64 byte string.
++	// The circuit independently bounds each element to 0..100.
++	Scores []uint16 `json:"scores"`
++}
++
++type SpawnRoomStateParams struct {
++	Binding                SpawnRoomBindingParams `json:"binding"`
++	SeedManifest           []Field                `json:"seedManifest"`
++	FixedMembers           []Field                `json:"fixedMembers"`
++	Writer                 Field                  `json:"writer"`
++	Revision               uint64                 `json:"revision"`
++	Memory                 SpawnRoomMemoryParams  `json:"memory"`
++	Policy                 SpawnRoomPolicyParams  `json:"policy"`
++	Predecessor            Field                  `json:"predecessor"`
++	Authorization          Field                  `json:"authorization"`
++	LastAuthorizationEpoch uint64                 `json:"lastAuthorizationEpoch"`
++}
++
++type SpawnRoomGrantParams struct {
++	RoomIdentity      Field                 `json:"roomIdentity"`
++	Actor             Field                 `json:"actor"`
++	Epoch             uint64                `json:"epoch"`
++	Predecessor       Field                 `json:"predecessor"`
++	Ordinal           uint64                `json:"ordinal"`
++	Memory            SpawnRoomMemoryParams `json:"memory"`
++	SelectedProcedure uint8                 `json:"selectedProcedure"`
++	Negative          uint8                 `json:"negative"`
++	Magnitude         uint8                 `json:"magnitude"`
++	Nonce             []Field               `json:"nonce"`
++}
++
++// Index is bounded by the 4-ary height13 path inside the constraint system.
++// Every row has exactly3 canonical scalar siblings; assign refuses other widths.
++type SpawnRoomGrantPathParams struct {
++	Index    uint64    `json:"index"`
++	Siblings [][]Field `json:"siblings"`
++}
++
++type SpawnRoomAdvanceWitnessParams struct {
++	Old       SpawnRoomStateParams     `json:"old"`
++	Next      SpawnRoomStateParams     `json:"next"`
++	Grant     SpawnRoomGrantParams     `json:"grant"`
++	GrantPath SpawnRoomGrantPathParams `json:"grantPath"`
++}
++
++type SpawnRoomAdvanceParams struct {
++	TransferParams
++	ApplicationStatementHash Field                         `json:"applicationStatementHash"`
++	Context                  SpawnRoomContextParams        `json:"context"`
++	Advance                  SpawnRoomAdvanceWitnessParams `json:"advance"`
++}
++
++type SpawnRoomGenesisParams struct {
++	TransferParams
++	GenesisStatementHash Field                         `json:"genesisStatementHash"`
++	Context              SpawnRoomGenesisContextParams `json:"context"`
++	State                SpawnRoomStateParams          `json:"state"`
++}
+diff --git a/prover/ring/spawn_room_http_test.go b/prover/ring/spawn_room_http_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..a572d4c721fbf7d5c313c26cb800295dddf0ac2b
+--- /dev/null
++++ b/prover/ring/spawn_room_http_test.go
+@@ -0,0 +1,159 @@
++package ring
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/json"
++	"fmt"
++	"io"
++	"net"
++	"net/http"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark/backend/groth16"
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana/prover/server/prover/common"
++)
++
++// Opt-in real HTTP proof integration. The test starts a loopback-only prover in
++// its own process namespace; no remote endpoint receives fixture witnesses.
++func TestSpawnRoomHTTPProver(t *testing.T) {
++	if os.Getenv("SPAWN_ROOM_HTTP_PROVER") != "1" {
++		t.Skip("explicit localnet proof integration")
++	}
++	artifactDir, err := filepath.Abs("../../target/spawn-room-keys")
++	if err != nil {
++		t.Fatal(err)
++	}
++	keyDir, err := filepath.Abs("../../target/spawn-prover-keys")
++	if err != nil {
++		t.Fatal(err)
++	}
++	binary, err := filepath.Abs("../../target/spawn-room-prover")
++	if err != nil {
++		t.Fatal(err)
++	}
++	address, metrics := spawnFreeAddress(t), spawnFreeAddress(t)
++	log, err := os.CreateTemp(t.TempDir(), "prover-*.log")
++	if err != nil {
++		t.Fatal(err)
++	}
++	cmd := exec.Command(binary, "start", "--prover-address", address, "--metrics-address", metrics, "--keys-dir", keyDir, "--preload-keys", "none", "--transfer-concurrency", "1")
++	cmd.Stdout, cmd.Stderr = log, log
++	if err := cmd.Start(); err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { _ = cmd.Process.Kill(); _ = cmd.Wait(); _ = log.Close() })
++	client := &http.Client{Timeout: 5 * time.Minute}
++	base := "http://" + address
++	ready := false
++	for i := 0; i < 100; i++ {
++		response, err := client.Get(base + "/health")
++		if err == nil {
++			ready = response.StatusCode == 200
++			_ = response.Body.Close()
++			if ready {
++				break
++			}
++		}
++		time.Sleep(50 * time.Millisecond)
++	}
++	if !ready {
++		t.Fatal("local prover did not become healthy")
++	}
++	for _, extension := range SpawnRoomExtensions() {
++		t.Run(string(extension.Type), func(t *testing.T) {
++			payload, err := os.ReadFile(filepath.Join(artifactDir, string(extension.Type)+".request.json"))
++			if err != nil {
++				t.Fatal(err)
++			}
++			request := extension.Request()
++			if err := json.Unmarshal(payload, request); err != nil {
++				t.Fatal(err)
++			}
++			assignment, err := request.Assignment()
++			if err != nil {
++				t.Fatal(err)
++			}
++			public, err := frontend.NewWitness(assignment, ecc.BN254.ScalarField(), frontend.PublicOnly())
++			if err != nil {
++				t.Fatal(err)
++			}
++			response, err := client.Post(base+"/prove/"+strings.TrimSuffix(extension.KeyFile, ".key"), "application/json", bytes.NewReader(payload))
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer response.Body.Close()
++			if response.StatusCode != http.StatusOK {
++				t.Fatalf("proof HTTP status %d", response.StatusCode)
++			}
++			var proof common.Proof
++			if err := json.NewDecoder(response.Body).Decode(&proof); err != nil {
++				t.Fatal(err)
++			}
++			keyFile, err := os.Open(filepath.Join(keyDir, extension.KeyFile))
++			if err != nil {
++				t.Fatal(err)
++			}
++			h := sha256.New()
++			if _, err := io.Copy(h, keyFile); err != nil {
++				t.Fatal(err)
++			}
++			if err := keyFile.Close(); err != nil {
++				t.Fatal(err)
++			}
++			if !bytes.Equal(h.Sum(nil), proof.ProvingKeySha256[:]) {
++				t.Fatal("proof response key digest mismatch")
++			}
++			vkFile, err := os.Open(filepath.Join(artifactDir, string(extension.Type)+".vk.bin"))
++			if err != nil {
++				t.Fatal(err)
++			}
++			vk := groth16.NewVerifyingKey(ecc.BN254)
++			if _, err := vk.ReadFrom(vkFile); err != nil {
++				t.Fatal(err)
++			}
++			if err := vkFile.Close(); err != nil {
++				t.Fatal(err)
++			}
++			if err := groth16.Verify(proof.Proof, vk, public); err != nil {
++				t.Fatalf("HTTP proof does not verify: %v", err)
++			}
++			t.Logf("verified actual HTTP proof with key %x", proof.ProvingKeySha256)
++			other := "spawn_room_genesis_v1"
++			if extension.Type == SpawnRoomGenesisType {
++				other = "spawn_room_advance_v1"
++			}
++			wrong, err := client.Post(base+"/prove/"+other, "application/json", bytes.NewReader(payload))
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer wrong.Body.Close()
++			if wrong.StatusCode != http.StatusBadRequest {
++				t.Fatalf("wrong key path HTTP status %d", wrong.StatusCode)
++			}
++		})
++	}
++}
++
++func spawnFreeAddress(t testing.TB) string {
++	t.Helper()
++	listener, err := net.Listen("tcp", "127.0.0.1:0")
++	if err != nil {
++		t.Fatal(err)
++	}
++	address := listener.Addr().String()
++	if err := listener.Close(); err != nil {
++		t.Fatal(err)
++	}
++	if !strings.HasPrefix(address, "127.0.0.1:") {
++		t.Fatal(fmt.Errorf("nonlocal listener %s", address))
++	}
++	return address
++}
+diff --git a/prover/ring/spawn_room_test.go b/prover/ring/spawn_room_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..6226dd92c215b393c9cfea457f71b2b9805b6887
+--- /dev/null
++++ b/prover/ring/spawn_room_test.go
+@@ -0,0 +1,146 @@
++package ring
++
++import (
++	"bytes"
++	"encoding/json"
++	"math"
++	"math/big"
++	"testing"
++
++	"github.com/consensys/gnark-crypto/ecc"
++	"github.com/consensys/gnark-crypto/ecc/bn254/fr"
++	"github.com/consensys/gnark/frontend"
++	"github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
++	"github.com/helius-labs/zolana/prover/server/prover/common"
++)
++
++func spawnRequestFixture(t testing.TB, extension common.ExtensionCircuit) []byte {
++	t.Helper()
++	c := extension.Circuit()
++	if err := assign(c, nil); err != nil {
++		t.Fatal(err)
++	}
++	switch c := c.(type) {
++	case *transfer.SpawnRoomApplicationCircuit:
++		c.PublicInputHash, c.ApplicationStatementHash = 17, 19
++		c.Context.Network = transfer.SpawnDigest{new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 128), big.NewInt(1)), 23}
++		c.Context.GrantEpoch = uint64(math.MaxUint64)
++		c.Advance.Old.Revision = uint64(math.MaxUint64)
++		return mustMarshal(t, requestOf[SpawnRoomAdvanceParams](t, extension.Type, c))
++	case *transfer.SpawnRoomGenesisCircuit:
++		c.PublicInputHash, c.GenesisStatementHash = 29, 31
++		return mustMarshal(t, requestOf[SpawnRoomGenesisParams](t, extension.Type, c))
++	default:
++		t.Fatalf("unexpected circuit %T", c)
++	}
++	return nil
++}
++
++func TestSpawnRequestsAreOptInAndKeepTwoPublicInputs(t *testing.T) {
++	for _, extension := range SpawnRoomExtensions() {
++		if _, registered := common.LookupExtension(extension.Type); registered {
++			t.Fatal("experimental key registered in upstream command")
++		}
++		if extension.KeyFile != (Key{Circuit: extension.Type}).KeyFile() {
++			t.Fatal("key filename drift")
++		}
++		request := extension.Request()
++		if err := json.Unmarshal(spawnRequestFixture(t, extension), request); err != nil {
++			t.Fatal(err)
++		}
++		assignment, err := request.Assignment()
++		if err != nil {
++			t.Fatal(err)
++		}
++		witness, err := frontend.NewWitness(assignment, ecc.BN254.ScalarField())
++		if err != nil {
++			t.Fatal(err)
++		}
++		public, err := witness.Public()
++		if err != nil {
++			t.Fatal(err)
++		}
++		if len(public.Vector().(fr.Vector)) != 2 {
++			t.Fatal("unexpected public witness shape")
++		}
++		if c, ok := assignment.(*transfer.SpawnRoomApplicationCircuit); ok {
++			if c.Context.GrantEpoch != uint64(math.MaxUint64) || c.Advance.Old.Revision != uint64(math.MaxUint64) {
++				t.Fatal("u64 precision lost")
++			}
++		}
++	}
++}
++
++func TestSpawnRequestsRefuseAmbiguousOrMisshapedWire(t *testing.T) {
++	extension := SpawnRoomExtensions()[0]
++	honest := spawnRequestFixture(t, extension)
++	for _, name := range []string{"missing application hash", "duplicate context", "unknown field", "trailing JSON", "wrong family", "short network", "short lesson", "short grant path", "short sibling row", "noncanonical field"} {
++		t.Run(name, func(t *testing.T) {
++			var body map[string]json.RawMessage
++			if err := json.Unmarshal(honest, &body); err != nil {
++				t.Fatal(err)
++			}
++			payload := honest
++			switch name {
++			case "missing application hash":
++				delete(body, "applicationStatementHash")
++			case "duplicate context":
++				payload = append(bytes.Clone(bytes.TrimSpace(honest[:len(honest)-1])), append([]byte(",\"context\":"), append(body["context"], '}')...)...)
++			case "unknown field":
++				body["uncheckedGrant"] = json.RawMessage(`true`)
++			case "trailing JSON":
++				payload = append(append([]byte{}, honest...), []byte(` {}`)...)
++			case "wrong family":
++				body["circuitType"] = json.RawMessage(`"spawn-room-genesis-v1"`)
++			case "noncanonical field":
++				body["applicationStatementHash"] = json.RawMessage(`"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"`)
++			case "short network":
++				var context map[string]json.RawMessage
++				if err := json.Unmarshal(body["context"], &context); err != nil {
++					t.Fatal(err)
++				}
++				context["network"] = json.RawMessage(`[]`)
++				body["context"] = mustMarshal(t, context)
++			case "short lesson", "short grant path", "short sibling row":
++				var advance map[string]json.RawMessage
++				if err := json.Unmarshal(body["advance"], &advance); err != nil {
++					t.Fatal(err)
++				}
++				if name == "short lesson" {
++					var state, memory map[string]json.RawMessage
++					if err := json.Unmarshal(advance["old"], &state); err != nil {
++						t.Fatal(err)
++					}
++					if err := json.Unmarshal(state["memory"], &memory); err != nil {
++						t.Fatal(err)
++					}
++					memory["lesson"] = json.RawMessage(`"0x00"`)
++					state["memory"] = mustMarshal(t, memory)
++					advance["old"] = mustMarshal(t, state)
++				} else {
++					var path SpawnRoomGrantPathParams
++					if err := json.Unmarshal(advance["grantPath"], &path); err != nil {
++						t.Fatal(err)
++					}
++					if name == "short grant path" {
++						path.Siblings = path.Siblings[:12]
++					} else {
++						path.Siblings[0] = path.Siblings[0][:2]
++					}
++					advance["grantPath"] = mustMarshal(t, path)
++				}
++				body["advance"] = mustMarshal(t, advance)
++			}
++			if name != "duplicate context" && name != "trailing JSON" {
++				payload = mustMarshal(t, body)
++			}
++			request := extension.Request()
++			if err := json.Unmarshal(payload, request); err != nil {
++				return
++			}
++			if _, err := request.Assignment(); err == nil {
++				t.Fatal("accepted ambiguous or misshaped room witness")
++			}
++		})
++	}
++}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts b/sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6aaf94d0220b9d0d549ef3222a547d18cb9e7fb4
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts
+@@ -0,0 +1,15 @@
++// Generated by tools/prepare-spawn-room-localnet.sh. Local validator keys only.
++export const SPAWN_ROOM_LOCALNET_INSECURE = true as const;
++
++export const SPAWN_ROOM_LOCALNET_KEYS: Readonly<
++  Record<string, Readonly<{ sha256: string; size: number }>>
++> = Object.freeze({
++  "spawn_room_advance_v1.key": Object.freeze({
++    sha256: "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
++    size: 294753109,
++  }),
++  "spawn_room_genesis_v1.key": Object.freeze({
++    sha256: "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
++    size: 287934208,
++  }),
++});
+diff --git a/test-vectors/proof/spawn-room-advance-v1.json b/test-vectors/proof/spawn-room-advance-v1.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..1c544de97a852595977614330089b7001a802da5
+--- /dev/null
++++ b/test-vectors/proof/spawn-room-advance-v1.json
+@@ -0,0 +1,43 @@
++{
++  "applicationId": "0x0000000000000000000000000000000000000000000000000000000000000013",
++  "circuit": "spawn-room-advance-v1",
++  "constraints": 618360,
++  "grantEpoch": 3,
++  "grantRoot": "0x1f469a52cff5add9157616c5346be6e4d783bbeb10d43af5da9637045bc4c8ba",
++  "network": "0xffffffffffffffffffffffffffffffff00000000000000000000000000000011",
++  "proof": {
++    "ar": [
++      "0x0c578d6b1f91bb927fdfc6bf9a1b3feaff2e70337f9f64f1bac431df492930a1",
++      "0x1da7554d6787d5df50e8ebb05753fb09acabc2f82d1949ddbd8ffcc28f61e46e"
++    ],
++    "bs": [
++      [
++        "0x0a361e875387aca094a8ee24ed23c16416b94c7486d6e891605ff85a71dc5b0e",
++        "0x1f0db00e363cd89f45770c95aebfea78a51e67dd9bc2b1126d1f24910a79be42"
++      ],
++      [
++        "0x17bf81d64575ba26bb3b9ef6f56cf947045e762516b04681628a2207981deada",
++        "0x146367378280731161d165ee72e112d43527cd7e6ce738c1bdca65792559e731"
++      ]
++    ],
++    "krs": [
++      "0x16d04f321d34969eab783834df4204c6d0153e22486e25753adc81f155d55b48",
++      "0x1ea168b4248b17b4457b799bc84dc73005f2921a7f16c7f1db323c73a0cfa35f"
++    ],
++    "proofCommitment": [
++      "0x25658818112450afcbbb9757baaaca01383942be00d4fa7d5b15f672990340c2",
++      "0x097c6ce8a47b95c7050b2a1255c6ffd74118c6a5ba7bdecbc87d6aafaca3ba88"
++    ],
++    "proofCommitmentPok": [
++      "0x0f4e1a8762c664b1f44543c41600f0193943f0462d2f8929c38ecd6d15581873",
++      "0x020c33d3fd724832b7fb0c7bc9b985bf27b4112d58144c1cbf9c869554322190"
++    ],
++    "provingKeySha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822"
++  },
++  "publicInputs": [
++    "0x2298fc84258e80ad1cb80e6e0f272c3dc0ffd566602fbe3e458e9c2de9b517fd",
++    "0x2468e4154361b645f8c67ed811a91398bc8fd6dd5be92a0bc2205cd0a65eae6d"
++  ],
++  "ringProgramId": "0x20e0be6dfffc08f84cabd1ac32663e0da61e91831935fd010c769d08919394ef",
++  "setup": "experimental localnet single-party setup; no production authorization"
++}
+diff --git a/test-vectors/proof/spawn-room-genesis-v1.json b/test-vectors/proof/spawn-room-genesis-v1.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..89465f9bf6219ba62aa74a87daa4ffaa7320c351
+--- /dev/null
++++ b/test-vectors/proof/spawn-room-genesis-v1.json
+@@ -0,0 +1,43 @@
++{
++  "applicationId": "0x0000000000000000000000000000000000000000000000000000000000000013",
++  "circuit": "spawn-room-genesis-v1",
++  "constraints": 594484,
++  "creationIdentity": "0x2a1ad3d82588214505c98bbb115b16cc4d47704f5f51f1c63f3ac1d6e838a938",
++  "network": "0x0000000000000000000000000000000b00000000000000000000000000000011",
++  "proof": {
++    "ar": [
++      "0x250a99b0867190223d63a20fce686d120d9eb54f7293e2ee28231b148e3baa97",
++      "0x30149aa61c574cb4ed0cfee8d49153bc8fa27cccc78c030bdf80f227d6f4c2da"
++    ],
++    "bs": [
++      [
++        "0x0cae69bdbaf3ab1159290120d891b8dbf6b3899e81ae18f15ad6d7ecb32ab1dd",
++        "0x1583ce198e8d20d961ae32c1f0b8d2cd132276908bc29c82aea461a2f92731b2"
++      ],
++      [
++        "0x18f3a41535394ed30c2fef9eadba460468452d12a6b5c3460031885a8954825c",
++        "0x2524c6f404c5eccbc5fd00b3790dcc74a089112ecdd5144066b44a76621adc0b"
++      ]
++    ],
++    "krs": [
++      "0x18735862f6b1cf88de6842243105339a4d8f8d2713c88718ecf3779f851e8d64",
++      "0x09d8e4cfe1f3f2d48d74445de532358e4ab16c31fc5842f826c6eac3753cd929"
++    ],
++    "proofCommitment": [
++      "0x02fb9d757975d5787e5670baf4a097bdb3440cd40d9a5b8c433da9f2366cfee6",
++      "0x278d2ed85e705d23db806838addcf37b69933b2274ad4937fce23d1b8767923c"
++    ],
++    "proofCommitmentPok": [
++      "0x253cab10a2f064c039b61c0c8bbd747ae1870e260ee9506fd04212c409e9f6df",
++      "0x131ea9baf44a47f2bd6af91eb201bd123660eda5141352593a3bead540b772ba"
++    ],
++    "provingKeySha256": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57"
++  },
++  "publicInputs": [
++    "0x20056c33fe47325eadc50c28ba4571f028c4145af92d2339100da2e1ebe29033",
++    "0x09c8f057bb16fbd8bb44262c439581dd0e65af613adebff8f0ba32c31e9e387a"
++  ],
++  "ringProgramId": "0x20e0be6dfffc08f84cabd1ac32663e0da61e91831935fd010c769d08919394ef",
++  "setup": "experimental localnet single-party setup; no production authorization",
++  "writerOwnerHash": "0x2aa67f0c9e559a88391a0ce98c9a7bcb6357e3069e5d13c32e453e5ea12c85a0"
++}
+diff --git a/tools/prepare-spawn-room-localnet.sh b/tools/prepare-spawn-room-localnet.sh
+new file mode 100755
+index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c94867d30a
+--- /dev/null
++++ b/tools/prepare-spawn-room-localnet.sh
+@@ -0,0 +1,111 @@
++#!/usr/bin/env bash
++# Prepare two separate experimental application keys, prove their full circuits,
++# export exact Rust keys/public fixtures, and build the localnet prover/program.
++# Existing upstream/v0 catalogs are never regenerated or overwritten.
++set -euo pipefail
++
++root="$(cd "$(dirname "$0")/.." && pwd)"
++if (($#)); then
++  echo "Usage: tools/prepare-spawn-room-localnet.sh" >&2
++  echo "Uses target/spawn-room-keys; existing keys must match the current complete R1CS." >&2
++  exit 64
++fi
++cd "$root"
++expected_go="$(awk '$1 == "go" { print "go" $2; exit }' prover/go.mod)"
++[[ "$(go env GOVERSION)" == "$expected_go" ]] || {
++  echo "Use the Go version pinned by prover/go.mod: $expected_go" >&2
++  exit 1
++}
++[[ "$(git -C zolana rev-parse HEAD)" == "0fe4f952182b39464d472c52c40b3febe6cbd9ec" ]] || {
++  echo "The Zolana checkout does not match this experimental profile's source pin" >&2
++  exit 1
++}
++export GOENV=off GOWORK=off
++export GOMAXPROCS="${GOMAXPROCS:-2}"
++export GOMEMLIMIT="${GOMEMLIMIT:-3GiB}"
++keys="$root/target/spawn-room-keys"
++mkdir -p "$keys" "$root/target/spawn-prover-keys"
++for operation in advance genesis; do
++  name="spawn-room-$operation-v1"
++  test_name=TestSpawnRoomApplicationGroth16Proof
++  [[ "$operation" != genesis ]] || test_name=TestSpawnRoomGenesisGroth16Proof
++  reuse=0
++  if [[ -e "$keys/$name.key" ]]; then
++    [[ -s "$keys/$name.vk.bin" ]] || {
++      echo "Incomplete prior setup for $name; retain it for diagnosis before making a fresh key directory" >&2
++      exit 1
++    }
++    reuse=1
++  fi
++  (
++    cd prover
++    SPAWN_ROOM_PROOF_DIR="$keys" SPAWN_ROOM_REUSE_LOCAL_KEY="$reuse" \
++      go test ./circuits/transfer -run "^${test_name}$" -timeout 30m -count=1 -v
++  )
++  mkdir -p programs/custom-ring/src/instructions/spawn_room/keys
++  cargo run --locked --manifest-path zolana/Cargo.toml --target-dir "$root/target" -p xtask -- \
++    bsb22-vk "$keys/$name.vk.bin" "$keys/$name.key" \
++    programs/custom-ring/src/instructions/spawn_room/keys "$operation.rs" --insecure-test-setup
++  cp "$keys/$name.proof.json" "test-vectors/proof/$name.json"
++done
++
++# Publish only public key metadata and public proof vectors. Request bodies and
++# proving artifacts remain in ignored target directories.
++python3 - "$root" <<'PY'
++import hashlib, json, pathlib, sys
++root = pathlib.Path(sys.argv[1])
++keys = root / "target/spawn-room-keys"
++served = root / "target/spawn-prover-keys"
++entries = {}
++for operation in ("advance", "genesis"):
++    stem = f"spawn-room-{operation}-v1"
++    file = keys / f"{stem}.key"
++    with file.open("rb") as source:
++        digest = hashlib.file_digest(source, "sha256").hexdigest()
++    proof = json.loads((keys / f"{stem}.proof.json").read_text())
++    if proof["proof"]["provingKeySha256"] != digest:
++        raise SystemExit(f"Proof/key digest mismatch for {stem}")
++    name = f"spawn_room_{operation}_v1.key"
++    link = served / name
++    if link.is_symlink() and link.resolve() == file.resolve():
++        pass
++    elif link.exists() or link.is_symlink():
++        raise SystemExit(f"Refusing to replace unexpected key path {link}")
++    else:
++        link.symlink_to(file)
++    entries[name] = {"sha256": digest, "size": file.stat().st_size}
++# Reuse only local cached upstream keys; normal pinned download commands remain
++# responsible for fetching and checking those artifacts.
++for file in (root / "zolana/prover/server/proving-keys").glob("*.key"):
++    link = served / file.name
++    if not link.exists() and not link.is_symlink():
++        link.symlink_to(file.resolve())
++manifest = {"setup": "insecure localnet only", "keys": entries}
++(keys / "localnet-keys.json").write_text(json.dumps(manifest, indent=2) + "\n")
++lines = ["// Generated by tools/prepare-spawn-room-localnet.sh. Local validator keys only.",
++         "export const SPAWN_ROOM_LOCALNET_INSECURE = true as const;", "",
++         "export const SPAWN_ROOM_LOCALNET_KEYS: Readonly<",
++         "  Record<string, Readonly<{ sha256: string; size: number }>>",
++         "> = Object.freeze({"]
++for name, entry in entries.items():
++    lines += [f'  "{name}": Object.freeze({{',
++              f'    sha256: "{entry["sha256"]}",',
++              f'    size: {entry["size"]},', "  }),"]
++lines += ["});", ""]
++(root / "sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts").write_text("\n".join(lines))
++print(json.dumps(manifest, indent=2))
++PY
++
++(
++  cd prover
++  SPAWN_ROOM_REQUEST_DIR="$keys" go test ./circuits/transfer \
++    -run '^TestSpawnRoomFullRequestRoundTrip$' -timeout 5m -count=1
++  go build -trimpath -o ../target/spawn-room-prover ./cmd/spawn-room-prover
++)
++rustfmt --edition 2021 programs/custom-ring/src/instructions/spawn_room/keys/{advance,genesis}.rs
++cargo test --locked -p custom-ring-program --test spawn_room_proofs \
++  --features spawn-room-v1-localnet-keys
++CARGO_TARGET_DIR="$root/target/spawn-sbf" \
++  zolana/tools/build-programs.sh --manifest-path programs/custom-ring/Cargo.toml -- \
++  --locked --features bpf-entrypoint,spawn-room-v1-localnet-keys
++sha256sum target/deploy/custom_ring_program.so

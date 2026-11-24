@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "scope": "core proof and SBF checkpoint; validator journey still pending",
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "backrooms": "08822c65254cd73c5f2dccbdf182ce1df2c7510a"
+  },
+  "patchSha256": "8372b467214fb9e3f1bc04a2ac9aaf6f9b4ff99fdc2340d8e80e93243fb4956f",
+  "keys": {
+    "advance": {
+      "sha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
+      "bytes": 294753109,
+      "constraints": 618360
+    },
+    "genesis": {
+      "sha256": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
+      "bytes": 287934208,
+      "constraints": 594484
+    }
+  },
+  "publicInputs": 2,
+  "privateBsb22Commitments": 1,
+  "setup": "insecure single-party localnet only",
+  "applicationProgram": {
+    "bytes": 526024,
+    "sha256": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d"
+  },
+  "logDigests": {
+    "application-proof-reloaded.log": {
+      "sha256": "3154c01e6de3a6c5cb66ef05fcaba48382b6b851222ef216b33126d46764d091",
+      "bytes": 613
+    },
+    "genesis-proof.log": {
+      "sha256": "cbfed2e3d99af2fad177911a30d7d28b272701d063e49da3d5914cae08c39965",
+      "bytes": 586
+    },
+    "full-wire-roundtrip.log": {
+      "sha256": "4deb1f4eb633cf55c1a7b39cff2ad0b2cf99631f584cbe682d64d337175c3134",
+      "bytes": 471
+    },
+    "spawn-wire-tests-green.log": {
+      "sha256": "05309d12741cce20bb9acdf2c91cc6e01fdecadad3f4b35151f6b64709a9ade5",
+      "bytes": 1930
+    },
+    "spawn-http-proofs.log": {
+      "sha256": "32e379088d72519d561ff7180c36f30c09bd8faec46974814e4f1a6efb73c1d7",
+      "bytes": 668
+    },
+    "typescript-go-request-solve.log": {
+      "sha256": "874d3ca3c32af1e5d626918a25680987911b65eac229392c76918c439667037c",
+      "bytes": 501
+    },
+    "spawn-room-real-proof.log": {
+      "sha256": "ebd7cd406d0e2b96e2dfbaf0cfbfc833d748438b685cd7a31184de7f7f6e182f",
+      "bytes": 959
+    },
+    "spawn-room-regressions.log": {
+      "sha256": "91743b0f83f2c8549b16c4f59b54e09667d4ccdc4bce8f39a55b2fe745fca0e6",
+      "bytes": 3783
+    },
+    "spawn-profile-sbf-final.log": {
+      "sha256": "8b6ca1015cac4ce720d50c89d5ad949fde3e7ef71397ab4a070edf62fa640db9",
+      "bytes": 229
+    },
+    "cr01-check-all-resume.log": {
+      "sha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3",
+      "bytes": 1160
+    }
+  },
+  "completed": [
+    "Go full genesis and advance Groth16 proof generation and verification",
+    "refusal of either changed public input",
+    "real HTTP proof service for both exact key families",
+    "strict full request witness round trip",
+    "strict decode and full circuit solve of actual TypeScript SDK requests",
+    "Rust verification of actual Go proof vectors with BSB22 commitments",
+    "40 interface tests and 3 program entrypoint tests",
+    "generic and unkeyed application build checks",
+    "dedicated application SBF build",
+    "clean baseline just check-all"
+  ],
+  "pending": [
+    "complete upstream Go suite with explicit resource-adjusted timeout",
+    "two exact upstream anonymous validator tests",
+    "live application create/advance/revoke/restart/reuse journey",
+    "final SDK/native/harness independent review"
+  ]
+}
