@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "implemented combined application, SDK/native adapter and runner; complete 25-step real-validator create/hidden-update/restart/retry/reuse journey passed; final independent review, remaining upstream baseline gates and native product activation remain pending",
+  "scope": "implemented combined application, SDK/native adapter and runner; complete 25-step real-validator create/hidden-update/restart/retry/reuse journey passed; fresh terminal Go qualification covers all 18 upstream packages at unchanged source; final independent review, broader CR02/CR04 acceptance, Daybreak scan and native product activation remain pending",
   "sourcePins": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
     "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
@@ -145,7 +145,7 @@
     "5 focused localnet runner tests, zero failures/cancellations/skips",
     "historical independent core, SDK/native, worker/resource reviews with their recorded corrections; not a review of later helper/corpus",
     "clean pristine upstream just check-all, all eight native build stages, and just test-hermetic",
-    "15/18 upstream whole packages covered at unchanged source: nine test-package passes and six explicit no-test-files results",
+    "18/18 upstream whole packages covered at unchanged source: 12 passing test packages and 6 explicit no-test-files results, using separate unfiltered package commands with complete terminal evidence; no single whole-suite command exit is claimed",
     "both exact upstream anonymous-validator cases passed with full command exit0 and unchanged source pins",
     "full real-validator journey passed all 25 steps and its one executed Vitest test, with zero failures/pending tests",
     "two eligible room notes, both actual hidden updates and retained-lesson reuse settled on the local validator",
@@ -154,7 +154,6 @@
     "five owned service groups stopped and application, Zolana and reference-host source remained unchanged"
   ],
   "pending": [
-    "complete fresh upstream Go qualification: 17/18 packages have publicly retained terminal raw evidence; historical summaries do not replace missing current receipts",
     "complete the broader CR02/CR04 qualification listed in ACCEPTANCE-STATUS.md; the executed named live corpus does not establish every acceptance variant",
     "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
     "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
@@ -727,17 +726,36 @@
       "remainingUsd": "0",
       "environmentCount": 7,
       "matchingRepositoryEnvironmentCount": 0,
+      "targetRepository": "Spawn-Backrooms/backroom-rings",
       "scanLaunched": false,
-      "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+      "recordedAt": "2026-11-24T14:01:06.844Z",
       "observationWindow": {
-        "date": "2026-11-24",
-        "completedBeforeUtc": "11:39:32",
-        "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+        "scope": "Fresh read-only bootstrap, usage and complete environment-inventory responses; no scan launched and no server event timestamps returned"
+      },
+      "previousCheck": {
+        "schema": "cr01-recovery-daybreak-status-v1",
+        "access": "allowed",
+        "githubConnected": true,
+        "workflowsEnabled": true,
+        "usageStatus": {
+          "available": false,
+          "outcome": "credits_exhausted"
+        },
+        "remainingUsd": "0",
+        "environmentCount": 7,
+        "matchingRepositoryEnvironmentCount": 0,
+        "scanLaunched": false,
+        "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+        "observationWindow": {
+          "date": "2026-11-24",
+          "completedBeforeUtc": "11:39:32",
+          "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+        }
       }
     }
   },
   "upstreamBaseline": {
-    "status": "incomplete",
+    "status": "passed",
     "checkAll": {
       "status": "passed",
       "exitCode": 0,
@@ -856,20 +874,18 @@
       "logSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e"
     },
     "go": {
-      "status": "incomplete",
+      "status": "passed",
       "requiredPackages": 18,
-      "completedWholePackages": 17,
-      "retainedTerminalPassedPackages": 11,
+      "completedWholePackages": 18,
+      "retainedTerminalPassedPackages": 12,
       "explicitNoTestFilesPackages": 6,
-      "wholeSuitePass": false,
+      "wholeSuitePass": true,
       "executionMode": "18-separate-unfiltered-package-commands",
       "wholeSuiteSingleCommandExitClaimed": false,
-      "remainingPackages": [
-        "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
-      ],
-      "summaryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
-      "summarySha256": "e79962d33f845677de248623ee67a7496719bcce5b120af966c715298bd5b1ab",
-      "recordedAt": "2026-11-24T13:22:45.984168+00:00",
+      "remainingPackages": [],
+      "summaryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+      "summarySha256": "63c69c9de9cfb6f1045019e74068d18d6ec4b8d234ab2e1cf5076e0a8517b3d6",
+      "recordedAt": "2026-11-24T14:18:12.734871+00:00",
       "historicalMetadataCountedAsNewExecution": false,
       "historicalCheckpoint": {
         "frozen": true,
@@ -995,7 +1011,7 @@
           }
         }
       },
-      "recoveryHistoryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md",
+      "recoveryHistoryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md",
       "scope": "Fresh terminal evidence for every counted package; prior interrupted and failed attempts remain historical, and the application patch/live receipt are unchanged."
     },
     "anonymousValidator": {
@@ -1269,11 +1285,11 @@
     }
   },
   "goQualificationPacket": {
-    "commit": "10925f49091294233a42e5401f3f9261752423c2",
-    "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md",
-    "summary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
-    "status": "incomplete",
-    "count": 17,
+    "commit": "25439b26fcbaa1d938ea2be4c23b7ced132037ec",
+    "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md",
+    "summary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+    "status": "passed",
+    "count": 18,
     "required": 18
   }
 }

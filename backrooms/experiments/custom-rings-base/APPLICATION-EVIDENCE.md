@@ -5,7 +5,7 @@ attempt completed all 25 recorded steps, including two eligible room notes,
 hidden updates, fresh-process recovery, interrupted-confirmation retry, retained
 lesson reuse and 15 ledger-confirmed refusals. The command exited zero with one
 executed Vitest test, no failures or pending tests, unchanged source and complete
-cleanup. Final independent review, the remaining upstream Go packages and native
+cleanup. Final independent review, broader conformance and native
 product activation are still separate gates. This is a recorded localnet pass,
 not final preview release approval.
 
@@ -36,7 +36,7 @@ checkpoints, not proof or validator evidence.
 | Localnet runner | A fresh focused run passed all 5 runner tests, with zero failed/cancelled/skipped tests. The runner, monitor and test files also match the earlier independent worker/resource review's frozen file digests. |
 | Actual signed transactions | The passing live run matched the earlier fixture sizes. Visible genesis was 2,740 bytes with 2 signers. Both hidden updates were 2,639 bytes with 1 payer signer and no explicit writer or stable room-marker account in the decoded message. All fit the pinned 4,096-byte ceiling. |
 | Full application validator journey | `journey-KXteXY` passed all 25 steps and its one unskipped Vitest test. Both hidden updates settled; fresh native processes recovered the first accepted update, retried an interrupted confirmation and reused the retained lesson for the second update. All 15 named refusal transactions failed as expected without changing accepted state. |
-| Pristine upstream checks/builds | `just check-all`, all eight native build stages and `just test-hermetic` passed at the exact clean source pins. The three hermetic nextest groups reported 149/1,497/40 passes and 0/33/4 canonical default skips. Both exact upstream anonymous-validator cases also passed with full command exit 0. Complete upstream Go coverage remains incomplete. |
+| Pristine upstream checks/builds | `just check-all`, all eight native build stages and `just test-hermetic` passed at the exact clean source pins. The three hermetic nextest groups reported 149/1,497/40 passes and 0/33/4 canonical default skips. Both exact upstream anonymous-validator cases also passed with full command exit 0. All 18 upstream Go packages now have fresh verified terminal evidence. |
 | Overlay integrity | The patch applied to a temporary Git index at the exact base and every resulting file matched the manifest. The portable helper passed its clean-checkout preflight against the untouched baseline. |
 
 The ten complete, content-safe application Go logs and their exact hashes are
@@ -170,14 +170,14 @@ reported `credits_exhausted` and no Cloud environment containing this repository
 overlay, rather than treating a scan of the unmodified base as review of this
 profile. This checkpoint carries no final independent sign-off or merge approval.
 
-CR01 still needs complete fresh Go package coverage. The [fresh qualification packet](https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md)
-contains verified terminal evidence for **17/18 whole packages**: 11
+CR01 has complete fresh Go package coverage. The [fresh qualification packet](https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md)
+contains verified terminal evidence for **18/18 whole packages**: 12
 passing test packages and 6 packages explicitly reporting no test files.
-The [machine-readable summary](https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json) records every exact unfiltered
+The [machine-readable summary](https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json) records every exact unfiltered
 command, complete raw-log digest, terminal exit and unchanged clean source pins.
 Default fixture/service/population opt-ins remain unset, with named skips retained.
 
-The [recovery checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/10925f49091294233a42e5401f3f9261752423c2/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md) preserves the prior history. Public
+The [recovery checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md) preserves the prior history. Public
 summaries had recorded 15/18 and later local observations reached 17/18, but the
 unpublished working files became unavailable before the final ring result was
 observed. The final old ring attempt has no recovered terminal receipt. Those
