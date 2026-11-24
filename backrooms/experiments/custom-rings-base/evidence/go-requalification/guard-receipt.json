@@ -1,0 +1,37 @@
+{
+  "schema": "cr01-recovery-recorder-negative-guards-v1",
+  "verifiedAt": "2026-11-24T11:42:38.163111+00:00",
+  "runnerSha256": "107c7a72367650d5d8cc077f11be969eeadad9aa11a2109fbd4c89b725aca1a8",
+  "results": [
+    {
+      "case": "truncated",
+      "rejected": true
+    },
+    {
+      "case": "test-failure",
+      "rejected": true
+    },
+    {
+      "case": "unexecuted-skip",
+      "rejected": true
+    },
+    {
+      "case": "unfinished-test",
+      "rejected": true
+    },
+    {
+      "case": "wrong-package",
+      "rejected": true
+    },
+    {
+      "case": "unexpected-test-skip",
+      "rejected": true
+    },
+    {
+      "case": "actual-published-timeout",
+      "rejected": true,
+      "sha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234"
+    }
+  ],
+  "scope": "Synthetic parser rejection cases and an actual published failed log. These are not application source/security review and not successful Go-package execution."
+}

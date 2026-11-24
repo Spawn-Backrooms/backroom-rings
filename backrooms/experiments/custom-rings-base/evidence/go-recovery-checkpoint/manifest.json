@@ -1,0 +1,15 @@
+{
+  "schema": "cr01-frozen-recovery-checkpoint-manifest-v1",
+  "files": [
+    {
+      "path": "recovery-checkpoint.json",
+      "bytes": 17708,
+      "sha256": "e0fbc07f3c9d27d38acad9ddb3e83b5a77ab2da63541c86f4f3a4b34170a71e3"
+    },
+    {
+      "path": "recovery-checkpoint.md",
+      "bytes": 7395,
+      "sha256": "4a4be9e94bd1d21d80406adc3f952f075eb791a1c3bc48d38e8644e14dfcfe1f"
+    }
+  ]
+}

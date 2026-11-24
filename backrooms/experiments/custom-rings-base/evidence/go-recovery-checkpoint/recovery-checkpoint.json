@@ -1,0 +1,305 @@
+{
+  "schema": "cr01-go-recovery-checkpoint-v1",
+  "recordedAt": "2026-11-24T11:46:59.854867+00:00",
+  "status": "awaiting-new-terminal-receipts",
+  "scope": "Factual recovery checkpoint. No application source change, security verdict, new test result, merge or deployment.",
+  "source": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "referenceHost": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+    "customRingsCloneUrl": "https://github.com/Spawn-Backrooms/custom-privacy-rings.git",
+    "sourceChanges": false,
+    "applicationOverlay": {
+      "files": 59,
+      "bytes": 424108,
+      "sha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "manifestSha256": "f0fded9848ee7e30ec9d64e963efcd8e2176e9e9a13f25e27b115bbba676e614",
+      "unchanged": true,
+      "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/fork-overlay/application-core.manifest.json"
+    }
+  },
+  "observedInterruption": {
+    "observedAtApproximate": "2026-11-24 11:30 UTC",
+    "observation": "The previous scratch working directory was found empty and the prior tool session was unavailable.",
+    "cause": "unknown",
+    "priorToolSessionId": 69960,
+    "toolSessionIdIsOsPid": false,
+    "implication": "Locally observed results whose complete logs and terminal receipts were not published cannot be revalidated from the recovered workspace."
+  },
+  "preservedPublicGo": {
+    "historicalCoveredPackageCount": 15,
+    "requiredPackageCount": 18,
+    "historicalPassingTestPackageCount": 9,
+    "historicalExplicitNoTestFilesPackageCount": 6,
+    "newQualificationCreditFromHistoricalMetadata": 0,
+    "publicPrHeads": {
+      "pr38": "86ee116339de1ac8c067f7af479384bf0168bfef",
+      "pr39": "d5380fce351659785b2837fba0bae2ebbafce92b"
+    },
+    "checkedPrCommitTrees": 19,
+    "newerTerminalGoPacketFound": false,
+    "summary": {
+      "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/cr01-summary.json",
+      "sha256": "b7ce76f30e742a8a550dfeb9be15b1d7a8dabf657a3bd8904ae870113a2f8497"
+    },
+    "originalSixLog": {
+      "recoveryMethod": "Deterministic reconstruction from six ordered published package/duration pairs using Go success-line formatting.",
+      "bytes": 473,
+      "sha256": "1f72b938e0247487527c597305120f467342ef5098ed460f79e613de5c07f592",
+      "matchesPublishedFullLogSha256": true,
+      "downloadedAsRawBlob": false,
+      "newlyExecuted": false,
+      "exactOriginalArgvRecovered": false,
+      "originalInterruptedReceiptRecovered": false,
+      "originalInterruptedReceiptSha256": "1daa596728dc7cc0a2f63760b1ad603de0be2fac15c79b8d39eadae6945a334c",
+      "wholeCommandSuccessEstablished": false,
+      "qualificationUse": "Historical byte identity only; does not replace missing original argv/source-run binding or a new package receipt."
+    },
+    "subsequentNinePackages": {
+      "detailedMetadataRecovered": true,
+      "completeRawJsonlRecovered": false,
+      "qualificationUse": "Historical metadata only."
+    },
+    "fullFailedTransfer": {
+      "status": "failed",
+      "exitCode": 1,
+      "packageTerminalAction": "fail",
+      "durationSeconds": 3605.007,
+      "testEvents": {
+        "pass": 191,
+        "fail": 0,
+        "skip": 0
+      },
+      "causeObserved": "panic: test timed out after 1h0m0s",
+      "fullLogBytes": 239408,
+      "fullLogSha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+      "receiptSha256": "4cb0e13d5f8ca73839e52544eda16b60b7e88c6b4fdf9c0dc981b32a53816aa0",
+      "rawLogAndReceiptRecovered": true,
+      "packageSuccess": false,
+      "references": [
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/manifest.json",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/transfer-timeout.jsonl",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/transfer-timeout-receipt.json"
+      ]
+    }
+  },
+  "laterLocalGoHistory": {
+    "provenance": "Prior in-session observations retained in the coordinating conversation; complete raw files were not found in any checked public PR tree.",
+    "highestObservedCoveredPackageCount": 17,
+    "requiredPackageCount": 18,
+    "currentRawEvidenceSufficientToRevalidate17": false,
+    "lostRunnerSha256": "5122c3d353f3c76066fc2e7f70b6297bacb524abc4f0b81cf0bdc3a35c085426",
+    "lostResourcePolicySha256": "2136e5e3055b845e6354453568cbdd70a49809de477f67d04fda315767c52920",
+    "ringtest": {
+      "observedTerminalStatus": "passed",
+      "durationSeconds": 607.133,
+      "testEvents": {
+        "pass": 2,
+        "fail": 0,
+        "skip": 0
+      },
+      "logBytes": 2425,
+      "logSha256": "e190f4e3a846ae3e9f2a80f67c5362b9ec9c57b3b20b6a25a0c792497ba5589d",
+      "receiptSha256": "0e4439f219def0d63a77f34da9965aa781a426c1af650cd823843aa6c40dd29f",
+      "rawLogRecovered": false,
+      "terminalReceiptRecovered": false
+    },
+    "transfer": {
+      "observedTerminalStatus": "passed",
+      "durationSeconds": 6204.209,
+      "passingTopLevelTests": 44,
+      "passingSubtests": 200,
+      "testEvents": {
+        "pass": 244,
+        "fail": 0,
+        "skip": 0
+      },
+      "logBytes": 287639,
+      "logSha256": "6a765d4ba88174ee4b03ee6fef50e675fabc81a736d75722f22e4e87cec2d020",
+      "receiptSha256": "549ea7dd3ba7063b19fd215454e42d998c187b472479613c4026b7f4f76f6dcf",
+      "rawLogRecovered": false,
+      "terminalReceiptRecovered": false
+    },
+    "ring": {
+      "lastObservedTestEvents": {
+        "pass": 161,
+        "fail": 0,
+        "skip": 4
+      },
+      "lastObservedActiveCase": "TestCatalogRequestsProveWithTheInstalledKeys/custom-ring-transfer-entry-8-in5-w4-s4",
+      "previouslyKilledWideCatalogCaseObservedPassSeconds": 198.4,
+      "packageTerminalActionObserved": false,
+      "exitCodeObserved": null,
+      "completeRawLogRecovered": false,
+      "finalOutcome": "unverified; no terminal result observed or recovered",
+      "wholePackagePassClaimed": false,
+      "lastObservedSkipScope": "Four default skips observed before interruption; not a complete-run skip expectation."
+    },
+    "eighteenOfEighteenClaimed": false,
+    "historicalHashesAreIdentifiersOnly": true
+  },
+  "restoredPrerequisites": {
+    "recordedAt": "2026-11-24T11:40:31.455380+00:00",
+    "environmentReceiptSha256": "11ca05a28bbeb7c787ab10bd8b0248d7259c0c485ea273c9b887d5170157f1a1",
+    "cleanCustomRings": true,
+    "cleanZolana": true,
+    "goVersion": "go version go1.27.3 linux/amd64",
+    "goArchive": {
+      "bytes": 70588678,
+      "sha256": "65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40",
+      "url": "https://go.dev/dl/go1.27.3.linux-amd64.tar.gz"
+    },
+    "goExecutableSha256": "5f5eb6d0b2fb6aa0bb5d5f8c5f1c944e0de955c925f0111af92a9d8f79680b5b",
+    "independentPackageCatalog": {
+      "packageCount": 18,
+      "bytes": 1190,
+      "sha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc"
+    },
+    "dependencyDiscoveryExitCode": 0,
+    "moduleVerificationExitCode": 0,
+    "prerequisiteReceiptTestsStarted": false,
+    "prerequisiteReceiptProofsStarted": false,
+    "provingKeysIncludedInPrerequisiteReceipt": false,
+    "limitation": "Restored prerequisites and module checks establish neither compilation nor test success."
+  },
+  "newQualification": {
+    "status": "awaiting-new-terminal-receipts",
+    "executionConfirmedForThisCheckpoint": true,
+    "scope": "A fresh execution of all 18 whole Go packages from the independent catalog at the unchanged clean source pins.",
+    "requiredPackageCount": 18,
+    "newVerifiedTerminalPackageCount": 1,
+    "historicalMetadataSubstitutesForMissingCurrentRawReceipts": false,
+    "checkpointPolicy": "Publish each completed package's complete raw log, terminal receipt, hashes, exact argv and source-state evidence to a GitHub checkpoint before beginning the next long package.",
+    "terminalReceipts": [
+      {
+        "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
+        "status": "no-tests",
+        "exitCode": 0,
+        "durationSeconds": 101.472,
+        "finishedAt": "2026-11-24T11:44:04.863823+00:00",
+        "tests": {
+          "pass": 0,
+          "fail": 0,
+          "skip": 0
+        },
+        "explicitlyHasNoTestFiles": true,
+        "logBytes": 524,
+        "logSha256": "6d1dd9eb56ca21ea1c7d324f68e95865fbc6ad7006bf81b8758af8611a0dbc55",
+        "receiptSha256": "db5cedeabc14b1b34154a56443d86d5387cb5045873815cdbcaf798e09711874",
+        "sourceBefore": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "sourceAfter": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "publicationState": "requires-coordinator-checkpoint"
+      }
+    ],
+    "qualificationPredicate": "Every catalog package must have an unfiltered full-package terminal result with exit 0, matching complete raw-log hash, source pins/cleanliness and no failed-test events. Packages with no tests must explicitly report no test files. Partial passes and missing receipts do not qualify.",
+    "asOf": "2026-11-24T11:44:04.863823+00:00",
+    "coordinatorToolSessionId": 56638,
+    "executionStartedAt": "2026-11-24T11:42:23.389469+00:00",
+    "wholeSuitePassEstablished": false,
+    "skipPolicy": "Preserve canonical default opt-ins unset. The earlier ring count of four skips is only the last observed partial count, not the expected full-run count. The coordinator will maintain the explicit default-skip inventory for each package."
+  },
+  "unchangedCompletedEvidence": {
+    "application": {
+      "status": "published-pass-unchanged",
+      "recordedSteps": 25,
+      "executedVitestIntegrationTests": 1,
+      "testResults": {
+        "passed": 1,
+        "failed": 0,
+        "pending": 0
+      },
+      "namedLedgerRefusalsPreservingAcceptedState": 15,
+      "publicJsonBytes": 91251,
+      "publicJsonSha256": "057b96ccfffc3b6d04980ff26fda758665b6eaf5bf6f45df4a83c7321a1bff52",
+      "publicMarkdownSha256": "0c75af563d655b8756cb2732d77bcfff8ae64d0767921b5988986ef9d1d1946c",
+      "references": [
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/evidence/spawn-room-live-pass.md",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/evidence/spawn-room-live-pass.json",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/APPLICATION-EVIDENCE.md"
+      ],
+      "rawPrivateApplicationMaterialIncluded": false
+    },
+    "nativeBaseline": {
+      "status": "published-passes-unchanged",
+      "checkAllPassed": true,
+      "nativeBuildStagesPassed": 8,
+      "hermeticPassed": 1686,
+      "hermeticDefaultSkipped": 37,
+      "requiredAnonymousValidatorCasesPassed": 2,
+      "hermeticLogSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+      "anonymousValidatorLogSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+      "baselineManifestSha256": "262ff1d66b61762fc9973c3c23040091d501dc632ba24f6a5cc0907caaf1bf41",
+      "references": [
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/README.md",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/manifest.json",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/cr01-stage-test-hermetic-20261124T014430Z.log",
+        "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/anonymous-validator/receipt.json"
+      ]
+    }
+  },
+  "remainingGates": {
+    "daybreak": {
+      "status": "not-scanned",
+      "latestObservationSource": "Sanitized current connector-read receipt recorded 2026-11-24T11:43:17.248766+00:00.",
+      "scanAvailability": "credits_exhausted",
+      "remainingCreditsUsd": 0,
+      "environmentCount": 7,
+      "matchingTargetEnvironment": false,
+      "targetRepositoryId": "github-1467934824",
+      "scanLaunched": false,
+      "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+      "observationWindow": {
+        "date": "2026-11-24",
+        "completedBeforeUtc": "11:39:32",
+        "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+      },
+      "receiptSha256": "17931a822a876678c8adba91e7450a6abfe93919af1d86a47d425b3dc04df459"
+    },
+    "independentLatestSourceReview": {
+      "status": "blocked",
+      "reason": "Automated content checks rejected the requested latest source review.",
+      "completed": false,
+      "rerouted": false
+    },
+    "cr04BroaderAcceptance": {
+      "status": "open",
+      "allFourBroadBulletsRemainOpen": true,
+      "executed15RefusalsDoNotEstablishEveryVariant": true,
+      "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/ACCEPTANCE-STATUS.md"
+    },
+    "nativeActivation": {
+      "status": "separate-maintainer-gate",
+      "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/NATIVE-ADAPTER-HANDOFF.md"
+    },
+    "mergeAndDeployment": {
+      "performed": false
+    }
+  },
+  "publicReferences": {
+    "baseline": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/README.md",
+    "baselineSummary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/cr01-summary.json",
+    "baselineManifest": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/manifest.json",
+    "hermetic": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/baseline-checkpoint/cr01-stage-test-hermetic-20261124T014430Z.log",
+    "validatorReceipt": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/anonymous-validator/receipt.json",
+    "validatorLog": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/anonymous-validator/command.log",
+    "timeoutManifest": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/manifest.json",
+    "timeoutLog": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/transfer-timeout.jsonl",
+    "timeoutReceipt": "https://github.com/Spawn-Backrooms/backroom-rings/blob/86ee116339de1ac8c067f7af479384bf0168bfef/backrooms/experiments/custom-rings-base/evidence/go-timeout-checkpoint/transfer-timeout-receipt.json",
+    "application": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/APPLICATION-EVIDENCE.md",
+    "applicationLiveJson": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/evidence/spawn-room-live-pass.json",
+    "applicationLiveMd": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/evidence/spawn-room-live-pass.md",
+    "overlayManifest": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/fork-overlay/application-core.manifest.json",
+    "quickstart": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/QUICKSTART.md",
+    "acceptance": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/ACCEPTANCE-STATUS.md",
+    "nativeHandoff": "https://github.com/Spawn-Backrooms/backroom-rings/blob/d5380fce351659785b2837fba0bae2ebbafce92b/backrooms/experiments/custom-rings-base/NATIVE-ADAPTER-HANDOFF.md"
+  },
+  "frozenRecoverySnapshot": true
+}

@@ -1,0 +1,570 @@
+{
+  "schema": "cr01-public-go-key-restoration/v1",
+  "startedAt": "2026-11-24T11:39:56.191178+00:00",
+  "status": "verified",
+  "requiredCount": 26,
+  "requiredBytes": 5411670952,
+  "maxConcurrentDownloads": 2,
+  "sourceBefore": {
+    "customRings": {
+      "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "clean": true
+    },
+    "zolana": {
+      "revision": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "clean": true
+    }
+  },
+  "sourceFiles": [
+    {
+      "path": "prover/ring/proving-keys.lock",
+      "sha256": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc",
+      "bytes": 5008
+    },
+    {
+      "path": "prover/ring/keys.go",
+      "sha256": "7b2ed6e9a494a218c4c3b9e7df01c34c89f5e72b667c29f9c7991704fd0c3e0f",
+      "bytes": 2543
+    },
+    {
+      "path": "prover/ring/keys_test.go",
+      "sha256": "5b3e580958e2fb55e1ba844486d7454b501fb440fde8cc0b43197a829bf6cd08",
+      "bytes": 4714
+    },
+    {
+      "path": "prover/ring/prove_test.go",
+      "sha256": "2f7d82588e0f7496572c23d7772aa04c195443a115cd97319f787943ef9e1bb1",
+      "bytes": 3160
+    },
+    {
+      "path": "prover/ringtest/prove_test.go",
+      "sha256": "45f3eceaf556fe175513065518c94f31ee5a1718c1e7ae7198ba07bbde451f8f",
+      "bytes": 2082
+    },
+    {
+      "path": "justfile",
+      "sha256": "492ab73705b1f4834467e6b1e4496139f6c72fc48e268a410ce1c469b71c8f31",
+      "bytes": 35343
+    }
+  ],
+  "lockSha256": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc",
+  "destination": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys",
+  "testsExecuted": false,
+  "trackedSourceModified": false,
+  "scope": "The 26 installed custom-ring artifacts loaded by unfiltered tests in the Custom Rings prover module.",
+  "omittedSppKeysReason": "Direct Custom Rings Go test key loads use the custom-ring catalog. Ringtest creates an ephemeral setup. Native validator/SPP service artifact prerequisites are outside this Go-only restoration.",
+  "requiredTestEnvironment": {
+    "REQUIRE_RING_KEYS": "1",
+    "ZOLANA_PROVER_KEYS_DIR": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys"
+  },
+  "keys": [
+    {
+      "name": "custom_ring_apply_enrollments_1.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_enrollments_1.key",
+      "expectedBytes": 7430633,
+      "expectedSha256": "3d238da30b162fd46e4725b58af2ded1d25112766a1e25cc8dedd1d634e8193b",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:39:56.197393+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 7430633,
+      "sha256": "3d238da30b162fd46e4725b58af2ded1d25112766a1e25cc8dedd1d634e8193b",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_enrollments_1.key",
+      "finishedAt": "2026-11-24T11:40:05.483580+00:00",
+      "durationSeconds": 9.286
+    },
+    {
+      "name": "custom_ring_apply_enrollments_2.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_enrollments_2.key",
+      "expectedBytes": 14851658,
+      "expectedSha256": "5b4062c084d45b64b1c4a9bfa080173af6d43b1b5b6652a12dadd7a458913a64",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:39:56.197587+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 14851658,
+      "sha256": "5b4062c084d45b64b1c4a9bfa080173af6d43b1b5b6652a12dadd7a458913a64",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_enrollments_2.key",
+      "finishedAt": "2026-11-24T11:40:05.650684+00:00",
+      "durationSeconds": 9.453
+    },
+    {
+      "name": "custom_ring_apply_enrollments_4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_enrollments_4.key",
+      "expectedBytes": 29662267,
+      "expectedSha256": "0ddf9a8b8bbe6089370ebb7f885001a45ea36b99a99db06614fbbaf124f5dd79",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:05.489457+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 29662267,
+      "sha256": "0ddf9a8b8bbe6089370ebb7f885001a45ea36b99a99db06614fbbaf124f5dd79",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_enrollments_4.key",
+      "finishedAt": "2026-11-24T11:40:11.325870+00:00",
+      "durationSeconds": 5.836
+    },
+    {
+      "name": "custom_ring_apply_enrollments_8.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_enrollments_8.key",
+      "expectedBytes": 59282986,
+      "expectedSha256": "25e761192caaedaf15663e5060c7ac3582de8a88589776a16e275860865312bf",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:05.652339+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 59282986,
+      "sha256": "25e761192caaedaf15663e5060c7ac3582de8a88589776a16e275860865312bf",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_enrollments_8.key",
+      "finishedAt": "2026-11-24T11:40:11.810943+00:00",
+      "durationSeconds": 6.159
+    },
+    {
+      "name": "custom_ring_apply_records_1.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_1.key",
+      "expectedBytes": 6714211,
+      "expectedSha256": "5d1b02af6650d908c95662ad370c667ba08ac368b389573c0f920f01d94d23bb",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:11.327835+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 6714211,
+      "sha256": "5d1b02af6650d908c95662ad370c667ba08ac368b389573c0f920f01d94d23bb",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_1.key",
+      "finishedAt": "2026-11-24T11:40:16.063679+00:00",
+      "durationSeconds": 4.736
+    },
+    {
+      "name": "custom_ring_apply_records_16.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_16.key",
+      "expectedBytes": 106784225,
+      "expectedSha256": "fbd80a216491ce475f6fdfa96d3fb1b56833c5f5aa6b6c4b94543e3f7fab9a85",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:11.812862+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 106784225,
+      "sha256": "fbd80a216491ce475f6fdfa96d3fb1b56833c5f5aa6b6c4b94543e3f7fab9a85",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_16.key",
+      "finishedAt": "2026-11-24T11:40:17.773836+00:00",
+      "durationSeconds": 5.961
+    },
+    {
+      "name": "custom_ring_apply_records_2.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_2.key",
+      "expectedBytes": 13399938,
+      "expectedSha256": "11ab04f10df5f39bc06fd1637a70729a7ad77e9c224d7c3100f814f5c836fbb8",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:16.066364+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 13399938,
+      "sha256": "11ab04f10df5f39bc06fd1637a70729a7ad77e9c224d7c3100f814f5c836fbb8",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_2.key",
+      "finishedAt": "2026-11-24T11:40:21.238663+00:00",
+      "durationSeconds": 5.172
+    },
+    {
+      "name": "custom_ring_apply_records_4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_4.key",
+      "expectedBytes": 26751581,
+      "expectedSha256": "b24358187d78532b656f3aa89fac9427f2ec97afde87d28f954a37d0a3210805",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:17.775932+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 26751581,
+      "sha256": "b24358187d78532b656f3aa89fac9427f2ec97afde87d28f954a37d0a3210805",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_4.key",
+      "finishedAt": "2026-11-24T11:40:21.611128+00:00",
+      "durationSeconds": 3.835
+    },
+    {
+      "name": "custom_ring_apply_records_8.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_8.key",
+      "expectedBytes": 53437485,
+      "expectedSha256": "6109969bbef6607c3fcc8e4d884f03a3721a4479888720f78c380b96f66f47d6",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:21.241711+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 53437485,
+      "sha256": "6109969bbef6607c3fcc8e4d884f03a3721a4479888720f78c380b96f66f47d6",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_8.key",
+      "finishedAt": "2026-11-24T11:40:27.001137+00:00",
+      "durationSeconds": 5.759
+    },
+    {
+      "name": "custom_ring_apply_records_private_1.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_private_1.key",
+      "expectedBytes": 8730945,
+      "expectedSha256": "192c0739123e3c4cb80587ff6d8cc8240ef8d6746d3abc2bb5272d8789799985",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:21.612995+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 8730945,
+      "sha256": "192c0739123e3c4cb80587ff6d8cc8240ef8d6746d3abc2bb5272d8789799985",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_private_1.key",
+      "finishedAt": "2026-11-24T11:40:26.448001+00:00",
+      "durationSeconds": 4.835
+    },
+    {
+      "name": "custom_ring_apply_records_private_16.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_private_16.key",
+      "expectedBytes": 136257965,
+      "expectedSha256": "0462d1e07946f3741940bc35e2ab2b11cc57618634cdfff4a7f060ccb88e0b70",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:26.449727+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 136257965,
+      "sha256": "0462d1e07946f3741940bc35e2ab2b11cc57618634cdfff4a7f060ccb88e0b70",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_private_16.key",
+      "finishedAt": "2026-11-24T11:40:33.704995+00:00",
+      "durationSeconds": 7.255
+    },
+    {
+      "name": "custom_ring_apply_records_private_2.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_private_2.key",
+      "expectedBytes": 17240117,
+      "expectedSha256": "2f34912fd4666239d326def947587be87667af9ff33165128ef0fa71af98d07e",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:27.003134+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 17240117,
+      "sha256": "2f34912fd4666239d326def947587be87667af9ff33165128ef0fa71af98d07e",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_private_2.key",
+      "finishedAt": "2026-11-24T11:40:31.701253+00:00",
+      "durationSeconds": 4.698
+    },
+    {
+      "name": "custom_ring_apply_records_private_4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_private_4.key",
+      "expectedBytes": 34243920,
+      "expectedSha256": "a057052789177e1f5dda6e307527b6144768ccfee3bf7ea6f190708eab4e3520",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:31.703583+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 34243920,
+      "sha256": "a057052789177e1f5dda6e307527b6144768ccfee3bf7ea6f190708eab4e3520",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_private_4.key",
+      "finishedAt": "2026-11-24T11:40:39.632807+00:00",
+      "durationSeconds": 7.929
+    },
+    {
+      "name": "custom_ring_apply_records_private_8.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_apply_records_private_8.key",
+      "expectedBytes": 68253916,
+      "expectedSha256": "b174f62ff8bf932d44d015039376528df54d8e1542508e39302b459696cb3289",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:33.709182+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 68253916,
+      "sha256": "b174f62ff8bf932d44d015039376528df54d8e1542508e39302b459696cb3289",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_apply_records_private_8.key",
+      "finishedAt": "2026-11-24T11:40:39.961115+00:00",
+      "durationSeconds": 6.252
+    },
+    {
+      "name": "custom_ring_merge.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_merge.key",
+      "expectedBytes": 38162616,
+      "expectedSha256": "64a8ab474e1ad0aeb2a520cd21fab2bbef75c7b6e7a8ae506c18980bc893db2f",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:39.635485+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 38162616,
+      "sha256": "64a8ab474e1ad0aeb2a520cd21fab2bbef75c7b6e7a8ae506c18980bc893db2f",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_merge.key",
+      "finishedAt": "2026-11-24T11:40:45.274242+00:00",
+      "durationSeconds": 5.639
+    },
+    {
+      "name": "custom_ring_register_key.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_register_key.key",
+      "expectedBytes": 17797993,
+      "expectedSha256": "90d0f3a05edf2bef59de6726aa1e3c4b08abed8dd4c627f94a169752a49fcfe6",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:39.962943+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 17797993,
+      "sha256": "90d0f3a05edf2bef59de6726aa1e3c4b08abed8dd4c627f94a169752a49fcfe6",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_register_key.key",
+      "finishedAt": "2026-11-24T11:40:45.007597+00:00",
+      "durationSeconds": 5.045
+    },
+    {
+      "name": "custom_ring_transfer_16_in4_w4_s2.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_16_in4_w4_s2.key",
+      "expectedBytes": 650892617,
+      "expectedSha256": "7708af1286eedfc245d84641deaf6da68c932ea14418cfbac2b2c4285180c11f",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:45.010918+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 650892617,
+      "sha256": "7708af1286eedfc245d84641deaf6da68c932ea14418cfbac2b2c4285180c11f",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_16_in4_w4_s2.key",
+      "finishedAt": "2026-11-24T11:41:05.398080+00:00",
+      "durationSeconds": 20.387
+    },
+    {
+      "name": "custom_ring_transfer_2_in24_w4_s4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_2_in24_w4_s4.key",
+      "expectedBytes": 285409001,
+      "expectedSha256": "3921ac82248a03e9b03f836d457d636667cc0d4c96125f24fea838b4f9be8c5b",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:45.276254+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 285409001,
+      "sha256": "3921ac82248a03e9b03f836d457d636667cc0d4c96125f24fea838b4f9be8c5b",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_2_in24_w4_s4.key",
+      "finishedAt": "2026-11-24T11:40:58.903683+00:00",
+      "durationSeconds": 13.628
+    },
+    {
+      "name": "custom_ring_transfer_4_in24_w4_s4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_4_in24_w4_s4.key",
+      "expectedBytes": 330207713,
+      "expectedSha256": "c343825a5429feef491f0042c7da363ec9b288f8bc7d5f6d1b85e5cc4955a9cb",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:40:58.913316+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 330207713,
+      "sha256": "c343825a5429feef491f0042c7da363ec9b288f8bc7d5f6d1b85e5cc4955a9cb",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_4_in24_w4_s4.key",
+      "finishedAt": "2026-11-24T11:41:21.150546+00:00",
+      "durationSeconds": 22.237
+    },
+    {
+      "name": "custom_ring_transfer_8_in16_w4_s4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_8_in16_w4_s4.key",
+      "expectedBytes": 396921639,
+      "expectedSha256": "61c5ab9df37df49928ef543c05afc9b5979938e6d59c027294d2a37511fba569",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:41:05.400269+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 396921639,
+      "sha256": "61c5ab9df37df49928ef543c05afc9b5979938e6d59c027294d2a37511fba569",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_8_in16_w4_s4.key",
+      "finishedAt": "2026-11-24T11:41:21.002020+00:00",
+      "durationSeconds": 15.602
+    },
+    {
+      "name": "custom_ring_transfer_entry_4_in8_w4_s8.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_entry_4_in8_w4_s8.key",
+      "expectedBytes": 413536211,
+      "expectedSha256": "ea2b68fcffa03f93c49dd2c36ae0c41cd107589401a4d5a77655dc89c1624a44",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:41:21.004823+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 413536211,
+      "sha256": "ea2b68fcffa03f93c49dd2c36ae0c41cd107589401a4d5a77655dc89c1624a44",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_entry_4_in8_w4_s8.key",
+      "finishedAt": "2026-11-24T11:41:39.482322+00:00",
+      "durationSeconds": 18.478
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in2_w4_s2.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_entry_8_in2_w4_s2.key",
+      "expectedBytes": 426950438,
+      "expectedSha256": "cbaeda1e963a45d7741c4d63de4a402594789a45510ccd67da2d21f2467f5666",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:41:21.152835+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 426950438,
+      "sha256": "cbaeda1e963a45d7741c4d63de4a402594789a45510ccd67da2d21f2467f5666",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_entry_8_in2_w4_s2.key",
+      "finishedAt": "2026-11-24T11:41:39.905685+00:00",
+      "durationSeconds": 18.753
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in5_w4_s4.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_entry_8_in5_w4_s4.key",
+      "expectedBytes": 499173553,
+      "expectedSha256": "2072ae7d9f14c9a91831e7b289a7803688262de0870af064b4acf421b3b2d129",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:41:39.488285+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 499173553,
+      "sha256": "2072ae7d9f14c9a91831e7b289a7803688262de0870af064b4acf421b3b2d129",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_entry_8_in5_w4_s4.key",
+      "finishedAt": "2026-11-24T11:42:01.948323+00:00",
+      "durationSeconds": 22.46
+    },
+    {
+      "name": "custom_ring_transfer_entry_8_in8_w32_s8.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_entry_8_in8_w32_s8.key",
+      "expectedBytes": 691202058,
+      "expectedSha256": "6b7ee5da650a78ed37e39fb417c352edd95396baa9af9dc299b649038458c375",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:41:39.908967+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 691202058,
+      "sha256": "6b7ee5da650a78ed37e39fb417c352edd95396baa9af9dc299b649038458c375",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_entry_8_in8_w32_s8.key",
+      "finishedAt": "2026-11-24T11:42:04.587754+00:00",
+      "durationSeconds": 24.679
+    },
+    {
+      "name": "custom_ring_transfer_wide_2_in40_w4_s9.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_wide_2_in40_w4_s9.key",
+      "expectedBytes": 359679572,
+      "expectedSha256": "97ea032322421e594476bd47d0d6d71fd11785ba74bf918c79cb2100094f6bee",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:42:01.953955+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 359679572,
+      "sha256": "97ea032322421e594476bd47d0d6d71fd11785ba74bf918c79cb2100094f6bee",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_wide_2_in40_w4_s9.key",
+      "finishedAt": "2026-11-24T11:42:16.220131+00:00",
+      "durationSeconds": 14.266
+    },
+    {
+      "name": "custom_ring_transfer_wide_8_in24_w32_s13.key",
+      "url": "https://github.com/helius-labs/zolana-custom-rings/releases/download/ring-production-keys-v19/custom_ring_transfer_wide_8_in24_w32_s13.key",
+      "expectedBytes": 718695694,
+      "expectedSha256": "ea0f805642fe5c2af0238628764c5ad1fc8212c9c42fb470a8965413300ef031",
+      "source": "public-release",
+      "requiredBy": [
+        "prover/ring TestRingKeysCarryTheCompiledCircuits",
+        "prover/ring TestCatalogRequestsProveWithTheInstalledKeys"
+      ],
+      "startedAt": "2026-11-24T11:42:04.593379+00:00",
+      "downloaded": true,
+      "status": "verified",
+      "bytes": 718695694,
+      "sha256": "ea0f805642fe5c2af0238628764c5ad1fc8212c9c42fb470a8965413300ef031",
+      "path": "/workspace/scratch/06977f839292/custom-rings-base/zolana/prover/server/proving-keys/custom_ring_transfer_wide_8_in24_w32_s13.key",
+      "finishedAt": "2026-11-24T11:42:24.431203+00:00",
+      "durationSeconds": 19.838
+    }
+  ],
+  "verifiedCount": 26,
+  "verifiedBytes": 5411670952,
+  "updatedAt": "2026-11-24T11:42:24.431521+00:00",
+  "sourceAfter": {
+    "customRings": {
+      "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "clean": true
+    },
+    "zolana": {
+      "revision": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "clean": true
+    }
+  },
+  "finishedAt": "2026-11-24T11:42:24.460916+00:00"
+}

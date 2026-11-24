@@ -1,0 +1,250 @@
+{
+  "schema": "cr01-go-requalification-manifest-v1",
+  "generatedAt": "2026-11-24T11:48:41.093988+00:00",
+  "qualificationStatus": "incomplete",
+  "verifiedTerminalPackageCount": 9,
+  "requiredPackageCount": 18,
+  "summarySha256": "673cb00e2a14cb5ea698003bbe73185b5306350d716f75dc9914194bd7522cf9",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2356,
+      "sha256": "893f107d6b165bf174713eafdd7cf1418c24a6913a4a0d93ab31b92c3be35dd3",
+      "gitBlobSha1": "830a55104ab1cc3dc2af083041d6d2bc5ac31f62"
+    },
+    {
+      "path": "daybreak-status.json",
+      "bytes": 579,
+      "sha256": "17931a822a876678c8adba91e7450a6abfe93919af1d86a47d425b3dc04df459",
+      "gitBlobSha1": "9e3399ff20d271ed1f418c6af51d1111fc197b4a"
+    },
+    {
+      "path": "default-skips.json",
+      "bytes": 2695,
+      "sha256": "9d03aa96ad54fcbbec553433dec538648bc8a04126bb5a063e3edb176c23e55b",
+      "gitBlobSha1": "9d9135656ef07a8c30fd99866eb2980b891ef25e"
+    },
+    {
+      "path": "environment-recovery.json",
+      "bytes": 4921,
+      "sha256": "11ca05a28bbeb7c787ab10bd8b0248d7259c0c485ea273c9b887d5170157f1a1",
+      "gitBlobSha1": "b5aea1e7f16c571f0f2fd48b06a3a15316da8dbd"
+    },
+    {
+      "path": "guard-receipt.json",
+      "bytes": 960,
+      "sha256": "7d396d19157baabc826f8603e1cc7d0d5fe6e9b781d089bd7343a5df257416f5",
+      "gitBlobSha1": "d8e008c6c49e909dcbd79b98c9139cdfb484fd26"
+    },
+    {
+      "path": "keys-recovery.json",
+      "bytes": 27973,
+      "sha256": "11694efd2aa61bab733515fc3ad6f3d56181545fd539470ac5bea52864185c51",
+      "gitBlobSha1": "1869b65b75aeace05cd369ace1a4aee3d1b31852"
+    },
+    {
+      "path": "package-catalog.json",
+      "bytes": 3094,
+      "sha256": "b62506048867ff9e3973314ac721888e376ec48bd377e878fdcebce8807698f5",
+      "gitBlobSha1": "4abc9a40a1aa5267169b6f571517f8cd8eb1c598"
+    },
+    {
+      "path": "package-catalog.txt",
+      "bytes": 1190,
+      "sha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
+      "gitBlobSha1": "a7b80c2156e38fa95c51bc731df709490b3b3ea0"
+    },
+    {
+      "path": "packages/cmd-catalog-20261124T114223Z.json",
+      "bytes": 4891,
+      "sha256": "db5cedeabc14b1b34154a56443d86d5387cb5045873815cdbcaf798e09711874",
+      "gitBlobSha1": "bd4c53cfa8fe31fe9a329f6f582138859d77d1d5"
+    },
+    {
+      "path": "packages/cmd-catalog-20261124T114223Z.jsonl",
+      "bytes": 524,
+      "sha256": "6d1dd9eb56ca21ea1c7d324f68e95865fbc6ad7006bf81b8758af8611a0dbc55",
+      "gitBlobSha1": "0bce520fbc60a3c976f75e65db84d36ef6ed8307"
+    },
+    {
+      "path": "packages/cmd-catalog-20261124T114223Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/cmd-prover-20261124T114404Z.json",
+      "bytes": 4740,
+      "sha256": "86eeddeb51c3059213b3f065121cc7981a9510fadb24aabc7a7ce9425266975a",
+      "gitBlobSha1": "1b3e74423aacef58510657733c08e27c95c70956"
+    },
+    {
+      "path": "packages/cmd-prover-20261124T114404Z.jsonl",
+      "bytes": 520,
+      "sha256": "00ee75f3dd47e3c1b79d3172c84e5a0ae7486c5ef46a4845822fcabc245534c2",
+      "gitBlobSha1": "ef071c8489fad5c46c545f0a4891135f984cb1aa"
+    },
+    {
+      "path": "packages/cmd-prover-20261124T114404Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringaudit-20261124T114534Z.json",
+      "bytes": 4708,
+      "sha256": "1e099078fc2fee9904152118f6a3d217b955be4bedf57a5ac9f4a8967b02f405",
+      "gitBlobSha1": "f6e7d42af99a303bf05ccc79dbd3c3276bac5d33"
+    },
+    {
+      "path": "packages/ringtest-ringaudit-20261124T114534Z.jsonl",
+      "bytes": 1598,
+      "sha256": "b5bab8936f30cbc634cba75a47bbb69431fe8face9a5c3357e052a17ee526c66",
+      "gitBlobSha1": "a9b358abbe84ae8896fb2397dfb1dd3d6f4af192"
+    },
+    {
+      "path": "packages/ringtest-ringaudit-20261124T114534Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringkey-20261124T114510Z.json",
+      "bytes": 4715,
+      "sha256": "d5fd4b3a8fec02abcb54eaf9a3a97ef554cc2c998fc886d7274d54d65650acf7",
+      "gitBlobSha1": "906a7cf722217a6a24deaefcb8f3bfd223166c62"
+    },
+    {
+      "path": "packages/ringtest-ringkey-20261124T114510Z.jsonl",
+      "bytes": 544,
+      "sha256": "914ee74e65373e24e792b3bc21e7e002b69e00fa7d3561b2d0cab523d77a2348",
+      "gitBlobSha1": "58724adde9f50bb91d0b4ef5526234222bb1e1df"
+    },
+    {
+      "path": "packages/ringtest-ringkey-20261124T114510Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringmerge-20261124T114532Z.json",
+      "bytes": 4671,
+      "sha256": "c813d1108cc17fa8c2d7e979ad6edb234a13ebf995ae3f8134888da5bc3981da",
+      "gitBlobSha1": "f4c7a186d925592e65f107851afb8d2b3195a619"
+    },
+    {
+      "path": "packages/ringtest-ringmerge-20261124T114532Z.jsonl",
+      "bytes": 552,
+      "sha256": "7e92fecf922513abb1893b1450bce01101bbf3a8b42c48297d6ed9c2f4585f37",
+      "gitBlobSha1": "b14587b969bf95de664bce09eb366998647ddf1e"
+    },
+    {
+      "path": "packages/ringtest-ringmerge-20261124T114532Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringpolicy-20261124T114533Z.json",
+      "bytes": 4675,
+      "sha256": "0d7b00ca50bdc83dfc3b78e87b635634303abefd09a107c307144a1890b39b17",
+      "gitBlobSha1": "48b08f49e15dffe3a6c03cd455c20bda17f2d1d3"
+    },
+    {
+      "path": "packages/ringtest-ringpolicy-20261124T114533Z.jsonl",
+      "bytes": 555,
+      "sha256": "18f2da789989668c301b7b239a17a4775eb8d69866e3099492477cf28ce37224",
+      "gitBlobSha1": "861e205a6f3a4abfabfe685eb0b097e509b60d2e"
+    },
+    {
+      "path": "packages/ringtest-ringpolicy-20261124T114533Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringprotocol-20261124T114538Z.json",
+      "bytes": 4803,
+      "sha256": "2fcf32706f0e4221d24bdd613095986ddf6d48469a09ef805caaf6a0689f6051",
+      "gitBlobSha1": "7e9cebe610a38ebd3e2fb3e5beb57a385b038b20"
+    },
+    {
+      "path": "packages/ringtest-ringprotocol-20261124T114538Z.jsonl",
+      "bytes": 14268,
+      "sha256": "f7f9996eb30ada458c543866b887eecae353d8d64dbcc62ff7baa795572b168e",
+      "gitBlobSha1": "fd1f91bd88353109120b51630659576f662cc6c8"
+    },
+    {
+      "path": "packages/ringtest-ringprotocol-20261124T114538Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringregistry-20261124T114539Z.json",
+      "bytes": 4827,
+      "sha256": "498d0da5d292ffba271236269c79ecb6723c3e2ecc930a8e203f6c2fe7c723ba",
+      "gitBlobSha1": "1198bdb647a89312ed1b0ce209f40cf927f75cd0"
+    },
+    {
+      "path": "packages/ringtest-ringregistry-20261124T114539Z.jsonl",
+      "bytes": 18429,
+      "sha256": "4c84f1dd0861ea8c7b3ad2bf370dc5f762b3c971ce0ee619300c68d6b6ab537c",
+      "gitBlobSha1": "25f2ee624f4b29c1bc141652448a47d5e6d14944"
+    },
+    {
+      "path": "packages/ringtest-ringregistry-20261124T114539Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/ringtest-ringtransfer-20261124T114534Z.json",
+      "bytes": 4683,
+      "sha256": "18d5071771f2d84af05029e747d261d653c02642855cc3227c74ff57510880ae",
+      "gitBlobSha1": "aca4e42640ed6a270f39733fa04c8dc0050540ce"
+    },
+    {
+      "path": "packages/ringtest-ringtransfer-20261124T114534Z.jsonl",
+      "bytes": 564,
+      "sha256": "5dc478d09c54b135d0622f91df8df730b3d8b87c55e727fb1718db2a4f30e5af",
+      "gitBlobSha1": "50fb9fe3709831e20783f1d5e899b8d85d7dbc31"
+    },
+    {
+      "path": "packages/ringtest-ringtransfer-20261124T114534Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "run_packages.py",
+      "bytes": 14307,
+      "sha256": "c177f9f747e821d14427aa198591ce55ad593150bcdd74efb057ef954cf4af73",
+      "gitBlobSha1": "7375e36320f01163c279f79d8875d8afe5bc6778"
+    },
+    {
+      "path": "run_packages_initial.py",
+      "bytes": 14138,
+      "sha256": "107c7a72367650d5d8cc077f11be969eeadad9aa11a2109fbd4c89b725aca1a8",
+      "gitBlobSha1": "d7925a8007e91f36378593635fd4d6401bad18fb"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 7576,
+      "sha256": "673cb00e2a14cb5ea698003bbe73185b5306350d716f75dc9914194bd7522cf9",
+      "gitBlobSha1": "7be5336d3238de73a4a10abd6860f687f207a901"
+    },
+    {
+      "path": "verification-guards.json",
+      "bytes": 906,
+      "sha256": "22485692441a7f8ed03f7380efb8c91049945290c146492691caba2e1e1c7ce0",
+      "gitBlobSha1": "a5aee07d4f7abfab3b34282b96ecb07d02210f90"
+    },
+    {
+      "path": "verify_and_stage.py",
+      "bytes": 12336,
+      "sha256": "0417018536d61e12fcd76fde75c73c4efcb2325784311e620cb6884839dbd2c7",
+      "gitBlobSha1": "765ef284f8d3c096c341c7a938762aec35c969bc"
+    }
+  ]
+}

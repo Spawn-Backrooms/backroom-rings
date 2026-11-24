@@ -1,0 +1,67 @@
+{
+  "schema": "cr01-pinned-default-go-skip-inventory-v1",
+  "recordedAt": "2026-11-24T11:47:49.201717+00:00",
+  "sourcePin": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+  "entries": [
+    {
+      "package": "ring",
+      "test": "TestExportAeglosRingFixtures",
+      "sourceFile": "prover/ring/aeglos_fixture_test.go",
+      "sourceSha256": "f719ce9b9f66e0a3a204766b6f3106d83f3e61db45eb168f185a6499741a5298",
+      "requiredOptIn": "AEGLOS_FIXTURES",
+      "optInEnabled": false
+    },
+    {
+      "package": "ring",
+      "test": "TestWriteGoldenRequests",
+      "sourceFile": "prover/ring/golden_write_test.go",
+      "sourceSha256": "ab6616f085a099c696628d8805d2f1fe74429d823b193648ff678c678b222118",
+      "requiredOptIn": "WRITE_RING_GOLDENS",
+      "optInEnabled": false
+    },
+    {
+      "package": "ring",
+      "test": "TestWriteRequestFixtures",
+      "sourceFile": "prover/ring/golden_write_test.go",
+      "sourceSha256": "ab6616f085a099c696628d8805d2f1fe74429d823b193648ff678c678b222118",
+      "requiredOptIn": "REQUEST_FIXTURES",
+      "optInEnabled": false
+    },
+    {
+      "package": "ring",
+      "test": "TestWriteConstraintPins",
+      "sourceFile": "prover/ring/keys_test.go",
+      "sourceSha256": "5b3e580958e2fb55e1ba844486d7454b501fb440fde8cc0b43197a829bf6cd08",
+      "requiredOptIn": "WRITE_RING_PINS",
+      "optInEnabled": false
+    },
+    {
+      "package": "ring",
+      "test": "TestRingRpcEscrowFixture",
+      "sourceFile": "prover/ring/ring_rpc_escrow_test.go",
+      "sourceSha256": "021d4a7e86465075e18d7e1d0f172aff5a8b1ef31436441560afd71074092f59",
+      "requiredOptIn": "RING_RPC_ESCROW_MEMBER",
+      "optInEnabled": false
+    },
+    {
+      "package": "ring",
+      "test": "TestStorageFixtures",
+      "sourceFile": "prover/ring/storage_test.go",
+      "sourceSha256": "693d65287f79ae689e9ea23bf62dda553116e69c9ffe4a9e081c659ac91f1f1d",
+      "requiredOptIn": "STORAGE_REGISTRY",
+      "optInEnabled": false
+    },
+    {
+      "package": "circuits/registry",
+      "test": "TestSharedQuadProofMillionMembers",
+      "sourceFile": "prover/circuits/registry/shared_path_population_test.go",
+      "sourceSha256": "f9996815403224c543bd71031fa6db5e2efc73e900dcd26f551f3545ff9416c9",
+      "requiredOptIn": "RING_MILLION_RECORDS",
+      "optInEnabled": false
+    }
+  ],
+  "testSelectionChanged": false,
+  "shortModeEnabled": false,
+  "keyAbsenceSkipsAllowed": false,
+  "note": "The prior unfinished ring run had observed only four skips before interruption. The unchanged complete default inventory also includes later service fixture skips; registry has its population opt-in. Required installed key absence remains failure with REQUIRE_RING_KEYS=1."
+}
