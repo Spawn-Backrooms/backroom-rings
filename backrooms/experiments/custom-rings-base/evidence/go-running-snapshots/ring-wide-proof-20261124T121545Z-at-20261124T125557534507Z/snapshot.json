@@ -1,0 +1,163 @@
+{
+  "schema": "cr01-running-ring-prefix-capture-v1",
+  "captureStartedAt": "2026-11-24T12:55:57.426340+00:00",
+  "receiptCapturedAt": "2026-11-24T12:55:57.426657+00:00",
+  "prefixCapturedAt": "2026-11-24T12:55:57.427523+00:00",
+  "snapshotDirectory": "/workspace/scratch/06977f839292/context/go-recovery/running-snapshots/ring-wide-proof-20261124T121545Z-at-20261124T125557534507Z",
+  "sourceAtCapture": {
+    "customRings": {
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "pinMatches": true,
+      "clean": true,
+      "statusPorcelain": ""
+    },
+    "zolana": {
+      "commit": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "pinMatches": true,
+      "clean": true,
+      "statusPorcelain": ""
+    },
+    "checkedAt": "2026-11-24T12:55:57.531709+00:00",
+    "lockfiles": {
+      "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+      "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+      "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+      "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+    },
+    "lockfileHashesMatchStart": true
+  },
+  "runIdentity": {
+    "package": "github.com/helius-labs/zolana-custom-rings/prover/ring",
+    "startedAt": "2026-11-24T12:15:45.715504+00:00",
+    "coordinatorToolSessionId": 30876,
+    "coordinatorToolSessionIdIsOsPid": false,
+    "processIdFromReceipt": 67,
+    "runnerSha256": "c177f9f747e821d14427aa198591ce55ad593150bcdd74efb057ef954cf4af73",
+    "catalogSha256": "4ad6ce9bf91a5446c0876b25c937b522a75473355e87bba81e776eaeaa13f3bc",
+    "command": [
+      "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+      "test",
+      "-json",
+      "-p",
+      "1",
+      "-parallel",
+      "1",
+      "-timeout",
+      "180m",
+      "github.com/helius-labs/zolana-custom-rings/prover/ring",
+      "-count=1"
+    ],
+    "toolchain": "go version go1.27.3 linux/amd64",
+    "sourceScope": "Clean unmodified upstream checkout; application overlay not applied."
+  },
+  "rawPrefix": {
+    "file": "ring-prefix.jsonl",
+    "sourcePath": "/workspace/scratch/06977f839292/context/go-recovery/packages/ring-20261124T121545Z.jsonl",
+    "capturedBytes": 169981,
+    "sha256": "b9488121b6d25049f5cda42757e8db83279f00501e4cc4e37313e635e079476d",
+    "sourceFileSizeAtRead": 169981,
+    "discardedIncompleteTrailingBytes": 0,
+    "completeLineCount": 661,
+    "firstEventTime": "2026-11-24T13:15:49.199221526+01:00",
+    "lastEventTime": "2026-11-24T13:55:10.939414268+01:00"
+  },
+  "runningReceipt": {
+    "file": "running-receipt.json",
+    "sourcePath": "/workspace/scratch/06977f839292/context/go-recovery/packages/ring-20261124T121545Z.json",
+    "bytes": 3862,
+    "sha256": "488b5f8f7c22ad07ef9af63d638ca6a61b78093e2aeae8802de32f1d5f9be254",
+    "status": "running",
+    "heartbeatAt": "2026-11-24T12:55:55.059395+00:00",
+    "lastHeartbeatLogBytes": 169981,
+    "exitCode": null,
+    "finishedAt": null
+  },
+  "proofMilestone": {
+    "test": "TestCatalogRequestsProveWithTheInstalledKeys/custom-ring-transfer-wide-8-in24-w32-s13",
+    "exactEvents": [
+      {
+        "eventLine": 652,
+        "action": "run",
+        "rawTime": "2026-11-24T13:51:58.728701351+01:00",
+        "utcTimeExact": "2026-11-24T12:51:58.728701351Z",
+        "elapsedSeconds": null
+      },
+      {
+        "eventLine": 655,
+        "action": "pass",
+        "rawTime": "2026-11-24T13:54:08.885745334+01:00",
+        "utcTimeExact": "2026-11-24T12:54:08.885745334Z",
+        "elapsedSeconds": 130.12
+      }
+    ],
+    "reportedTestElapsedSeconds": 130.12,
+    "wholePackagePassEstablished": false
+  },
+  "parserCounts": {
+    "run": 165,
+    "pass": 159,
+    "fail": 0,
+    "skip": 4,
+    "eventCount": 661,
+    "outputEventCount": 332,
+    "topLevelPassCount": 17,
+    "packageTerminalActionCount": 0
+  },
+  "skippedTests": [
+    "TestExportAeglosRingFixtures",
+    "TestWriteConstraintPins",
+    "TestWriteGoldenRequests",
+    "TestWriteRequestFixtures"
+  ],
+  "partialSkipCountIsNotFullRunExpectation": true,
+  "outputClassification": {
+    "structuredNonOutputEvents": 329,
+    "outputEventCounts": {
+      "status": 328,
+      "defaultSkipNotice": 4,
+      "constraintDiagnostics": 0,
+      "unknown": 0
+    },
+    "defaultSkipNotices": [
+      {
+        "eventLine": 4,
+        "test": "TestExportAeglosRingFixtures",
+        "unsetOptIn": "AEGLOS_FIXTURES",
+        "message": "aeglos_fixture_test.go:13: AEGLOS_FIXTURES is unset"
+      },
+      {
+        "eventLine": 213,
+        "test": "TestWriteGoldenRequests",
+        "unsetOptIn": "WRITE_RING_GOLDENS",
+        "message": "golden_write_test.go:15: WRITE_RING_GOLDENS=1 rewrites the request fixtures"
+      },
+      {
+        "eventLine": 218,
+        "test": "TestWriteRequestFixtures",
+        "unsetOptIn": "REQUEST_FIXTURES",
+        "message": "golden_write_test.go:39: REQUEST_FIXTURES=<dir> writes a request per ring key"
+      },
+      {
+        "eventLine": 231,
+        "test": "TestWriteConstraintPins",
+        "unsetOptIn": "WRITE_RING_PINS",
+        "message": "keys_test.go:70: WRITE_RING_PINS=1 rewrites prover/ringtest/ringkey/constraints.json"
+      }
+    ],
+    "unknownOutputs": [],
+    "unknownContentFlagged": false,
+    "scope": "Factual output categories only, not publication or security approval; unrecognized text is marked unknown."
+  },
+  "captureConsistency": "The atomic running receipt was read through one file descriptor before the log. The complete-line prefix was copied from the log size observed through its descriptor. Receipt heartbeat and prefix are not claimed to be one atomic pair.",
+  "packageTerminalResultObserved": false,
+  "exitCodeObserved": null,
+  "fullPackageQualificationCredit": 0,
+  "wholeSuiteQualificationCredit": 0,
+  "firstSnapshotTouched": false,
+  "liveFilesModified": false,
+  "testsOrProofsStartedByCapture": false,
+  "githubWritesPerformed": false,
+  "publicationDecision": "Pending coordinating agent.",
+  "reviewScope": "Factual upstream log capture; no application overlay or independent application source/security review."
+}
