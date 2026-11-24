@@ -1,0 +1,63 @@
+{
+  "schema": "public-terminal-check-evidence-v1",
+  "scope": "Focused SDK, native fixture, process launcher, typecheck, lint, and local runner guard results. These checks do not establish chain settlement or provide an independent source review.",
+  "files": [
+    {
+      "file": "final-sdk-tests.json",
+      "bytes": 862,
+      "sha256": "64471579fdc1135e3fa0c3f1bb8f80d6ed8cf70352f8b5bcb78ae6ea1d0ed3a4"
+    },
+    {
+      "file": "final-sdk-tests.log",
+      "bytes": 1034,
+      "sha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41"
+    },
+    {
+      "file": "final-native-tests.json",
+      "bytes": 925,
+      "sha256": "3eebc121a2c0600918012566871c60b09148e197607385aa705e846a4c0f8b7a"
+    },
+    {
+      "file": "final-native-tests.log",
+      "bytes": 846,
+      "sha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758"
+    },
+    {
+      "file": "final-sdk-codechecks.json",
+      "bytes": 1854,
+      "sha256": "4f3f1590388ae5b1e127bdfef8a875160499c67441fff977a7b104567d848ec6"
+    },
+    {
+      "file": "final-sdk-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "final-journey-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "final-focused-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "final-app-harness-tests.json",
+      "bytes": 1511,
+      "sha256": "5bd1709a5af878f0a559d1f02e303f70704e248ce7829ccc0e243a5c74ee39ec"
+    },
+    {
+      "file": "final-app-harness-tests.log",
+      "bytes": 587,
+      "sha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee"
+    },
+    {
+      "file": "final-app-harness-tests-count-parser-mismatch.json",
+      "bytes": 1044,
+      "sha256": "eab67adfe13b6c6b3f0619e22ac9c3d60e579274591f6cbe42a11c8d9139edf1"
+    }
+  ],
+  "receiptPaths": "Absolute paths in the original receipts identify the recording workspace. Public copies use the filenames in this manifest. Original bytes are preserved.",
+  "measurementScope": "Each receipt states command wall time; test reporters may also state their narrower runtime. Timing is local-run evidence, not a production performance claim."
+}

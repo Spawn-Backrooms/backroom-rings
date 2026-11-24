@@ -1,5 +1,7 @@
 # Independent application composition review
 
+**Author checkpoint note:** This historical report covers the core composition at its original review checkpoint. Its findings are preserved below. It does not approve the later indexed-note recovery helper or expanded live refusal corpus. The latest independent review is blocked, and the full application validator journey remains unqualified; see [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md).
+
 Reviewed the uncommitted implementation in `custom-rings-app` against Custom Rings HEAD `02bca33729051798834ecbb4d94e968cdc0ef9b8` and Zolana `0fe4f952182b39464d472c52c40b3febe6cbd9ec` on 2026-11-24.
 
 ## Findings

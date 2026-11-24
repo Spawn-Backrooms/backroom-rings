@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "command": [
+    "/workspace/scratch/06977f839292/custom-rings-app/node_modules/.bin/vitest",
+    "run",
+    "test/experimental/spawn-room-codec.test.ts",
+    "test/experimental/spawn-room-payload.test.ts",
+    "test/experimental/spawn-room-staging.test.ts",
+    "test/experimental/spawn-room-recovery.test.ts",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/06977f839292/context/final-sdk-vitest.json"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings-app/sdk-libs/ts",
+  "startedAt": "2026-11-24T02:32:56.808088+00:00",
+  "finishedAt": "2026-11-24T02:33:05.728560+00:00",
+  "exitCode": 0,
+  "durationSeconds": 8.921,
+  "logSha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41",
+  "passedTests": 18,
+  "failedTests": 0,
+  "pendingTests": 0
+}

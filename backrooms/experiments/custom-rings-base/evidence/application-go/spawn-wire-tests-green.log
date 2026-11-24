@@ -1,0 +1,26 @@
+=== RUN   TestSpawnRequestsAreOptInAndKeepTwoPublicInputs
+--- PASS: TestSpawnRequestsAreOptInAndKeepTwoPublicInputs (0.06s)
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/missing_application_hash
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/duplicate_context
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/unknown_field
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/trailing_JSON
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/wrong_family
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_network
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_lesson
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_grant_path
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_sibling_row
+=== RUN   TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/noncanonical_field
+--- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire (0.11s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/missing_application_hash (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/duplicate_context (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/unknown_field (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/trailing_JSON (0.00s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/wrong_family (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_network (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_lesson (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_grant_path (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/short_sibling_row (0.01s)
+    --- PASS: TestSpawnRequestsRefuseAmbiguousOrMisshapedWire/noncanonical_field (0.01s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/ring	0.204s

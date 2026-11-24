@@ -1,0 +1,8 @@
+=== RUN   TestSpawnRoomTypeScriptRequestFixtures
+=== RUN   TestSpawnRoomTypeScriptRequestFixtures/spawn-room-advance-v1
+=== RUN   TestSpawnRoomTypeScriptRequestFixtures/spawn-room-genesis-v1
+--- PASS: TestSpawnRoomTypeScriptRequestFixtures (17.71s)
+    --- PASS: TestSpawnRoomTypeScriptRequestFixtures/spawn-room-advance-v1 (8.71s)
+    --- PASS: TestSpawnRoomTypeScriptRequestFixtures/spawn-room-genesis-v1 (9.00s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	17.785s

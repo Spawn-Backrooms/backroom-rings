@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "sdk-types",
+      "command": [
+        "./node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "sdk-libs/ts/tsconfig.json"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-app",
+      "exitCode": 0,
+      "startedAt": "2026-11-24T02:32:56.811120+00:00",
+      "finishedAt": "2026-11-24T02:33:10.816933+00:00",
+      "durationSeconds": 14.006,
+      "logPath": "/workspace/scratch/06977f839292/context/final-sdk-types.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "journey-types",
+      "command": [
+        "./node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "sdk-tests/spawn-room/tsconfig.json"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-app",
+      "exitCode": 0,
+      "startedAt": "2026-11-24T02:33:10.817153+00:00",
+      "finishedAt": "2026-11-24T02:33:20.585864+00:00",
+      "durationSeconds": 9.769,
+      "logPath": "/workspace/scratch/06977f839292/context/final-journey-types.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "focused-lint",
+      "command": [
+        "./node_modules/.bin/oxlint",
+        "--deny-warnings",
+        "sdk-libs/ts/src/experimental/spawn-room",
+        "sdk-libs/ts/test/experimental",
+        "sdk-tests/spawn-room"
+      ],
+      "cwd": "/workspace/scratch/06977f839292/custom-rings-app",
+      "exitCode": 0,
+      "startedAt": "2026-11-24T02:33:20.585989+00:00",
+      "finishedAt": "2026-11-24T02:33:20.724206+00:00",
+      "durationSeconds": 0.138,
+      "logPath": "/workspace/scratch/06977f839292/context/final-focused-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

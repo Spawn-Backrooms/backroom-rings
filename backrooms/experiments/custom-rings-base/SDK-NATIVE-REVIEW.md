@@ -1,5 +1,7 @@
 # Independent SDK, native integration, and localnet-runner review
 
+**Author checkpoint note:** This historical report covers the SDK/native/runner checkpoint described below, including the then-current 10 SDK, 2 native and 3 runner tests. Later tests have expanded to 18 SDK, 3 native and 5 runner checks; those passing results do not extend this source review automatically. The later worker/resource review is preserved separately in [NATIVE-WORKER-REVIEW.md](NATIVE-WORKER-REVIEW.md). Neither historical report approves the new indexed-note recovery helper or expanded live refusal corpus; final independent review remains blocked. See [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md) for current execution status.
+
 Completed a focused source review on 2026-11-24 of `custom-rings-app/sdk-libs/ts/src/experimental/spawn-room/`, its focused SDK/native tests, `sdk-tests/spawn-room/localnet-journey.test.ts`, and `tools/run-spawn-room-localnet.mjs`. Core circuit/program findings remain in `independent-application-review.md`.
 
 Source identities: Custom Rings `02bca33729051798834ecbb4d94e968cdc0ef9b8`; Zolana `0fe4f952182b39464d472c52c40b3febe6cbd9ec`; Backrooms `08822c65254cd73c5f2dccbdf182ce1df2c7510a`. The application changes are an uncommitted additive overlay at review time.

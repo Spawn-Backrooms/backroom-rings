@@ -1,0 +1,16 @@
+
+ RUN  v5.0.5 /workspace/scratch/06977f839292/custom-rings-app
+
+ ✓ sdk-tests/spawn-room/native-worker-runner.test.ts (1 test) 5352ms
+   ✓ starts an independent native process and refuses an absent persisted job instead of reporting recovery 5348ms
+ ✓ sdk-tests/spawn-room/native-restart.test.ts (2 tests) 1589ms
+   ✓ Spawn adapter over actual native encrypted records (2)
+     ✓ retains original/CID, nonce, full grant and bounded lesson after close/reopen; then reserves the next episode 442ms
+     ✓ runs the real seeded Flue residents, commits their original, restarts, and selects the learned procedure 1143ms
+
+ Test Files  2 passed (2)
+      Tests  3 passed (3)
+   Start at  03:35:12
+   Duration  9.11s (tests 81%, setup 12%, transform 6%)
+
+JSON report written to /workspace/scratch/06977f839292/context/final-native-vitest.json

@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "command": [
+    "/workspace/scratch/06977f839292/custom-rings-app/node_modules/.bin/vitest",
+    "run",
+    "--config",
+    "sdk-tests/spawn-room/vitest.config.ts",
+    "sdk-tests/spawn-room/native-restart.test.ts",
+    "sdk-tests/spawn-room/native-worker-runner.test.ts",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/06977f839292/context/final-native-vitest.json"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings-app",
+  "startedAt": "2026-11-24T02:35:12.161309+00:00",
+  "finishedAt": "2026-11-24T02:35:21.845270+00:00",
+  "exitCode": 0,
+  "durationSeconds": 9.684,
+  "logSha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758",
+  "passedTests": 3,
+  "failedTests": 0,
+  "pendingTests": 0,
+  "scope": "Off-chain native fixtures and process-launcher behavior; does not establish validator settlement"
+}

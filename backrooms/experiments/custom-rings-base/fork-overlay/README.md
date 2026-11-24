@@ -99,10 +99,14 @@ under ignored `target/`; publish only a reviewed evidence extract.
 
 ## Review and remaining integration
 
-[APPLICATION-REVIEW.md](../APPLICATION-REVIEW.md) records the independent core
-source review. [SDK-NATIVE-REVIEW.md](../SDK-NATIVE-REVIEW.md) records the completed
-SDK/native/harness source review and corrected findings. Actual full-validator
-execution remains a separate gate. A native root publisher admits exact grants;
+[APPLICATION-REVIEW.md](../APPLICATION-REVIEW.md),
+[SDK-NATIVE-REVIEW.md](../SDK-NATIVE-REVIEW.md), and
+[NATIVE-WORKER-REVIEW.md](../NATIVE-WORKER-REVIEW.md) preserve independent reviews
+of earlier source checkpoints and their corrected findings. They do not approve
+the later indexed-note helper or expanded live corpus. Final independent review
+is blocked, and no Daybreak scan has launched. Actual full-validator execution
+also remains incomplete; the two retained attempts failed after partial chain
+progress. See the current evidence document for exact completed and pending gates. A native root publisher admits exact grants;
 the circuit does not prove the truth of an original external result. Owner
 authorization binds encrypted transaction data, but a malicious authorized
 writer can still withhold or corrupt its own recovery payload.

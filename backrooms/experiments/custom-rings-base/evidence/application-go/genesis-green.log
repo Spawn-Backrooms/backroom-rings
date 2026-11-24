@@ -1,0 +1,18 @@
+=== RUN   TestSpawnRoomGenesisRelation
+=== RUN   TestSpawnRoomGenesisRelation/honest
+=== RUN   TestSpawnRoomGenesisRelation/nonzero_revision
+=== RUN   TestSpawnRoomGenesisRelation/preloaded_memory
+=== RUN   TestSpawnRoomGenesisRelation/missing_seed
+=== RUN   TestSpawnRoomGenesisRelation/different_network
+=== RUN   TestSpawnRoomGenesisRelation/second_live_output
+=== RUN   TestSpawnRoomGenesisRelation/live_input
+--- PASS: TestSpawnRoomGenesisRelation (52.09s)
+    --- PASS: TestSpawnRoomGenesisRelation/honest (8.03s)
+    --- PASS: TestSpawnRoomGenesisRelation/nonzero_revision (7.96s)
+    --- PASS: TestSpawnRoomGenesisRelation/preloaded_memory (7.81s)
+    --- PASS: TestSpawnRoomGenesisRelation/missing_seed (7.59s)
+    --- PASS: TestSpawnRoomGenesisRelation/different_network (7.98s)
+    --- PASS: TestSpawnRoomGenesisRelation/second_live_output (8.03s)
+    --- PASS: TestSpawnRoomGenesisRelation/live_input (4.68s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	52.155s

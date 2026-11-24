@@ -1,0 +1,42 @@
+=== RUN   TestSpawnRoomNotePair
+=== RUN   TestSpawnRoomNotePair/input_dummy
+=== RUN   TestSpawnRoomNotePair/output_default_ring
+=== RUN   TestSpawnRoomNotePair/exit
+=== RUN   TestSpawnRoomNotePair/other_owner
+=== RUN   TestSpawnRoomNotePair/other_key
+=== RUN   TestSpawnRoomNotePair/zero_ring
+=== RUN   TestSpawnRoomNotePair/input_value
+=== RUN   TestSpawnRoomNotePair/other_asset
+=== RUN   TestSpawnRoomNotePair/same_commitment
+=== RUN   TestSpawnRoomNotePair/other_ring
+=== RUN   TestSpawnRoomNotePair/output_value
+=== RUN   TestSpawnRoomNotePair/zero_owner
+=== RUN   TestSpawnRoomNotePair/literal_zero_key
+=== RUN   TestSpawnRoomNotePair/output_dummy
+=== RUN   TestSpawnRoomNotePair/input_default_ring
+=== RUN   TestSpawnRoomNotePair/public_zero_secret
+--- PASS: TestSpawnRoomNotePair (0.00s)
+    --- PASS: TestSpawnRoomNotePair/input_dummy (0.00s)
+    --- PASS: TestSpawnRoomNotePair/output_default_ring (0.00s)
+    --- PASS: TestSpawnRoomNotePair/exit (0.00s)
+    --- PASS: TestSpawnRoomNotePair/other_owner (0.00s)
+    --- PASS: TestSpawnRoomNotePair/other_key (0.00s)
+    --- PASS: TestSpawnRoomNotePair/zero_ring (0.00s)
+    --- PASS: TestSpawnRoomNotePair/input_value (0.00s)
+    --- PASS: TestSpawnRoomNotePair/other_asset (0.00s)
+    --- PASS: TestSpawnRoomNotePair/same_commitment (0.00s)
+    --- PASS: TestSpawnRoomNotePair/other_ring (0.00s)
+    --- PASS: TestSpawnRoomNotePair/output_value (0.00s)
+    --- PASS: TestSpawnRoomNotePair/zero_owner (0.00s)
+    --- PASS: TestSpawnRoomNotePair/literal_zero_key (0.00s)
+    --- PASS: TestSpawnRoomNotePair/output_dummy (0.00s)
+    --- PASS: TestSpawnRoomNotePair/input_default_ring (0.00s)
+    --- PASS: TestSpawnRoomNotePair/public_zero_secret (0.00s)
+=== RUN   TestSpawnRoomFullHiddenZeroValueWitness
+--- PASS: TestSpawnRoomFullHiddenZeroValueWitness (9.99s)
+=== RUN   TestSpawnRoomFullRejectsOtherwiseValidPublicOwnerRail
+--- PASS: TestSpawnRoomFullRejectsOtherwiseValidPublicOwnerRail (14.98s)
+=== RUN   TestSpawnRoomFullRejectsOtherwiseValidOwnerChange
+--- PASS: TestSpawnRoomFullRejectsOtherwiseValidOwnerChange (15.11s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	40.130s

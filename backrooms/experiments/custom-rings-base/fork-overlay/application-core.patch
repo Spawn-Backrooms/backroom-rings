@@ -5495,6 +5495,72 @@ index 0000000000000000000000000000000000000000..75648d7cb7cdc1b19feb965d56f43ce0
 +        : client.proveRing(request, context),
 +  });
 +}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/recovery.ts b/sdk-libs/ts/src/experimental/spawn-room/recovery.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..971794c1b9cf81091f5164ea22311608a4adf5d9
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/recovery.ts
+@@ -0,0 +1,60 @@
++/** Confirmed-note lookup through the pinned indexer's ring-aware history query. */
++import type { Address, Bytes32, RequestContext, Signature } from "@heliuslabs/spr";
++import type { IndexerReader, IndexerRpcConfig } from "@heliuslabs/spr/client";
++import { equalBytes } from "@heliuslabs/spr/internal";
++import type { IndexedShieldedTransaction } from "@heliuslabs/spr/transaction";
++
++/**
++ * Pinned Photon omits ring metadata from its by-signature SELECT. The by-ring
++ * history query hydrates it. Read only the independently confirmed slot and
++ * require the exact signature, program and full note commitment in that row.
++ * The caller still verifies ledger status and opens the authenticated note.
++ */
++export async function findSpawnRoomIndexedNote(
++  input: Readonly<{
++    client: Pick<IndexerReader, "getShieldedTransactionsByTags">;
++    ringProgramId: Address;
++    signature: Signature;
++    slot: bigint;
++    commitment: Bytes32;
++    config: IndexerRpcConfig & { readonly requireSlot: bigint };
++  }>,
++  context?: RequestContext,
++): Promise<IndexedShieldedTransaction> {
++  if (input.slot < 0n || input.config.requireSlot < input.slot)
++    throw new Error("spawn_observed_note_slot");
++  let paginationToken: string | undefined;
++  const seen = new Set<string>();
++  for (;;) {
++    const page = await input.client.getShieldedTransactionsByTags(
++      {
++        tags: [],
++        ringProgramId: input.ringProgramId,
++        filters: { slot: { gte: input.slot, lte: input.slot } },
++        limit: 1_000,
++        ...(paginationToken === undefined ? {} : { paginationToken }),
++      },
++      input.config,
++      context,
++    );
++    if (page.context.slot < input.config.requireSlot)
++      throw new Error("spawn_observed_note_incomplete_index");
++    for (const group of page.data) {
++      if (group.slot !== input.slot || group.signature !== input.signature) continue;
++      for (const transaction of group.events)
++        if (
++          transaction.txSignature === input.signature &&
++          transaction.slot === input.slot &&
++          transaction.ringProgramId === input.ringProgramId &&
++          transaction.outputSlots.some((output) =>
++            equalBytes(output.outputContext.hash, input.commitment),
++          )
++        )
++          return transaction;
++    }
++    if (page.paginationToken === null) throw new Error("spawn_observed_note_not_in_transaction");
++    if (seen.has(page.paginationToken)) throw new Error("spawn_observed_note_repeated_page");
++    seen.add(page.paginationToken);
++    paginationToken = page.paginationToken;
++  }
++}
 diff --git a/sdk-libs/ts/src/experimental/spawn-room/staging.ts b/sdk-libs/ts/src/experimental/spawn-room/staging.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..cf94df6c2c48b9cde0145d0cc4dda4863456e5ed
@@ -6021,12 +6087,150 @@ index 0000000000000000000000000000000000000000..f410f2d8fb59aebb5b26e832ce5de887
 +    expect(openSpawnRoomOutput(f.reader, f.secret, publicKeyBody, f.domain)).toBeUndefined();
 +  });
 +});
+diff --git a/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts b/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d1c95e9e95e63bbd8ae426cc948d947f27f26887
+--- /dev/null
++++ b/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts
+@@ -0,0 +1,132 @@
++import { describe, expect, it } from "vitest";
++import type { GetShieldedTransactionsByTagsResponse, IndexerReader } from "@heliuslabs/spr/client";
++import type { IndexedShieldedTransaction } from "@heliuslabs/spr/transaction";
++import { findSpawnRoomIndexedNote } from "../../src/experimental/spawn-room/recovery.js";
++import { encodeRingBodyOutput } from "../../src/protocol/transaction/output.js";
++import { randomAddress, TREE } from "../helpers/ring-pipeline.js";
++import { signature } from "../helpers/ring-scan.js";
++import { spawnPayloadFixture } from "./spawn-room-fixture.js";
++
++function indexedFixture() {
++  const f = spawnPayloadFixture();
++  const transaction: IndexedShieldedTransaction = {
++    txSignature: signature(17n),
++    slot: 23n,
++    eventIndex: 0,
++    ringProgramId: f.reader.ring,
++    outputSlots: [
++      {
++        viewTag: new Uint8Array(32) as typeof f.commitment,
++        outputContext: { hash: f.commitment, tree: TREE, treeId: f.treeId, leafIndex: 0n },
++        payload: encodeRingBodyOutput(f.ciphertext, new Uint8Array()),
++      },
++    ],
++    nullifiers: [],
++    messages: [],
++    proofless: false,
++  };
++  const page = (row: IndexedShieldedTransaction): GetShieldedTransactionsByTagsResponse => ({
++    context: { slot: 29n, blockTime: 0n },
++    data: [{ signature: row.txSignature, slot: row.slot, events: [row] }],
++    paginationToken: null,
++  });
++  const input = {
++    ringProgramId: f.reader.ring,
++    signature: transaction.txSignature,
++    slot: transaction.slot,
++    commitment: f.commitment,
++    config: {
++      requireSlot: 29n,
++      poll: { numRetries: 0, delayMs: 1n, maxDelayMs: 1n },
++    },
++  };
++  return { f, transaction, page, input };
++}
++
++describe("Spawn confirmed note history binding", () => {
++  it("reads the ring-aware endpoint, follows pages and matches exact slot/signature/note", async () => {
++    const f = indexedFixture();
++    let calls = 0;
++    const client: Pick<IndexerReader, "getShieldedTransactionsByTags"> = {
++      getShieldedTransactionsByTags: async (request, config) => {
++        expect(request.ringProgramId).toBe(f.input.ringProgramId);
++        expect(request.tags).toEqual([]);
++        expect(request.filters).toEqual({ slot: { gte: 23n, lte: 23n } });
++        expect(config?.requireSlot).toBe(29n);
++        calls += 1;
++        if (calls === 1) {
++          expect(request.paginationToken).toBeUndefined();
++          return {
++            ...f.page({ ...f.transaction, txSignature: signature(18n) }),
++            paginationToken: "next-page",
++          };
++        }
++        expect(request.paginationToken).toBe("next-page");
++        return f.page(f.transaction);
++      },
++    };
++    await expect(findSpawnRoomIndexedNote({ ...f.input, client })).resolves.toBe(f.transaction);
++    expect(calls).toBe(2);
++  });
++
++  it.each(["ring", "signature", "slot", "commitment", "absent ring"] as const)(
++    "refuses a %s mismatch without falling back to an application-state digest",
++    async (kind) => {
++      const f = indexedFixture();
++      const { ringProgramId: _ring, ...withoutRing } = f.transaction;
++      const transaction =
++        kind === "ring"
++          ? { ...f.transaction, ringProgramId: randomAddress() }
++          : kind === "signature"
++            ? { ...f.transaction, txSignature: signature(18n) }
++            : kind === "slot"
++              ? { ...f.transaction, slot: 24n }
++              : kind === "commitment"
++                ? {
++                    ...f.transaction,
++                    outputSlots: f.transaction.outputSlots.map((output) => ({
++                      ...output,
++                      outputContext: { ...output.outputContext, hash: f.f.dataHash },
++                    })),
++                  }
++                : withoutRing;
++      await expect(
++        findSpawnRoomIndexedNote({
++          ...f.input,
++          client: { getShieldedTransactionsByTags: async () => f.page(transaction) },
++        }),
++      ).rejects.toThrow("spawn_observed_note_not_in_transaction");
++    },
++  );
++
++  it("refuses incomplete indexer coverage even if a matching row is present", async () => {
++    const f = indexedFixture();
++    await expect(
++      findSpawnRoomIndexedNote({
++        ...f.input,
++        client: {
++          getShieldedTransactionsByTags: async () => ({
++            ...f.page(f.transaction),
++            context: { slot: 22n, blockTime: 0n },
++          }),
++        },
++      }),
++    ).rejects.toThrow("spawn_observed_note_incomplete_index");
++  });
++
++  it("refuses a repeated page token instead of hanging or assuming coverage", async () => {
++    const f = indexedFixture();
++    await expect(
++      findSpawnRoomIndexedNote({
++        ...f.input,
++        client: {
++          getShieldedTransactionsByTags: async () => ({
++            context: { slot: 29n, blockTime: 0n },
++            data: [],
++            paginationToken: "repeated",
++          }),
++        },
++      }),
++    ).rejects.toThrow("spawn_observed_note_repeated_page");
++  });
++});
 diff --git a/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts b/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c21283b2fa9a1
+index 0000000000000000000000000000000000000000..46e47b919f4dd19cb9799c64a902bea87ca49552
 --- /dev/null
 +++ b/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts
-@@ -0,0 +1,286 @@
+@@ -0,0 +1,360 @@
 +import { describe, expect, it } from "vitest";
 +import { mkdir, writeFile } from "node:fs/promises";
 +import { join } from "node:path";
@@ -6049,7 +6253,15 @@ index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c2128
 +  poseidon,
 +} from "@heliuslabs/spr/internal";
 +import { ShieldedKeypair, SigningKey } from "@heliuslabs/spr/keypair";
-+import { AssetRegistry, Data, ProofInputUtxo, SOL_MINT, Utxo } from "@heliuslabs/spr/transaction";
++import {
++  AssetRegistry,
++  Data,
++  ProofInputUtxo,
++  SOL_MINT,
++  Utxo,
++  Wallet,
++  type IndexedShieldedTransaction,
++} from "@heliuslabs/spr/transaction";
 +import { ringIdField } from "../../src/crypto/derivation/ring-stream.js";
 +import { signingKeySpendSigner } from "../../src/operations/payments/anonymous.js";
 +import {
@@ -6067,7 +6279,10 @@ index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c2128
 +  type SpawnAcceptanceGrant,
 +  type SpawnGrantPath,
 +} from "../../src/experimental/spawn-room/codec.js";
-+import { createSpawnRoomApplicationData } from "../../src/experimental/spawn-room/payload.js";
++import {
++  createSpawnRoomApplicationData,
++  verifySpawnRoomNote,
++} from "../../src/experimental/spawn-room/payload.js";
 +import {
 +  SpawnRoomLocalnetProver,
 +  spawnRoomProofRequestBody,
@@ -6079,8 +6294,12 @@ index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c2128
 +  spawnRoomGenesisAddress,
 +  spawnRoomGenesisInstruction,
 +} from "../../src/experimental/spawn-room/instructions.js";
-+import { ringFixture, small, walletKeys } from "../helpers/ring-pipeline.js";
++import { ringFixture, small, TREE, TREE_ID, walletKeys } from "../helpers/ring-pipeline.js";
 +import { buildRuleTable } from "../../src/protocol/membership/policy.js";
++import { AnonymousWallet } from "../../src/state/anonymous-wallet.js";
++import { syncRingWallet } from "../../src/state/ring-sync.js";
++import { ViewingHistory } from "../../src/state/viewing-history.js";
++import { ScanIndexer, signature } from "../helpers/ring-scan.js";
 +
 +export async function spawnStagingFixture() {
 +  const fixture = await ringFixture({ mode: "anonymous", table: buildRuleTable({ rules: [] }) });
@@ -6201,6 +6420,65 @@ index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c2128
 +    expect(wrapped.data?.subarray(33)).toEqual(ordinary.data?.subarray(1));
 +    expect(wrapped.accounts?.slice(5)).toEqual(ordinary.accounts);
 +    await measuredTransaction("typescript-genesis", wrapped, [payer, writer]);
++
++    // The anonymous recipient tag varies per transaction. Confidential tag
++    // queries cannot discover this note: the wallet must explicitly read the
++    // application ring, including when its history is persisted for a worker.
++    const { externalData } = spp.proofInputs;
++    const indexer = new ScanIndexer();
++    indexer.publish({
++      slot: 3n,
++      txSignature: signature(9n),
++      eventIndex: 0,
++      txViewingPublicKey: externalData.txViewingPublicKey,
++      salt: externalData.salt,
++      outputSlots: externalData.outputs.map((output, index) => ({
++        viewTag: externalData.resolvedOwnerTags[index]!,
++        outputContext: {
++          hash: output.utxoHash,
++          tree: TREE,
++          treeId: TREE_ID,
++          leafIndex: BigInt(index),
++        },
++        payload: output.data ?? new Uint8Array(),
++      })) as IndexedShieldedTransaction["outputSlots"],
++      messages: externalData.messages,
++      nullifiers: spp.proofInputs.inputUtxos.map((input) => input.nullifier()),
++      proofless: false,
++      ringProgramId: fixture.ringProgramId,
++    });
++    const wallet = AnonymousWallet.create(
++      new Wallet({ identity: keypair.shieldedAddress() }),
++      ViewingHistory.create(keypair.shieldedAddress().viewingPublicKey, 0n),
++    );
++    await syncRingWallet({ client: indexer.client(), wallet, keys: base.keys });
++    expect(wallet.notes()).toHaveLength(0);
++    expect(indexer.ringReads).toHaveLength(0);
++    wallet.updateHistory(wallet.history().withRing(fixture.ringProgramId));
++    await syncRingWallet({ client: indexer.client(), wallet, keys: base.keys });
++    expect(indexer.ringReads).toHaveLength(1);
++    expect(wallet.notes()).toHaveLength(1);
++    const note = wallet.notes()[0]!;
++    expect(note.spent).toBe(false);
++    const recovered = verifySpawnRoomNote(
++      {
++        utxo: note.utxo,
++        utxoHash: note.outputContext.hash,
++        nullifierPublicKey: keypair.shieldedAddress().nullifierPublicKey,
++        dataHash: note.dataHash!,
++        registered: true,
++      },
++      TREE_ID,
++      base.state.binding,
++      note.outputContext.hash,
++    );
++    expect(recovered.state).toEqual(base.state);
++    const reopened = AnonymousWallet.fromJson(wallet.toJson());
++    expect(reopened.history().current().ringPosition(fixture.ringProgramId)).toBe(3n);
++    await syncRingWallet({ client: indexer.client(), wallet: reopened, keys: base.keys });
++    expect(reopened.notes().map((entry) => entry.outputContext.hash)).toEqual([
++      note.outputContext.hash,
++    ]);
 +  });
 +
 +  it("builds the hidden rail with the same zero-value owner and one state output", async () => {
@@ -6313,12 +6591,158 @@ index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c2128
 +    ).toThrow(/localnet_only/);
 +  });
 +});
+diff --git a/sdk-tests/spawn-room/live-refusals.ts b/sdk-tests/spawn-room/live-refusals.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d2f9ac8c4ed5b4007e52f5c699f7621a84a0946f
+--- /dev/null
++++ b/sdk-tests/spawn-room/live-refusals.ts
+@@ -0,0 +1,140 @@
++/** Adversarial frames reuse real proofs; this file never builds a proof witness. */
++import { AccountRole, type Address, type Instruction } from "@solana/kit";
++import { SHIELDED_POOL_PROGRAM_ID, type Bytes32 } from "@heliuslabs/spr";
++import { equalBytes, SYSTEM_PROGRAM } from "@heliuslabs/spr/internal";
++import {
++  ringTransactInstruction,
++  type ProvenRingTransfer,
++} from "../../sdk-libs/ts/src/operations/workflow/pipeline.js";
++import { RingTransactData } from "../../sdk-libs/ts/src/protocol/transaction/transact.js";
++import { spawnRoomConfigAddress } from "../../sdk-libs/ts/src/experimental/spawn-room/instructions.js";
++
++export interface SpawnRoomLiveRefusal {
++  readonly name: string;
++  readonly scope: string;
++  readonly instruction: Instruction;
++  readonly error: string | { readonly Custom: number };
++  readonly sppInvoked: boolean;
++}
++
++export async function spawnRoomLiveRefusals(input: {
++  readonly advance: ProvenRingTransfer;
++  readonly wrongOperationProof: Uint8Array;
++  readonly marker: Address;
++  readonly peerNullifier: Bytes32;
++  readonly peerCommitment: Bytes32;
++}): Promise<readonly SpawnRoomLiveRefusal[]> {
++  const { advance } = input;
++  const config = await spawnRoomConfigAddress(advance.ringProgramId);
++  const encode = async (data: RingTransactData): Promise<Instruction> => {
++    // Rebuild settlement/nullifier accounts for the mutated frame. A nullifier
++    // substitution must not fail merely because it retained the old PDA.
++    const ordinary = await ringTransactInstruction(advance.ringProgramId, advance.accounts, data);
++    return {
++      ...ordinary,
++      accounts: [{ address: config, role: AccountRole.READONLY }, ...ordinary.accounts!],
++      data: Uint8Array.of(0x83, ...ordinary.data!.subarray(1)),
++    };
++  };
++  const valid = await encode(advance.data);
++  const firstOutput = advance.data.outputs[0];
++  const firstNullifier = advance.data.nullifiers[0];
++  if (
++    firstOutput?.body.kind !== "recipient" ||
++    firstOutput.body.payload.length === 0 ||
++    firstNullifier === undefined ||
++    advance.data.envelope.length !== 33 ||
++    input.wrongOperationProof.length !== advance.data.proof.length ||
++    equalBytes(input.wrongOperationProof, advance.data.proof) ||
++    equalBytes(input.peerNullifier, firstNullifier) ||
++    equalBytes(input.peerCommitment, firstOutput.hash)
++  )
++    throw new Error("spawn_live_refusal_fixture");
++
++  const replaceAccount = (index: number, address: Address): Instruction => ({
++    ...valid,
++    accounts: valid.accounts!.map((account, at) =>
++      at === index ? { ...account, address } : account,
++    ),
++  });
++  const sppAccounts = valid.accounts!
++    .map((account, index) => ({ account, index }))
++    .filter(({ account }) => account.address === SHIELDED_POOL_PROGRAM_ID);
++  if (sppAccounts.length !== 1) throw new Error("spawn_live_spp_account_count");
++  const envelope = advance.data.envelope.slice();
++  envelope.set(advance.data.envelope.subarray(16, 32), 0);
++  envelope.set(advance.data.envelope.subarray(0, 16), 16);
++  const payload = firstOutput.body.payload.slice();
++  payload[0] = payload[0]! ^ 1;
++
++  return [
++    {
++      name: "reject-wrong-application-config",
++      scope: "canonical application config account admission",
++      instruction: replaceAccount(0, input.marker),
++      error: "InvalidAccountData",
++      sppInvoked: false,
++    },
++    {
++      name: "reject-wrong-ring-policy",
++      scope: "ring policy owner/discriminator admission",
++      instruction: replaceAccount(1, config),
++      error: { Custom: 8300 },
++      sppInvoked: false,
++    },
++    {
++      name: "reject-unapproved-settlement-program",
++      scope: "pinned SPP executable after combined application verification",
++      instruction: replaceAccount(sppAccounts[0]!.index, SYSTEM_PROGRAM),
++      error: { Custom: 8103 },
++      sppInvoked: false,
++    },
++    {
++      name: "reject-wrong-operation-key",
++      scope: "real valid genesis proof refused by the pinned advance verifier",
++      instruction: await encode({ ...advance.data, proof: input.wrongOperationProof.slice() }),
++      error: { Custom: 8101 },
++      sppInvoked: false,
++    },
++    {
++      name: "reject-reordered-audit-frame",
++      scope: "ordered encrypted audit-envelope blocks; lengths and count byte preserved",
++      instruction: await encode({ ...advance.data, envelope }),
++      error: { Custom: 8101 },
++      sppInvoked: false,
++    },
++    {
++      name: "reject-peer-room-input",
++      scope: "actual unspent peer room nullifier substituted under the first writer's proof",
++      instruction: await encode({
++        ...advance.data,
++        nullifiers: [input.peerNullifier, ...advance.data.nullifiers.slice(1)],
++      }),
++      error: { Custom: 8101 },
++      sppInvoked: false,
++    },
++    {
++      name: "reject-bound-output-substitution",
++      scope: "actual peer note commitment substituted after both proofs were authorized",
++      instruction: await encode({
++        ...advance.data,
++        outputs: [{ ...firstOutput, hash: input.peerCommitment }, ...advance.data.outputs.slice(1)],
++      }),
++      error: { Custom: 7008 },
++      sppInvoked: true,
++    },
++    {
++      name: "reject-ciphertext-substitution",
++      scope: "recipient payload byte changed with all lengths, note hash and proofs preserved",
++      instruction: await encode({
++        ...advance.data,
++        outputs: [
++          { ...firstOutput, body: { kind: "recipient", payload } },
++          ...advance.data.outputs.slice(1),
++        ],
++      }),
++      error: { Custom: 7008 },
++      sppInvoked: true,
++    },
++  ];
++}
 diff --git a/sdk-tests/spawn-room/localnet-journey.test.ts b/sdk-tests/spawn-room/localnet-journey.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f624172da0
+index 0000000000000000000000000000000000000000..15a3358f52e7740dfe28e096a1746da4adae10ab
 --- /dev/null
 +++ b/sdk-tests/spawn-room/localnet-journey.test.ts
-@@ -0,0 +1,1058 @@
+@@ -0,0 +1,1273 @@
 +/** Real local-validator journey. Invoked only by tools/run-spawn-room-localnet.mjs. */
 +import { mkdir, readFile, writeFile } from "node:fs/promises";
 +import { join, resolve } from "node:path";
@@ -6354,7 +6778,7 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +  setRingActivationInstruction,
 +} from "@heliuslabs/spr/internal";
 +import { AssetRegistry, ProofInputUtxo, type WalletUtxo } from "@heliuslabs/spr/transaction";
-+import { TRANSACTION_SIZE_LIMIT } from "@heliuslabs/spr/interface";
++import { SHIELDED_POOL_PROGRAM_ID, TRANSACTION_SIZE_LIMIT } from "@heliuslabs/spr/interface";
 +import { createCustomRingClient } from "../../sdk-libs/ts/src/rpc/client.js";
 +import {
 +  RingRpc,
@@ -6412,23 +6836,17 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +  spawnRoomNativeView,
 +  type NativeEpisodeBinding,
 +  type SpawnConfirmedObservation,
++  type NativeResidentBinding,
 +} from "../../sdk-libs/ts/src/experimental/spawn-room/native-adapter.js";
-+
-+interface JourneyConfig {
-+  rpcUrl: string;
-+  photonUrl: string;
-+  ringIndexerUrl: string;
-+  proverUrl: string;
-+  ringRpcUrl: string;
-+  ringOrigin: string;
-+  ringProgramId: string;
-+  enrollmentWriter: string;
-+  defaultTreeAddress: string;
-+  upgradeAuthorityKeypairPath: string;
-+  feePayerKeypairPath: string;
-+  publisherKeypairPath: string;
-+  workDirectory: string;
-+}
++import {
++  NativeWorkerFailure,
++  runNativeWorker,
++  type JourneyConfig,
++  type NativeWorkerJob,
++  type NativeWorkerPhase,
++  type NativeWorkerResult,
++} from "./native-worker.js";
++import { spawnRoomLiveRefusals } from "./live-refusals.js";
 +interface Step {
 +  name: string;
 +  status: "passed" | "failed";
@@ -6681,6 +7099,11 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      masterKey,
 +      residentIds: ids,
 +    });
++    const residentBinding: NativeResidentBinding = {
++      seedCommitment: residents.seedCommitment,
++      membershipCommitment: residents.membershipCommitment,
++      residentIds: [...ids] as [string, string],
++    };
 +    const writerSeed = crypto.getRandomValues(new Uint8Array(32)) as Bytes32;
 +    await records.create("spawn-room-v1/writer-seed", bytesToHex(writerSeed));
 +    let signing = SigningKey.fromEd25519Bytes(writerSeed);
@@ -6749,13 +7172,13 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +    });
 +    let wallet = AnonymousWallet.create(
 +      new Wallet({ identity: keypair.shieldedAddress() }),
-+      ViewingHistory.create(keypair.shieldedAddress().viewingPublicKey, 0n),
++      ViewingHistory.create(keypair.shieldedAddress().viewingPublicKey, 0n).withRing(ringProgramId),
 +    );
 +    let adapter = new SpawnRoomNativeAdapter(
 +      new ReferenceAuthority(records),
 +      records,
 +      domain,
-+      residents,
++      residentBinding,
 +    );
 +    const assets = new AssetRegistry();
 +    const staging = (state: SpawnRoomState) => ({
@@ -6853,7 +7276,9 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +    );
 +    const peerWallet = AnonymousWallet.create(
 +      new Wallet({ identity: peerKeypair.shieldedAddress() }),
-+      ViewingHistory.create(peerKeypair.shieldedAddress().viewingPublicKey, 0n),
++      ViewingHistory.create(peerKeypair.shieldedAddress().viewingPublicKey, 0n).withRing(
++        ringProgramId,
++      ),
 +    );
 +    const peerNote = await recover(peerInitial, peerCreation.slot, {
 +      wallet: peerWallet,
@@ -6880,6 +7305,11 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      minimumSlot: bigint,
 +    ) => {
 +      const recovered = await recover(expected, minimumSlot);
++      const peer = await recover(peerInitial, minimumSlot, {
++        wallet: peerWallet,
++        keys: peerKeys,
++        keypair: peerKeypair,
++      });
 +      const accountAddresses = [
 +        ...new Set([
 +          await spawnRoomConfigAddress(ringProgramId),
@@ -6904,6 +7334,11 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +          .filter((note) => note.utxo.ringProgramId === ringProgramId)
 +          .map((note) => ({ commitment: bytesToHex(note.outputContext.hash), spent: note.spent }))
 +          .sort((a, b) => a.commitment.localeCompare(b.commitment)),
++        peerRoom: {
++          commitment: bytesToHex(peer.room.commitment),
++          revision: peer.room.state.revision.toString(),
++          spent: peer.entry.spent,
++        },
 +        accounts: accountAddresses.map((account, index) => ({
 +          address: account,
 +          exists: accounts[index] !== undefined,
@@ -6922,6 +7357,8 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      minimumSlot: bigint;
 +      error: string | { Custom: number };
 +      previousSignature?: string;
++      sppInvoked?: boolean;
++      scope?: string;
 +    }) => {
 +      const before = await stateSnapshot(input.instruction, input.expected, input.minimumSlot);
 +      const { signed } = await prepareTransaction(input.instruction, input.signers);
@@ -6967,6 +7404,17 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      expect(failureLogs.some((line) => line.startsWith(`Program ${ringProgramId} failed:`))).toBe(
 +        true,
 +      );
++      if (input.sppInvoked !== undefined) {
++        expect(failureLogs.includes(`Program ${SHIELDED_POOL_PROGRAM_ID} invoke [2]`)).toBe(
++          input.sppInvoked,
++        );
++        if (input.sppInvoked)
++          expect(
++            failureLogs.some((line) =>
++              line.startsWith(`Program ${SHIELDED_POOL_PROGRAM_ID} failed:`),
++            ),
++          ).toBe(true);
++      }
 +      const after = await stateSnapshot(input.instruction, input.expected, rejected.slot);
 +      expect(after).toEqual(before);
 +      steps.push({
@@ -6979,6 +7427,9 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +        acceptedCommitment: after.commitment,
 +        unchangedAccounts: after.accounts,
 +        unchangedWalletNotes: after.walletNotes,
++        unchangedPeerRoom: after.peerRoom,
++        ...(input.sppInvoked === undefined ? {} : { sppInvoked: input.sppInvoked }),
++        ...(input.scope === undefined ? {} : { scope: input.scope }),
 +      });
 +      await evidence("running");
 +      return { signature, slot: rejected.slot };
@@ -7012,18 +7463,84 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      minimumConfirmedSlot: creation.slot.toString(),
 +      residentIds: ids,
 +    };
-+    await adapter.authority.resolveEpisode(binding);
-+    const original = await adapter.authority.captureOriginalResult(
++    const saveNativeJob = async (
++      request: Omit<NativeWorkerJob, "schema" | "coordinatorPid" | "residentIds">,
++    ) => {
++      const storedWallet = await records.read("spawn-room-v1/wallet");
++      expect(
++        storedWallet === undefined
++          ? await records.create("spawn-room-v1/wallet", wallet.toJson())
++          : await records.replace("spawn-room-v1/wallet", storedWallet.version, wallet.toJson()),
++      ).toBe(true);
++      const job: NativeWorkerJob = {
++        ...request,
++        schema: "spawn-room-native-job-v1",
++        coordinatorPid: process.pid,
++        residentIds: residentBinding.residentIds,
++      };
++      expect(await records.create(`spawn-room-v1/process-job/${job.phase}`, job)).toBe(true);
++    };
++    const executeNativeJob = async (phase: NativeWorkerPhase, stopAfterReceipt = false) => {
++      // Every native episode runs in a new independent process. The retained
++      // coordinator does proof submission; it passes no in-memory room or keys.
++      await residents?.stop();
++      residents = undefined;
++      records.close();
++      records = undefined;
++      const run = await (async () => {
++        try {
++          return await runNativeWorker({ configPath, config, nativeRoot, phase, stopAfterReceipt });
++        } finally {
++          records = await EncryptedSqliteRecords.open(
++            recordsPath,
++            await loadDevelopmentKey(join(nativeDirectory, "development.key")),
++            "spawn-room-localnet-v1",
++          );
++          adapter = new SpawnRoomNativeAdapter(
++            new ReferenceAuthority(records),
++            records,
++            domain,
++            residentBinding,
++          );
++          wallet = AnonymousWallet.fromJson((await records.read("spawn-room-v1/wallet")).value);
++        }
++      })();
++      const result = (await records.read(`spawn-room-v1/process-result/${phase}`))?.value as
++        | NativeWorkerResult
++        | undefined;
++      expect(result?.operationId).toBe(run.trace.operationId);
++      if (result === undefined) throw new Error("native process retained no result");
++      const prepared = await adapter.read(result.operationId);
++      if (prepared === undefined) throw new Error("native process retained no acceptance");
++      return { run, prepared };
++    };
++    await saveNativeJob({
++      phase: "first",
 +      binding,
-+      await residents.run(binding, genesisView),
-+    );
++      expectedCommitment: bytesToHex(current.room.commitment),
++      expectedRevision: "0",
++      observed: { signature: creation.signature, slot: creation.slot.toString() },
++    });
++    const firstWorker = await executeNativeJob("first");
++    const pending = firstWorker.prepared;
++    const original = pending.original;
++    expect(pending.binding).toEqual(binding);
 +    expect(JSON.parse(original.investigator)).toMatchObject({ selectedProcedure: 0, value: 9 });
 +    const before = await fetchSpawnRoomConfig(client, ringProgramId);
-+    const pending = await adapter.prepare({
-+      binding,
-+      room: current.room,
-+      grantEpoch: before.grantEpoch + 1n,
++    expect(pending.grant.epoch).toBe(before.grantEpoch + 1n);
++    steps.push({
++      name: "native-process-first",
++      status: "passed",
++      coordinatorPid: process.pid,
++      workerPid: firstWorker.run.trace.pid,
++      exitCode: firstWorker.run.exitCode,
++      exitedAt: firstWorker.run.exitedAt,
++      tracePath: firstWorker.run.tracePath,
++      exitPath: firstWorker.run.exitPath,
++      resources: firstWorker.run.trace.resources,
++      originalDigest: original.originalResultCommitment,
 +    });
++    await evidence("running");
 +    const grantPath = oneGrantPath();
 +    const root = bytesToBigInt(spawnGrantRoot(pending.grantLeaf as Bytes32, grantPath));
 +    // The configured publisher signs only after the existing native authority
@@ -7065,6 +7582,45 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      false,
 +    );
 +    expect(advanceInstruction.accounts?.some((account) => account.address === marker)).toBe(false);
++    const validAdvance = await prepareTransaction(advanceInstruction, [payer], {
++      writer: writer.address,
++      marker,
++    });
++    const advanceControl = await client.solanaRpc
++      .simulateTransaction(getBase64EncodedWireTransaction(validAdvance.signed), {
++        encoding: "base64",
++        commitment: "confirmed",
++        sigVerify: true,
++      })
++      .send();
++    expect(advanceControl.value.err).toBeNull();
++    expect(advanceControl.value.logs).toContain(`Program ${ringProgramId} success`);
++    expect(advanceControl.value.logs).toContain(`Program ${SHIELDED_POOL_PROGRAM_ID} success`);
++    steps.push({
++      name: "adversarial-valid-control",
++      status: "passed",
++      scope: "same unspent hidden advance successfully simulated before frame mutations",
++    });
++    await evidence("running");
++    const peerInput = ProofInputUtxo.fromKeypair(
++      peerNote.entry.utxo,
++      peerKeypair,
++      { dataHash: peerNote.entry.dataHash! },
++      peerNote.entry.outputContext.treeId,
++    );
++    for (const candidate of await spawnRoomLiveRefusals({
++      advance: advanced,
++      wrongOperationProof: peerGenesis.data.proof,
++      marker,
++      peerNullifier: peerInput.nullifier(),
++      peerCommitment: peerNote.room.commitment,
++    }))
++      await refuse({
++        ...candidate,
++        signers: [payer],
++        expected: initial,
++        minimumSlot: peerCreation.slot,
++      });
 +    const ordinaryAdvance = await advanced.instruction();
 +    for (const [name, tag] of [
 +      ["transfer", 55],
@@ -7083,14 +7639,50 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +        minimumSlot: peerCreation.slot,
 +        error: "InvalidInstructionData",
 +      });
-+    const advancement = await send(advanceInstruction, [payer], { writer: writer.address, marker });
++    const preparedAdvance = await prepareTransaction(advanceInstruction, [payer], {
++      writer: writer.address,
++      marker,
++    });
++    const advanceSignature = getSignatureFromTransaction(preparedAdvance.signed);
++    // Persist the exact signed submission and resume identity before broadcast.
++    // Deliberately omit the native confirmation receipt after it lands, modeling
++    // a host interruption between network submission and local confirmation.
++    expect(
++      await records.create("spawn-room-v1/submission/first", {
++        operationId: pending.authorization.operationId,
++        signature: advanceSignature,
++        wireTransaction: getBase64EncodedWireTransaction(preparedAdvance.signed),
++      }),
++    ).toBe(true);
++    await saveNativeJob({
++      phase: "recovery",
++      expectedCommitment: bytesToHex(advanced.outputs[0]!.hash(client.treeId)),
++      expectedRevision: "1",
++      observed: { signature: advanceSignature },
++      previousOperationId: pending.authorization.operationId,
++      previousProcessId: firstWorker.run.trace.pid,
++      resumeInterruptedCommit: true,
++      nextEpisode: {
++        episodeId: "localnet-episode-2",
++        episodeCommitment: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
++      },
++    });
++    expect(await records.read(`receipt/${pending.authorization.operationId}`)).toBeUndefined();
++    await sendTransactionWithoutConfirmingFactory({ rpc: client.solanaRpc })(
++      preparedAdvance.signed,
++      {
++        commitment: "confirmed",
++      },
++    );
++    const advancement = {
++      signature: advanceSignature,
++      slot: await confirmed(advanceSignature),
++      serializedBytes: preparedAdvance.serializedBytes,
++      signerCount: preparedAdvance.signerCount,
++    };
 +    current = await recover(pending.nextState, advancement.slot);
 +    const firstObserved = observe(advancement.signature, advancement.slot, current.contextSlot);
-+    const checkpoint = await adapter.retainConfirmed(
-+      pending.authorization.operationId,
-+      current.room,
-+      firstObserved,
-+    );
++    expect(await records.read(`receipt/${pending.authorization.operationId}`)).toBeUndefined();
 +    const acceptedView = spawnRoomNativeView({
 +      room: current.room,
 +      uniqueAddress,
@@ -7111,7 +7703,10 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      signerCount: advancement.signerCount,
 +      explicitWriterAbsent: true,
 +      stableMarkerAbsent: true,
++      nativeWorkerPid: firstWorker.run.trace.pid,
++      nativeWorkerExitCode: firstWorker.run.exitCode,
 +      eligibleUnspentRoomNotesBefore: 2,
++      nativeConfirmationReceipt: "deliberately absent until independent recovery",
 +    });
 +    await evidence("running");
 +    await refuse({
@@ -7123,47 +7718,70 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      error: { Custom: 7043 }, // SPP NullifierAlreadyQueued, not a stale app epoch.
 +      previousSignature: advancement.signature,
 +    });
-+    await records.create("spawn-room-v1/wallet", wallet.toJson());
-+    await residents.stop();
-+    residents = undefined;
-+    records.close();
-+    records = undefined;
-+    records = await EncryptedSqliteRecords.open(
-+      recordsPath,
-+      await loadDevelopmentKey(join(nativeDirectory, "development.key")),
-+      "spawn-room-localnet-v1",
-+    );
-+    residents = await FlueResidents.start({
-+      directory: nativeDirectory,
-+      records,
-+      masterKey,
-+      residentIds: ids,
++    let interrupted: NativeWorkerFailure["attempt"] | undefined;
++    try {
++      await executeNativeJob("recovery", true);
++      throw new Error("controlled receipt interruption did not occur");
++    } catch (error) {
++      if (
++        !(error instanceof NativeWorkerFailure) ||
++        error.attempt.trace?.error !== "spawn_worker_after_receipt_interruption"
++      )
++        throw error;
++      interrupted = error.attempt;
++    }
++    if (interrupted === undefined) throw new Error("missing controlled interruption evidence");
++    expect(interrupted.exitCode).toBe(1);
++    expect(interrupted.exitSignal).toBeNull();
++    expect(interrupted.timedOut).toBe(false);
++    expect(interrupted.trace?.nativeRuntimeStopped).toBe(true);
++    expect(interrupted.trace?.recordsClosed).toBe(true);
++    expect(interrupted.trace?.interruptedCommit).toEqual({
++      receiptAbsentOnEntry: true,
++      savedSignature: advancement.signature,
++      observedSlot: advancement.slot.toString(),
++      savedFrameMatchesLedger: true,
++      receiptRetained: true,
 +    });
-+    const retainedSeed = hexToBytes(
-+      (await records.read("spawn-room-v1/writer-seed")).value,
-+    ) as Bytes32;
-+    signing = SigningKey.fromEd25519Bytes(retainedSeed);
-+    keypair = ShieldedKeypair.fromKeypair(signing);
-+    writer = await createKeyPairSignerFromBytes(
-+      Uint8Array.of(...retainedSeed, ...ed25519.getPublicKey(retainedSeed)),
++    expect(interrupted.trace?.prior?.inferenceCallsBeforeTask).toBe(0);
++    expect(await records.read("spawn-room-v1/process-result/recovery")).toBeUndefined();
++    const receiptBeforeRetry = await records.read(`receipt/${pending.authorization.operationId}`);
++    expect(receiptBeforeRetry).toBeDefined();
++    const secondWorker = await executeNativeJob("recovery");
++    expect(secondWorker.run.trace.pid).not.toBe(firstWorker.run.trace.pid);
++    expect(secondWorker.run.trace.pid).not.toBe(interrupted.trace?.pid);
++    expect(Date.parse(secondWorker.run.trace.startedAt)).toBeGreaterThanOrEqual(
++      Date.parse(firstWorker.run.exitedAt),
 +    );
-+    keys = ringWalletKeys(
-+      LocalKeys.fromKeypair(keypair, client.proofService),
-+      LocalRingKeys.fromKeypair(keypair),
++    expect(Date.parse(secondWorker.run.trace.startedAt)).toBeGreaterThanOrEqual(
++      Date.parse(interrupted.exitedAt),
 +    );
-+    wallet = AnonymousWallet.fromJson((await records.read("spawn-room-v1/wallet")).value);
-+    adapter = new SpawnRoomNativeAdapter(
-+      new ReferenceAuthority(records),
-+      records,
-+      domain,
-+      residents,
++    expect(secondWorker.run.trace.prior?.originalResultCommitment).toBe(
++      firstWorker.run.trace.originalResultCommitment,
++    );
++    expect(secondWorker.run.trace.prior?.grantLeaf).toBe(firstWorker.run.trace.grantLeaf);
++    expect(secondWorker.run.trace.prior?.acceptanceNonceHash).toBe(
++      firstWorker.run.trace.acceptanceNonceHash,
++    );
++    expect(secondWorker.run.trace.prior?.inferenceCallsBeforeTask).toBe(0);
++    expect(secondWorker.run.trace.interruptedCommit).toEqual({
++      receiptAbsentOnEntry: false,
++      savedSignature: advancement.signature,
++      observedSlot: advancement.slot.toString(),
++      savedFrameMatchesLedger: true,
++      receiptRetained: true,
++    });
++    expect(await records.read(`receipt/${pending.authorization.operationId}`)).toEqual(
++      receiptBeforeRetry,
 +    );
 +    current = await recover(pending.nextState, advancement.slot);
 +    const retained = await adapter.read(pending.authorization.operationId);
 +    expect(retained?.original).toEqual(original);
 +    expect(retained?.authorization.acceptanceNonce).toBe(pending.authorization.acceptanceNonce);
-+    expect(await residents.run(binding, genesisView)).toEqual(original);
-+    expect(residents.inferenceCalls).toBe(0);
++    const resumedReceipt = (await records.read(`receipt/${pending.authorization.operationId}`))
++      ?.value;
++    expect(resumedReceipt?.authorization).toEqual(pending.authorization);
++    expect(resumedReceipt?.room.checkpoint).toEqual(acceptedView.checkpoint);
 +    steps.push({
 +      name: "recovery",
 +      status: "passed",
@@ -7171,33 +7789,55 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      coverage: wallet.recoveryCoverage().status,
 +      originalDigest: retained!.authorization.originalResultCommitment,
 +      resumedInferenceCalls: 0,
++      coordinatorPid: process.pid,
++      priorNativePid: firstWorker.run.trace.pid,
++      recoveredNativePid: secondWorker.run.trace.pid,
++      priorProcessExitedAt: firstWorker.run.exitedAt,
++      workerExitCode: secondWorker.run.exitCode,
++      processTraces: [firstWorker.run.tracePath, interrupted.tracePath, secondWorker.run.tracePath],
++      processExits: [firstWorker.run.exitPath, interrupted.exitPath, secondWorker.run.exitPath],
++      interruptedCommitRecovered: true,
++      controlledReceiptInterruption: {
++        workerPid: interrupted.trace?.pid,
++        exitCode: interrupted.exitCode,
++        reason: interrupted.trace?.error,
++        receiptRetainedExactly: true,
++      },
++      sameSavedSubmissionSignature: advancement.signature,
++      coordinatorRemainedRunning: true,
++      resources: secondWorker.run.trace.resources,
 +    });
 +    await evidence("running");
-+
-+    const secondBinding: NativeEpisodeBinding = {
-+      ...binding,
-+      episodeId: "localnet-episode-2",
-+      episodeCommitment: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
-+      predecessor: checkpoint,
-+      ordinal: "2",
-+      minimumConfirmedSlot: advancement.slot.toString(),
-+    };
-+    await adapter.authority.resolveEpisode(secondBinding);
-+    const secondOriginal = await adapter.authority.captureOriginalResult(
-+      secondBinding,
-+      await residents.run(secondBinding, acceptedView),
-+    );
++    const secondPending = secondWorker.prepared;
++    const secondOriginal = secondPending.original;
 +    expect(JSON.parse(secondOriginal.investigator)).toMatchObject({
 +      selectedProcedure: 1,
 +      value: 5,
 +      lessonUsed: original.proposal.lesson,
 +    });
-+    const secondBefore = await fetchSpawnRoomConfig(client, ringProgramId);
-+    const secondPending = await adapter.prepare({
-+      binding: secondBinding,
-+      room: current.room,
-+      grantEpoch: secondBefore.grantEpoch + 1n,
++    const reenteredWorker = await executeNativeJob("recovery");
++    expect(reenteredWorker.run.trace.pid).not.toBe(secondWorker.run.trace.pid);
++    expect(reenteredWorker.prepared).toEqual(secondPending);
++    expect(reenteredWorker.run.trace.task?.inferenceCalls).toBe(0);
++    expect(await records.read(`receipt/${pending.authorization.operationId}`)).toEqual(
++      receiptBeforeRetry,
++    );
++    steps.push({
++      name: "native-worker-idempotent-reentry",
++      status: "passed",
++      operationId: secondPending.authorization.operationId,
++      originalDigest: secondOriginal.originalResultCommitment,
++      workerPid: reenteredWorker.run.trace.pid,
++      exitCode: reenteredWorker.run.exitCode,
++      tracePath: reenteredWorker.run.tracePath,
++      exitPath: reenteredWorker.run.exitPath,
++      repeatedInferenceCalls: 0,
++      originalGrantNonceAndReceiptUnchanged: true,
++      resources: reenteredWorker.run.trace.resources,
 +    });
++    await evidence("running");
++    const secondBefore = await fetchSpawnRoomConfig(client, ringProgramId);
++    expect(secondPending.grant.epoch).toBe(secondBefore.grantEpoch + 1n);
 +    const secondRoot = bytesToBigInt(spawnGrantRoot(secondPending.grantLeaf as Bytes32, grantPath));
 +    await send(
 +      await updateSpawnRoomGrantRootInstruction({
@@ -7248,6 +7888,8 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      slot: reuse.slot.toString(),
 +      selectedProcedure: 1,
 +      learnedValue: 5,
++      nativeWorkerPid: secondWorker.run.trace.pid,
++      nativeWorkerExitCode: secondWorker.run.exitCode,
 +      lessonUsed: (JSON.parse(secondOriginal.investigator) as { lessonUsed: string }).lessonUsed,
 +      proposedLesson: secondOriginal.proposal.lesson,
 +      scores: [40, 60],
@@ -7258,12 +7900,6 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +    });
 +    await evidence("running");
 +
-+    const secondView = spawnRoomNativeView({
-+      room: current.room,
-+      uniqueAddress,
-+      operationId: secondPending.authorization.operationId,
-+      observed: observe(reuse.signature, reuse.slot, current.contextSlot),
-+    });
 +    const thirdBinding: NativeEpisodeBinding = {
 +      ...binding,
 +      episodeId: "localnet-episode-3-revoked",
@@ -7272,17 +7908,20 @@ index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f6
 +      ordinal: "3",
 +      minimumConfirmedSlot: reuse.slot.toString(),
 +    };
-+    await adapter.authority.resolveEpisode(thirdBinding);
-+    const thirdOriginal = await adapter.authority.captureOriginalResult(
-+      thirdBinding,
-+      await residents.run(thirdBinding, secondView),
-+    );
-+    const thirdBefore = await fetchSpawnRoomConfig(client, ringProgramId);
-+    const thirdPending = await adapter.prepare({
++    await saveNativeJob({
++      phase: "revocation",
 +      binding: thirdBinding,
-+      room: current.room,
-+      grantEpoch: thirdBefore.grantEpoch + 1n,
++      expectedCommitment: bytesToHex(current.room.commitment),
++      expectedRevision: "2",
++      observed: { signature: reuse.signature, slot: reuse.slot.toString() },
++      previousOperationId: secondPending.authorization.operationId,
++      previousProcessId: secondWorker.run.trace.pid,
 +    });
++    const thirdWorker = await executeNativeJob("revocation");
++    const thirdPending = thirdWorker.prepared;
++    const thirdOriginal = thirdPending.original;
++    const thirdBefore = await fetchSpawnRoomConfig(client, ringProgramId);
++    expect(thirdPending.grant.epoch).toBe(thirdBefore.grantEpoch + 1n);
 +    const thirdRoot = bytesToBigInt(spawnGrantRoot(thirdPending.grantLeaf as Bytes32, grantPath));
 +    await send(
 +      await updateSpawnRoomGrantRootInstruction({
@@ -7715,6 +8354,765 @@ index 0000000000000000000000000000000000000000..8d80f2078c67ee7350888188e162e4fa
 +    }
 +  }, 60_000);
 +});
+diff --git a/sdk-tests/spawn-room/native-worker-runner.test.ts b/sdk-tests/spawn-room/native-worker-runner.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6454eb4b99d74e4543a462432c9da73af2c2b11c
+--- /dev/null
++++ b/sdk-tests/spawn-room/native-worker-runner.test.ts
+@@ -0,0 +1,69 @@
++import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import { join, resolve } from "node:path";
++import { expect, it } from "vitest";
++import {
++  NativeWorkerFailure,
++  runNativeWorker,
++  type JourneyConfig,
++  type NativeWorkerTrace,
++} from "./native-worker.js";
++
++it("starts an independent native process and refuses an absent persisted job instead of reporting recovery", async () => {
++  const workDirectory = await mkdtemp(join(tmpdir(), "spawn-native-worker-"));
++  try {
++    const config: JourneyConfig = {
++      rpcUrl: "http://127.0.0.1:1",
++      photonUrl: "http://127.0.0.1:1",
++      ringIndexerUrl: "http://127.0.0.1:1",
++      proverUrl: "http://127.0.0.1:1",
++      ringRpcUrl: "http://127.0.0.1:1",
++      ringOrigin: "http://localhost:3000",
++      ringProgramId: "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
++      enrollmentWriter: "11111111111111111111111111111111",
++      defaultTreeAddress: "11111111111111111111111111111111",
++      upgradeAuthorityKeypairPath: join(workDirectory, "unused-upgrade.json"),
++      feePayerKeypairPath: join(workDirectory, "unused-payer.json"),
++      publisherKeypairPath: join(workDirectory, "unused-publisher.json"),
++      workDirectory,
++    };
++    const configPath = join(workDirectory, "config.json");
++    await writeFile(configPath, JSON.stringify(config), { mode: 0o600 });
++    const attempts: NativeWorkerFailure["attempt"][] = [];
++    for (let attempt = 0; attempt < 2; attempt++) {
++      try {
++        await runNativeWorker({
++          configPath,
++          config,
++          phase: "first",
++          nativeRoot: resolve(
++            process.env.SPAWN_REFERENCE_HOST_ROOT ?? "../backroom-rings/backrooms/reference-host",
++          ),
++        });
++        throw new Error("missing job was incorrectly accepted");
++      } catch (error) {
++        if (!(error instanceof NativeWorkerFailure)) throw error;
++        attempts.push(error.attempt);
++      }
++    }
++    expect(attempts[0]!.tracePath).not.toBe(attempts[1]!.tracePath);
++    expect(attempts[0]!.trace?.pid).not.toBe(attempts[1]!.trace?.pid);
++    for (const attempt of attempts) {
++      const trace = JSON.parse(await readFile(attempt.tracePath, "utf8")) as NativeWorkerTrace;
++      expect(trace.pid).not.toBe(process.pid);
++      expect(trace.coordinatorPid).toBe(process.pid);
++      expect(trace.status).toBe("failed");
++      expect(trace.recovered).toBeUndefined();
++      expect(trace.recordsClosed).toBe(true);
++      expect(trace.resources?.maxRssKiB).toBeGreaterThan(0);
++      const exit = JSON.parse(await readFile(attempt.exitPath, "utf8")) as {
++        code: number;
++        signal: string | null;
++        timedOut: boolean;
++      };
++      expect(exit).toMatchObject({ code: 1, signal: null, timedOut: false });
++    }
++  } finally {
++    await rm(workDirectory, { recursive: true, force: true });
++  }
++}, 60_000);
+diff --git a/sdk-tests/spawn-room/native-worker.test.ts b/sdk-tests/spawn-room/native-worker.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..078b3d1cbf12bc55a97d1790ed841a254350f09b
+--- /dev/null
++++ b/sdk-tests/spawn-room/native-worker.test.ts
+@@ -0,0 +1,406 @@
++/** Invoked by a fresh Vitest process, never imported into the proof coordinator. */
++import { readFile, writeFile } from "node:fs/promises";
++import { join, resolve } from "node:path";
++import { pathToFileURL } from "node:url";
++import { expect, it } from "vitest";
++import { sha256 } from "@noble/hashes/sha2.js";
++import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
++import {
++  address,
++  getBase58Encoder,
++  getBase64Encoder,
++  getSignatureFromTransaction,
++  getTransactionDecoder,
++  signature,
++  type Signature,
++} from "@solana/kit";
++import { LocalKeys, ShieldedKeypair, SigningKey, type Bytes32 } from "@heliuslabs/spr";
++import { addressBytes } from "@heliuslabs/spr/internal";
++import { createCustomRingClient } from "../../sdk-libs/ts/src/rpc/client.js";
++import { AnonymousWallet } from "../../sdk-libs/ts/src/state/anonymous-wallet.js";
++import { LocalRingKeys, ringWalletKeys } from "../../sdk-libs/ts/src/state/ring-keys.js";
++import { syncRingWallet } from "../../sdk-libs/ts/src/state/ring-sync.js";
++import {
++  encodeSpawnRoomState,
++  spawnRoomIdentity,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/codec.js";
++import {
++  fetchSpawnRoomConfig,
++  spawnRoomGenesisAddress,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/instructions.js";
++import {
++  verifySpawnRoomNote,
++  type OpenedSpawnRoom,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/payload.js";
++import { findSpawnRoomIndexedNote } from "../../sdk-libs/ts/src/experimental/spawn-room/recovery.js";
++import {
++  SpawnRoomNativeAdapter,
++  spawnRoomNativeView,
++  type NativeEpisodeBinding,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/native-adapter.js";
++import type {
++  JourneyConfig,
++  NativeWorkerJob,
++  NativeWorkerPhase,
++  NativeWorkerResult,
++  NativeWorkerTrace,
++} from "./native-worker.js";
++
++const configPath = process.env.SPAWN_JOURNEY_CONFIG;
++const requestedPhase = process.env.SPAWN_NATIVE_WORKER_PHASE;
++const coordinatorPid = Number(process.env.SPAWN_NATIVE_COORDINATOR_PID);
++if (
++  configPath === undefined ||
++  !["first", "recovery", "revocation"].includes(requestedPhase ?? "") ||
++  !Number.isSafeInteger(coordinatorPid) ||
++  coordinatorPid <= 0 ||
++  coordinatorPid === process.pid
++)
++  throw new Error("native worker requires a distinct coordinator and explicit local job");
++const phase = requestedPhase as NativeWorkerPhase;
++const config = JSON.parse(await readFile(configPath, "utf8")) as JourneyConfig;
++const tracePath = process.env.SPAWN_NATIVE_WORKER_TRACE_PATH;
++if (tracePath === undefined || !resolve(tracePath).startsWith(`${resolve(config.workDirectory)}/`))
++  throw new Error("native worker requires an owned attempt trace path");
++const stopAfterReceipt = process.env.SPAWN_NATIVE_WORKER_STOP_AFTER_RECEIPT === "1";
++if (stopAfterReceipt && phase !== "recovery")
++  throw new Error("receipt interruption is only a recovery-worker test control");
++for (const endpoint of [config.rpcUrl, config.ringIndexerUrl, config.proverUrl])
++  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(endpoint).hostname))
++    throw new Error("native recovery worker requires loopback services");
++const nativeRoot = resolve(
++  process.env.SPAWN_REFERENCE_HOST_ROOT ?? "../backroom-rings/backrooms/reference-host",
++);
++const { ReferenceAuthority } = await import(pathToFileURL(join(nativeRoot, "authority.ts")).href);
++const { EncryptedSqliteRecords, loadDevelopmentKey } = await import(
++  pathToFileURL(join(nativeRoot, "records.ts")).href
++);
++const { FlueResidents } = await import(pathToFileURL(join(nativeRoot, "residents.ts")).href);
++
++async function poll<T>(read: () => Promise<T | undefined>, description: string): Promise<T> {
++  const until = Date.now() + 240_000;
++  for (;;) {
++    const found = await read();
++    if (found !== undefined) return found;
++    if (Date.now() > until) throw new Error(`worker timed out waiting for ${description}`);
++    await new Promise((accept) => setTimeout(accept, 500));
++  }
++}
++
++it("independently recovers a confirmed note and executes the persisted native task", async () => {
++  const started = performance.now();
++  const trace: NativeWorkerTrace = {
++    schema: "spawn-room-native-process-v1",
++    phase,
++    status: "running",
++    pid: process.pid,
++    ppid: process.ppid,
++    coordinatorPid,
++    startedAt: new Date().toISOString(),
++    nativeRuntimeStopped: false,
++    recordsClosed: false,
++  };
++  const saveTrace = () => writeFile(tracePath, JSON.stringify(trace, null, 2), { mode: 0o600 });
++  await saveTrace();
++  let records: InstanceType<typeof EncryptedSqliteRecords> | undefined;
++  let residents: InstanceType<typeof FlueResidents> | undefined;
++  let failure: unknown;
++  try {
++    const directory = join(config.workDirectory, "native-host");
++    const masterKey = await loadDevelopmentKey(join(directory, "development.key"));
++    records = await EncryptedSqliteRecords.open(
++      join(directory, "private-records.sqlite"),
++      masterKey,
++      "spawn-room-localnet-v1",
++    );
++    const job = (await records.read(`spawn-room-v1/process-job/${phase}`))?.value as
++      | NativeWorkerJob
++      | undefined;
++    expect(job?.schema).toBe("spawn-room-native-job-v1");
++    if (job === undefined) throw new Error("native worker job missing from encrypted store");
++    expect(job.phase).toBe(phase);
++    expect(job.coordinatorPid).toBe(coordinatorPid);
++    expect(job.previousProcessId).not.toBe(process.pid);
++    residents = await FlueResidents.start({
++      directory,
++      records,
++      masterKey,
++      residentIds: job.residentIds,
++    });
++    const ringProgramId = address(config.ringProgramId);
++    const client = await createCustomRingClient({
++      solanaRpcUrl: config.rpcUrl,
++      indexerUrl: config.ringIndexerUrl,
++      proverUrl: config.proverUrl,
++      tree: address(config.defaultTreeAddress),
++      proofDataSource: "prover",
++      commitment: "confirmed",
++      indexerConfig: { poll: { numRetries: 120, delayMs: 250n, maxDelayMs: 2_000n } },
++    });
++    const domain = await fetchSpawnRoomConfig(client, ringProgramId);
++    expect(domain.network).toEqual(
++      getBase58Encoder().encode(await client.solanaRpc.getGenesisHash().send()),
++    );
++    const seed = hexToBytes((await records.read("spawn-room-v1/writer-seed")).value) as Bytes32;
++    const keypair = ShieldedKeypair.fromKeypair(SigningKey.fromEd25519Bytes(seed));
++    const keys = ringWalletKeys(
++      LocalKeys.fromKeypair(keypair, client.proofService),
++      LocalRingKeys.fromKeypair(keypair),
++    );
++    const retainedWallet = await records.read("spawn-room-v1/wallet");
++    expect(retainedWallet).toBeDefined();
++    const wallet = AnonymousWallet.fromJson(retainedWallet.value);
++    const observedSignature: Signature = signature(job.observed.signature);
++    let savedWireTransaction: string | undefined;
++    let receiptAbsentOnEntry = false;
++    if (job.resumeInterruptedCommit) {
++      const submission = (await records.read("spawn-room-v1/submission/first"))?.value;
++      expect(submission?.operationId).toBe(job.previousOperationId);
++      expect(submission?.signature).toBe(job.observed.signature);
++      expect(
++        getSignatureFromTransaction(
++          getTransactionDecoder().decode(getBase64Encoder().encode(submission.wireTransaction)),
++        ),
++      ).toBe(observedSignature);
++      savedWireTransaction = submission.wireTransaction as string;
++      receiptAbsentOnEntry =
++        (await records.read(`receipt/${job.previousOperationId}`)) === undefined;
++    }
++    const observedSlot = await poll(async () => {
++      const observed = (
++        await client.solanaRpc
++          .getSignatureStatuses([observedSignature], { searchTransactionHistory: true })
++          .send()
++      ).value[0];
++      if (
++        observed?.confirmationStatus !== "confirmed" &&
++        observed?.confirmationStatus !== "finalized"
++      )
++        return undefined;
++      expect(observed.err).toBeNull();
++      return BigInt(observed.slot);
++    }, "accepted transaction");
++    if (job.observed.slot !== undefined) expect(observedSlot.toString()).toBe(job.observed.slot);
++    if (savedWireTransaction !== undefined) {
++      const committed = await poll(
++        async () =>
++          (await client.solanaRpc
++            .getTransaction(observedSignature, {
++              commitment: "confirmed",
++              encoding: "base64",
++              maxSupportedTransactionVersion: 1,
++            })
++            .send()) ?? undefined,
++        "exact saved transaction in confirmed ledger",
++      );
++      expect(committed.meta?.err).toBeNull();
++      expect(BigInt(committed.slot)).toBe(observedSlot);
++      expect(getBase64Encoder().encode(committed.transaction[0])).toEqual(
++        getBase64Encoder().encode(savedWireTransaction),
++      );
++    }
++    const recovered = await poll(
++      async (): Promise<{ room: OpenedSpawnRoom; contextSlot: bigint } | undefined> => {
++        const contextSlot = BigInt(
++          await client.solanaRpc.getSlot({ commitment: "confirmed" }).send(),
++        );
++        if (contextSlot < observedSlot) return undefined;
++        await syncRingWallet({ client, wallet, keys, config: { requireSlot: contextSlot } });
++        if (wallet.recoveryCoverage().status !== "Complete") return undefined;
++        const note = wallet
++          .notes()
++          .find(
++            (entry) =>
++              !entry.spent && bytesToHex(entry.outputContext.hash) === job.expectedCommitment,
++          );
++        if (note?.dataHash === undefined) return undefined;
++        const room = verifySpawnRoomNote(
++          {
++            utxo: note.utxo,
++            utxoHash: note.outputContext.hash,
++            nullifierPublicKey: keypair.shieldedAddress().nullifierPublicKey,
++            dataHash: note.dataHash,
++            ...(note.ringDataHash === undefined ? {} : { ringDataHash: note.ringDataHash }),
++            registered: true,
++          },
++          note.outputContext.treeId,
++          domain,
++          note.outputContext.hash,
++        );
++        expect(room.state.revision.toString()).toBe(job.expectedRevision);
++        return { room, contextSlot };
++      },
++      `actual note revision ${job.expectedRevision}`,
++    );
++    // Independently bind the recovered note to the recorded successful transaction.
++    await findSpawnRoomIndexedNote({
++      client,
++      ringProgramId,
++      signature: observedSignature,
++      slot: observedSlot,
++      commitment: recovered.room.commitment,
++      config: { ...client.indexerConfig, requireSlot: recovered.contextSlot },
++    });
++    const marker = await spawnRoomGenesisAddress(
++      ringProgramId,
++      spawnRoomIdentity(recovered.room.state),
++    );
++    const markerAccount = await client.getAccount(marker);
++    expect(markerAccount?.owner).toBe(ringProgramId);
++    expect(markerAccount?.data).toEqual(new TextEncoder().encode("SPRGEN01"));
++    const authority = new ReferenceAuthority(records);
++    const adapter = new SpawnRoomNativeAdapter(authority, records, domain, residents);
++    const view = spawnRoomNativeView({
++      room: recovered.room,
++      uniqueAddress: bytesToHex(addressBytes(marker, "marker")),
++      operationId: job.previousOperationId ?? "genesis",
++      observed: {
++        recoveryStatus: "Complete",
++        signature: observedSignature,
++        slot: observedSlot,
++        contextSlot: recovered.contextSlot,
++      },
++    });
++    trace.recovered = {
++      commitment: bytesToHex(recovered.room.commitment),
++      revision: recovered.room.state.revision.toString(),
++      contextSlot: recovered.contextSlot.toString(),
++      coverage: "Complete",
++    };
++    let expectedLesson = "";
++    if (phase !== "first") {
++      expect(job.previousOperationId).toBeDefined();
++      expect(job.previousProcessId).toBeGreaterThan(0);
++      const previous = await adapter.read(job.previousOperationId!);
++      expect(previous).toBeDefined();
++      if (previous === undefined) throw new Error("accepted original and grant missing");
++      expect(encodeSpawnRoomState(previous.nextState)).toEqual(
++        encodeSpawnRoomState(recovered.room.state),
++      );
++      expect(await authority.getOriginalResult(previous.binding.episodeId)).toEqual(
++        previous.original,
++      );
++      if (job.resumeInterruptedCommit) {
++        await adapter.retainConfirmed(previous.authorization.operationId, recovered.room, {
++          recoveryStatus: "Complete",
++          signature: observedSignature,
++          slot: observedSlot,
++          contextSlot: recovered.contextSlot,
++        });
++        trace.interruptedCommit = {
++          receiptAbsentOnEntry,
++          savedSignature: observedSignature,
++          observedSlot: observedSlot.toString(),
++          savedFrameMatchesLedger: true,
++          receiptRetained: true,
++        };
++      }
++      const receipt = (await records.read(`receipt/${previous.authorization.operationId}`))?.value;
++      expect(receipt?.authorization).toEqual(previous.authorization);
++      expect(receipt?.room.checkpoint).toEqual(view.checkpoint);
++      expect(receipt?.room.protocolVersion).toBe("backrooms.v0");
++      expect(residents.inferenceCalls).toBe(0);
++      trace.prior = {
++        processId: job.previousProcessId!,
++        originalResultCommitment: previous.original.originalResultCommitment,
++        grantLeaf: bytesToHex(previous.grantLeaf),
++        acceptanceNonceHash: bytesToHex(sha256(hexToBytes(previous.authorization.acceptanceNonce))),
++        inferenceCallsBeforeTask: residents.inferenceCalls,
++      };
++      expectedLesson = previous.original.proposal.lesson;
++      if (job.resumeInterruptedCommit && stopAfterReceipt)
++        throw new Error("spawn_worker_after_receipt_interruption");
++    }
++    const binding: NativeEpisodeBinding = job.binding ?? {
++      roomId: view.checkpoint.roomId,
++      episodeId: job.nextEpisode!.episodeId,
++      episodeCommitment: job.nextEpisode!.episodeCommitment,
++      predecessor: view.checkpoint,
++      ordinal: (recovered.room.state.revision + 1n).toString(),
++      minimumConfirmedSlot: observedSlot.toString(),
++      residentIds: job.residentIds,
++    };
++    expect(binding.predecessor).toEqual(view.checkpoint);
++    await authority.resolveEpisode(binding);
++    const priorOriginal = await authority.getOriginalResult(binding.episodeId);
++    const original =
++      priorOriginal ??
++      (await authority.captureOriginalResult(binding, await residents.run(binding, view)));
++    trace.originalReused = priorOriginal !== undefined;
++    const investigator = JSON.parse(original.investigator) as {
++      selectedProcedure: number;
++      value: number;
++      lessonUsed: string;
++    };
++    expect(investigator).toMatchObject({
++      selectedProcedure: phase === "first" ? 0 : 1,
++      value: phase === "first" ? 9 : 5,
++      lessonUsed: expectedLesson,
++    });
++    const retainedAuthorization = (await records.read(`authorization/${binding.episodeId}`))?.value;
++    const priorAcceptance =
++      retainedAuthorization === undefined
++        ? undefined
++        : await adapter.read(retainedAuthorization.operationId);
++    const pending =
++      priorAcceptance ??
++      (await adapter.prepare({
++        binding,
++        room: recovered.room,
++        grantEpoch: (await fetchSpawnRoomConfig(client, ringProgramId)).grantEpoch + 1n,
++      }));
++    expect(pending.binding).toEqual(binding);
++    expect(pending.original).toEqual(original);
++    expect(encodeSpawnRoomState(pending.oldState)).toEqual(
++      encodeSpawnRoomState(recovered.room.state),
++    );
++    const result: NativeWorkerResult = {
++      operationId: pending.authorization.operationId,
++    };
++    const resultKey = `spawn-room-v1/process-result/${phase}`;
++    await records.create(resultKey, result);
++    expect((await records.read(resultKey))?.value).toEqual(result);
++    expect(
++      await records.replace("spawn-room-v1/wallet", retainedWallet.version, wallet.toJson()),
++    ).toBe(true);
++    trace.operationId = result.operationId;
++    trace.task = { ...investigator, inferenceCalls: residents.inferenceCalls };
++    trace.originalResultCommitment = original.originalResultCommitment;
++    trace.grantLeaf = bytesToHex(pending.grantLeaf);
++    trace.acceptanceNonceHash = bytesToHex(
++      sha256(hexToBytes(pending.authorization.acceptanceNonce)),
++    );
++  } catch (error) {
++    failure = error;
++  }
++  try {
++    if (residents !== undefined) {
++      await residents.stop();
++      trace.nativeRuntimeStopped = true;
++    }
++  } catch (error) {
++    failure ??= error;
++  }
++  try {
++    if (records !== undefined) {
++      records.close();
++      trace.recordsClosed = true;
++    }
++  } catch (error) {
++    failure ??= error;
++  }
++  trace.status = failure === undefined ? "passed" : "failed";
++  trace.completedAt = new Date().toISOString();
++  trace.resources = {
++    maxRssKiB: process.resourceUsage().maxRSS,
++    elapsedWallMs: Math.round(process.uptime() * 1_000),
++    taskElapsedWallMs: Math.round(performance.now() - started),
++    platform: process.platform,
++    scope:
++      "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services",
++  };
++  if (failure !== undefined)
++    trace.error = failure instanceof Error ? failure.message : String(failure);
++  await saveTrace();
++  if (failure !== undefined) throw failure;
++}, 540_000);
+diff --git a/sdk-tests/spawn-room/native-worker.ts b/sdk-tests/spawn-room/native-worker.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..c27100bab4322cacdd4cc64aa9e023c4c40b3905
+--- /dev/null
++++ b/sdk-tests/spawn-room/native-worker.ts
+@@ -0,0 +1,266 @@
++/** Separate OS processes execute native episodes; the test process coordinates proofs. */
++import { spawn } from "node:child_process";
++import { mkdtemp, open, readFile, writeFile } from "node:fs/promises";
++import { join } from "node:path";
++import { fileURLToPath } from "node:url";
++import type { NativeEpisodeBinding } from "../../sdk-libs/ts/src/experimental/spawn-room/native-adapter.js";
++
++export interface JourneyConfig {
++  rpcUrl: string;
++  photonUrl: string;
++  ringIndexerUrl: string;
++  proverUrl: string;
++  ringRpcUrl: string;
++  ringOrigin: string;
++  ringProgramId: string;
++  enrollmentWriter: string;
++  defaultTreeAddress: string;
++  upgradeAuthorityKeypairPath: string;
++  feePayerKeypairPath: string;
++  publisherKeypairPath: string;
++  workDirectory: string;
++}
++export type NativeWorkerPhase = "first" | "recovery" | "revocation";
++export interface NativeWorkerJob {
++  schema: "spawn-room-native-job-v1";
++  phase: NativeWorkerPhase;
++  coordinatorPid: number;
++  residentIds: NativeEpisodeBinding["residentIds"];
++  binding?: NativeEpisodeBinding;
++  nextEpisode?: { episodeId: string; episodeCommitment: string };
++  expectedCommitment: string;
++  expectedRevision: string;
++  observed: { signature: string; slot?: string };
++  previousOperationId?: string;
++  previousProcessId?: number;
++  resumeInterruptedCommit?: boolean;
++}
++export interface NativeWorkerResult {
++  operationId: string;
++}
++export interface NativeWorkerTrace {
++  schema: "spawn-room-native-process-v1";
++  phase: NativeWorkerPhase;
++  status: "running" | "passed" | "failed";
++  pid: number;
++  ppid: number;
++  coordinatorPid: number;
++  startedAt: string;
++  completedAt?: string;
++  operationId?: string;
++  nativeRuntimeStopped: boolean;
++  recordsClosed: boolean;
++  recovered?: {
++    commitment: string;
++    revision: string;
++    contextSlot: string;
++    coverage: "Complete";
++  };
++  prior?: {
++    processId: number;
++    originalResultCommitment: string;
++    grantLeaf: string;
++    acceptanceNonceHash: string;
++    inferenceCallsBeforeTask: number;
++  };
++  interruptedCommit?: {
++    receiptAbsentOnEntry: boolean;
++    savedSignature: string;
++    observedSlot: string;
++    savedFrameMatchesLedger: true;
++    receiptRetained: true;
++  };
++  task?: { selectedProcedure: number; value: number; lessonUsed: string; inferenceCalls: number };
++  originalResultCommitment?: string;
++  originalReused?: boolean;
++  grantLeaf?: string;
++  acceptanceNonceHash?: string;
++  resources?: {
++    maxRssKiB: number;
++    elapsedWallMs: number;
++    taskElapsedWallMs: number;
++    platform: string;
++    scope: string;
++  };
++  error?: string;
++}
++export interface NativeWorkerRun {
++  trace: NativeWorkerTrace;
++  launcherPid: number;
++  exitCode: 0;
++  exitSignal: null;
++  exitedAt: string;
++  tracePath: string;
++  exitPath: string;
++  logPath: string;
++}
++export class NativeWorkerFailure extends Error {
++  constructor(
++    phase: NativeWorkerPhase,
++    readonly attempt: {
++      trace?: NativeWorkerTrace;
++      launcherPid?: number;
++      exitCode: number | null;
++      exitSignal: NodeJS.Signals | null;
++      timedOut: boolean;
++      exitedAt: string;
++      tracePath: string;
++      exitPath: string;
++      logPath: string;
++    },
++  ) {
++    super(`native ${phase} worker failed; inspect ${attempt.logPath}`);
++  }
++}
++
++/** Only job identity crosses IPC; private inputs and results stay encrypted on disk. */
++export async function runNativeWorker(input: {
++  configPath: string;
++  config: JourneyConfig;
++  nativeRoot: string;
++  phase: NativeWorkerPhase;
++  stopAfterReceipt?: boolean;
++}): Promise<NativeWorkerRun> {
++  const started = performance.now();
++  const attemptDirectory = await mkdtemp(
++    join(input.config.workDirectory, `native-process-${input.phase}-`),
++  );
++  const tracePath = join(attemptDirectory, "trace.json");
++  const exitPath = join(attemptDirectory, "exit.json");
++  const logPath = join(attemptDirectory, "worker.log");
++  const resultsPath = join(attemptDirectory, "vitest.json");
++  const log = await open(logPath, "wx", 0o600);
++  const environment = { ...process.env };
++  // The nested runner must not inherit the coordinator's Vitest worker identity.
++  for (const key of Object.keys(environment))
++    if (key.startsWith("VITEST") || key.startsWith("VITE_")) delete environment[key];
++  const child = spawn(
++    process.execPath,
++    [
++      fileURLToPath(new URL("../../node_modules/vitest/vitest.mjs", import.meta.url)),
++      "run",
++      "--config",
++      fileURLToPath(new URL("./vitest.config.ts", import.meta.url)),
++      fileURLToPath(new URL("./native-worker.test.ts", import.meta.url)),
++      "--maxWorkers=1",
++      "--pool=forks",
++      "--reporter=json",
++      "--outputFile",
++      resultsPath,
++    ],
++    {
++      cwd: fileURLToPath(new URL("../../", import.meta.url)),
++      env: {
++        ...environment,
++        SPAWN_JOURNEY_CONFIG: input.configPath,
++        SPAWN_REFERENCE_HOST_ROOT: input.nativeRoot,
++        SPAWN_NATIVE_WORKER_PHASE: input.phase,
++        SPAWN_NATIVE_COORDINATOR_PID: process.pid.toString(),
++        SPAWN_NATIVE_WORKER_TRACE_PATH: tracePath,
++        SPAWN_NATIVE_WORKER_STOP_AFTER_RECEIPT: input.stopAfterReceipt ? "1" : "0",
++      },
++      stdio: ["ignore", log.fd, log.fd],
++    },
++  );
++  let timedOut = false;
++  const timeout = setTimeout(() => {
++    timedOut = true;
++    child.kill("SIGTERM");
++  }, 600_000);
++  const stop = () => child.kill("SIGTERM");
++  process.once("SIGTERM", stop);
++  process.once("SIGINT", stop);
++  let exit: { code: number | null; signal: NodeJS.Signals | null };
++  try {
++    exit = await new Promise((accept, reject) => {
++      child.once("error", reject);
++      child.once("close", (code, signal) => accept({ code, signal }));
++    });
++  } finally {
++    clearTimeout(timeout);
++    process.removeListener("SIGTERM", stop);
++    process.removeListener("SIGINT", stop);
++    await log.close();
++  }
++  const exitedAt = new Date().toISOString();
++  await writeFile(
++    exitPath,
++    JSON.stringify({
++      schema: "spawn-room-native-process-exit-v1",
++      phase: input.phase,
++      coordinatorPid: process.pid,
++      launcherPid: child.pid,
++      code: exit.code,
++      signal: exit.signal,
++      timedOut,
++      exitedAt,
++      elapsedWallMs: Math.round(performance.now() - started),
++      durationScope: "native worker Vitest launch through observed process exit",
++      tracePath,
++      logPath,
++    }),
++    { mode: 0o600 },
++  );
++  if (timedOut || exit.code !== 0 || exit.signal !== null) {
++    let trace: NativeWorkerTrace | undefined;
++    try {
++      trace = JSON.parse(await readFile(tracePath, "utf8")) as NativeWorkerTrace;
++    } catch {
++      // A worker that dies before writing a trace has no recoverable evidence.
++    }
++    throw new NativeWorkerFailure(input.phase, {
++      ...(trace === undefined ? {} : { trace }),
++      ...(child.pid === undefined ? {} : { launcherPid: child.pid }),
++      exitCode: exit.code,
++      exitSignal: exit.signal,
++      timedOut,
++      exitedAt,
++      tracePath,
++      exitPath,
++      logPath,
++    });
++  }
++  const results = JSON.parse(await readFile(resultsPath, "utf8")) as {
++    success: boolean;
++    numPassedTests: number;
++    numFailedTests: number;
++    numPendingTests: number;
++    numTodoTests: number;
++  };
++  if (
++    !results.success ||
++    results.numPassedTests !== 1 ||
++    results.numFailedTests !== 0 ||
++    results.numPendingTests !== 0 ||
++    results.numTodoTests !== 0
++  )
++    throw new Error(`native ${input.phase} worker did not execute its assertion`);
++  const trace = JSON.parse(await readFile(tracePath, "utf8")) as NativeWorkerTrace;
++  if (
++    trace.schema !== "spawn-room-native-process-v1" ||
++    trace.phase !== input.phase ||
++    trace.status !== "passed" ||
++    !Number.isSafeInteger(trace.pid) ||
++    trace.pid === process.pid ||
++    trace.coordinatorPid !== process.pid ||
++    !trace.nativeRuntimeStopped ||
++    !trace.recordsClosed ||
++    trace.operationId === undefined ||
++    trace.completedAt === undefined ||
++    trace.resources === undefined ||
++    trace.resources.maxRssKiB <= 0 ||
++    trace.resources.elapsedWallMs <= 0 ||
++    child.pid === undefined
++  )
++    throw new Error(`invalid native ${input.phase} process trace`);
++  return {
++    trace,
++    launcherPid: child.pid,
++    exitCode: 0,
++    exitSignal: null,
++    exitedAt,
++    tracePath,
++    exitPath,
++    logPath,
++  };
++}
 diff --git a/sdk-tests/spawn-room/tsconfig.json b/sdk-tests/spawn-room/tsconfig.json
 new file mode 100644
 index 0000000000000000000000000000000000000000..a5a3786220764a5790e8f34b621e7a593e369da8
@@ -7844,6 +9242,116 @@ index 0000000000000000000000000000000000000000..89465f9bf6219ba62aa74a87daa4ffaa
 +  "setup": "experimental localnet single-party setup; no production authorization",
 +  "writerOwnerHash": "0x2aa67f0c9e559a88391a0ce98c9a7bcb6357e3069e5d13c32e453e5ea12c85a0"
 +}
+diff --git a/tools/localnet-resource-monitor.mjs b/tools/localnet-resource-monitor.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..49aecba77d3819743505325c08945ebd5d4addf9
+--- /dev/null
++++ b/tools/localnet-resource-monitor.mjs
+@@ -0,0 +1,104 @@
++import { readFile, readdir } from 'node:fs/promises';
++
++// Only process metadata is read. No command lines, environments, request bodies,
++// or memory contents are collected. Groups are registered when this harness
++// creates them; subprocesses of those groups are part of the same measurement.
++export class LocalnetResourceMonitor {
++  constructor(intervalMs = 250) {
++    this.intervalMs = intervalMs;
++    this.startedAt = new Date().toISOString();
++    this.started = performance.now();
++    this.groups = new Map();
++    this.processes = new Map();
++    this.samples = 0;
++    this.peakConcurrentRssKiB = 0;
++    this.supported = process.platform === 'linux';
++    this.sampling = undefined;
++    this.timer = this.supported ? setInterval(() => { void this.sample(); }, intervalMs) : undefined;
++    this.timer?.unref();
++  }
++
++  registerGroup(pid, scope) {
++    if (Number.isInteger(pid) && pid > 1) this.groups.set(pid, { scope, registered: performance.now(), observed: false });
++  }
++
++  async sample() {
++    if (!this.supported) return;
++    if (this.sampling) return this.sampling;
++    this.sampling = this.collect().catch((error) => { this.lastError = error.code ?? error.message; }).finally(() => { this.sampling = undefined; });
++    return this.sampling;
++  }
++
++  async collect() {
++    const rows = new Map();
++    const names = (await readdir('/proc')).filter((name) => /^\d+$/.test(name));
++    await Promise.all(names.map(async (name) => {
++      try {
++        const value = await readFile(`/proc/${name}/stat`, 'utf8');
++        const end = value.lastIndexOf(')');
++        const fields = value.slice(end + 2).trim().split(/\s+/);
++        rows.set(Number(name), { pid: Number(name), name: value.slice(value.indexOf('(') + 1, end),
++          parent: Number(fields[1]), group: Number(fields[2]), startTicks: fields[19] });
++      } catch { /* Processes can exit between directory and stat reads. */ }
++    }));
++    const scopes = new Map([[process.pid, 'harness']]);
++    for (const row of rows.values()) {
++      const owned = this.groups.get(row.group);
++      if (owned) { owned.observed = true; scopes.set(row.pid, owned.scope); }
++    }
++    // Vitest/native workers can create a process group of their own. Include
++    // them only while their parent relationship leads back to an owned process.
++    for (let changed = true; changed;) {
++      changed = false;
++      for (const row of rows.values()) {
++        if (!scopes.has(row.pid) && scopes.has(row.parent)) {
++          scopes.set(row.pid, scopes.get(row.parent)); changed = true;
++        }
++      }
++    }
++    let rss = 0;
++    const sampledAt = new Date().toISOString();
++    await Promise.all([...scopes].map(async ([pid, scope]) => {
++      const row = rows.get(pid);
++      if (!row) return;
++      try {
++        const status = await readFile(`/proc/${pid}/status`, 'utf8');
++        const current = Number(/^VmRSS:\s+(\d+)\s+kB$/m.exec(status)?.[1] ?? 0);
++        const highWater = Number(/^VmHWM:\s+(\d+)\s+kB$/m.exec(status)?.[1] ?? 0);
++        const identity = `${pid}:${row.startTicks}`;
++        const previous = this.processes.get(identity);
++        this.processes.set(identity, { pid, startTicks: row.startTicks, name: row.name, scope,
++          firstObservedAt: previous?.firstObservedAt ?? sampledAt, lastObservedAt: sampledAt,
++          sampledPeakRssKiB: Math.max(previous?.sampledPeakRssKiB ?? 0, current),
++          observedOsHighWaterRssKiB: Math.max(previous?.observedOsHighWaterRssKiB ?? 0, highWater) });
++        rss += current;
++      } catch { /* A short-lived process may exit before its status is read. */ }
++    }));
++    for (const [group, owned] of this.groups) {
++      if (![...rows.values()].some((row) => row.group === group) && (owned.observed || performance.now() - owned.registered > 1000)) this.groups.delete(group);
++    }
++    this.samples += 1;
++    this.peakConcurrentRssKiB = Math.max(this.peakConcurrentRssKiB, rss);
++  }
++
++  async stop() {
++    clearInterval(this.timer);
++    await this.sample();
++    return {
++      scope: 'this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes',
++      supported: this.supported, platform: process.platform,
++      method: 'Linux /proc VmRSS and process-lifetime VmHWM, sampled while each owned process exists',
++      sampleIntervalMs: this.intervalMs, samples: this.samples, startedAt: this.startedAt,
++      finishedAt: new Date().toISOString(), measuredDurationMs: Math.round(performance.now() - this.started),
++      sampledPeakConcurrentRssKiB: this.peakConcurrentRssKiB,
++      processes: [...this.processes.values()].sort((a, b) => a.pid - b.pid),
++      limitations: [
++        'Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.',
++        'VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.',
++        'Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.',
++        'These are measurements of this disposable local run, not production performance claims.',
++      ],
++      ...(this.lastError === undefined ? {} : { lastSamplingError: this.lastError }),
++    };
++  }
++}
 diff --git a/tools/prepare-spawn-room-localnet.sh b/tools/prepare-spawn-room-localnet.sh
 new file mode 100755
 index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c94867d30a
@@ -7963,10 +9471,10 @@ index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c9
 +sha256sum target/deploy/custom_ring_program.so
 diff --git a/tools/run-spawn-room-localnet.mjs b/tools/run-spawn-room-localnet.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1e1c43ade
+index 0000000000000000000000000000000000000000..fc28f41c4f2cceba4d48b94ec96a974a57552641
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.mjs
-@@ -0,0 +1,429 @@
+@@ -0,0 +1,451 @@
 +#!/usr/bin/env node
 +// All services and the journey are descendants of this process. In particular,
 +// this also works in executors whose separate commands cannot share loopback.
@@ -7979,6 +9487,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +import { dirname, isAbsolute, join, resolve } from 'node:path';
 +import { fileURLToPath, pathToFileURL } from 'node:url';
 +import { setTimeout as delay } from 'node:timers/promises';
++import { LocalnetResourceMonitor } from './localnet-resource-monitor.mjs';
 +
 +const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 +const NATIVE_PIN = '02bca33729051798834ecbb4d94e968cdc0ef9b8';
@@ -8041,6 +9550,17 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +    }
 +  } finally {
 +    await Promise.all(listeners.map((server) => new Promise((done) => server.close(done))));
++  }
++}
++
++export async function waitForAvailablePorts(ports, timeoutMs = 15_000) {
++  const deadline = Date.now() + timeoutMs;
++  for (;;) {
++    try { await requireAvailablePorts(ports); return; }
++    catch (error) {
++      if (error.code !== 'EADDRINUSE' || Date.now() >= deadline) throw error;
++      await delay(100);
++    }
 +  }
 +}
 +
@@ -8143,12 +9663,14 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +  await save();
 +  console.log(`Localnet run: ${workDirectory}`);
 +  const env = { ...childEnvironment(), ZOLANA_CONFIG_DIR: home, ZOLANA_PROCESS_SCOPE_DIR: scope };
++  const measurement = new LocalnetResourceMonitor();
 +  receipt.resources = Object.fromEntries(['GOMAXPROCS', 'GOMEMLIMIT', 'CARGO_BUILD_JOBS', 'CARGO_PROFILE_DEV_DEBUG', 'CARGO_PROFILE_TEST_DEBUG'].map((name) => [name, env[name]]));
 +  const services = [];
 +  const activeCommands = new Set();
 +  let stopping = false;
 +  let stoppedSignal;
 +  let validatorStarted = false;
++  let portPreflightPassed = false;
 +  let binaries;
 +  let referenceHostRoot;
 +  const signalHandler = (signal) => {
@@ -8170,9 +9692,11 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +    if (stoppedSignal && !stopping) throw new Error(`Interrupted by ${stoppedSignal}`);
 +    const logPath = join(logDirectory, `${String(receipt.commands.length).padStart(2, '0')}-${name}.log`);
 +    const row = { name, binary, ...(recordArgs ? { args } : {}), cwd, logPath, startedAt: now(), status: 'running' };
++    const started = performance.now();
 +    receipt.commands.push(row); await save();
 +    const fd = openSync(logPath, 'wx', 0o600);
 +    const child = spawn(binary, args, { cwd, env, detached: true, stdio: ['ignore', fd, fd] });
++    measurement.registerGroup(child.pid, `command:${name}`);
 +    closeSync(fd);
 +    activeCommands.add(child);
 +    let timedOut = false;
@@ -8184,7 +9708,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +        child.once('exit', (code, signal) => accept({ code, signal }));
 +      });
 +    } finally { clearTimeout(timer); activeCommands.delete(child); }
-+    Object.assign(row, { finishedAt: now(), exitCode: outcome.code, signal: outcome.signal, timedOut,
++    Object.assign(row, { finishedAt: now(), measuredDurationMs: Math.round(performance.now() - started), exitCode: outcome.code, signal: outcome.signal, timedOut,
 +      status: outcome.code === 0 && !timedOut ? 'passed' : 'failed', logSha256: (await hashFile(logPath)).sha256 });
 +    await save();
 +    if (!allowFailure) requireThat(row.status === 'passed', `${name} failed; see ${logPath}`);
@@ -8195,6 +9719,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +    const logPath = join(logDirectory, `${name}.log`);
 +    const fd = openSync(logPath, 'wx', 0o600);
 +    const child = spawn(binary, args, { cwd: workDirectory, env, detached: true, stdio: ['ignore', fd, fd] });
++    measurement.registerGroup(child.pid, `service:${name}`);
 +    closeSync(fd);
 +    const row = { name, binary, args, pid: child.pid, logPath, startedAt: now(), status: 'running' };
 +    child.once('error', (error) => { row.status = 'failed'; row.error = error.message; });
@@ -8224,6 +9749,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +
 +  try {
 +    await requireAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]);
++    portPreflightPassed = true;
 +    const requested = config.binaries ?? {};
 +    binaries = {};
 +    for (const [name, fallback] of Object.entries({
@@ -8336,6 +9862,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +  } catch (error) {
 +    receipt.status = 'failed'; receipt.error = error instanceof Error ? error.message : String(error);
 +  } finally {
++    await measurement.sample();
 +    stopping = true;
 +    for (const { child, row } of services.toReversed()) {
 +      if (child.exitCode === null && child.signalCode === null && child.pid) {
@@ -8355,8 +9882,10 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +        receipt.cleanup.push({ name: 'scoped-validator-and-photon', stopped: stop.exitCode === 0 });
 +      } catch (error) { receipt.cleanup.push({ name: 'scoped-validator-and-photon', stopped: false, error: error.message }); }
 +    }
-+    try { await requireAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]); }
-+    catch { receipt.cleanup.push({ name: 'owned-port-release', stopped: false }); }
++    if (portPreflightPassed) {
++      try { await waitForAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]); }
++      catch { receipt.cleanup.push({ name: 'owned-port-release', stopped: false }); }
++    }
 +    if (receipt.cleanup.some((item) => item.stopped === false || item.error)) {
 +      receipt.status = 'failed'; receipt.error ??= 'Owned service cleanup did not finish';
 +    }
@@ -8374,6 +9903,7 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +        if (!receipt.sources.unchanged) { receipt.status = 'failed'; receipt.error ??= 'Application or reference-host source changed during this run'; }
 +      } catch (error) { receipt.status = 'failed'; receipt.error ??= `Source receipt failed: ${error.message}`; }
 +    }
++    receipt.measurements = await measurement.stop();
 +    await save();
 +    process.off('SIGINT', onInt); process.off('SIGTERM', onTerm);
 +  }
@@ -8398,14 +9928,15 @@ index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1
 +}
 diff --git a/tools/run-spawn-room-localnet.test.mjs b/tools/run-spawn-room-localnet.test.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..147dd5645657abe2a978cdc8911947f8769a63c8
+index 0000000000000000000000000000000000000000..9c6a0c22944bb8e77d5e645b5d5a389aa7520633
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.test.mjs
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,67 @@
 +import test from 'node:test';
 +import assert from 'node:assert/strict';
 +import { createServer, connect } from 'node:net';
-+import { normalizedPorts, requireAvailablePorts, validateJourneyResult } from './run-spawn-room-localnet.mjs';
++import { normalizedPorts, requireAvailablePorts, waitForAvailablePorts, validateJourneyResult } from './run-spawn-room-localnet.mjs';
++import { LocalnetResourceMonitor } from './localnet-resource-monitor.mjs';
 +
 +const report = () => ({ success: true, numPassedTests: 1, numFailedTests: 0, numPendingTests: 0, numTodoTests: 0,
 +  testResults: [{ assertionResults: [{ status: 'passed' }] }] });
@@ -8444,12 +9975,36 @@ index 0000000000000000000000000000000000000000..147dd5645657abe2a978cdc8911947f8
 +  assert.throws(() => normalizedPorts({ rpc: 65535 }), /range/);
 +  assert.throws(() => normalizedPorts({ rpc: '42899' }), /range/);
 +});
++
++test('shutdown waits for the owned listener to close after a stop acknowledgement', async () => {
++  const server = createServer();
++  await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
++  const port = server.address().port;
++  const closing = setTimeout(() => server.close(), 150);
++  try { await waitForAvailablePorts([port], 2000); }
++  finally {
++    clearTimeout(closing);
++    if (server.listening) await new Promise((done) => server.close(done));
++  }
++  assert.equal(server.listening, false);
++});
++
++test('Linux resource evidence reports an observed process RSS rather than a configured heap limit', { skip: process.platform !== 'linux' }, async () => {
++  const monitor = new LocalnetResourceMonitor();
++  const result = await monitor.stop();
++  assert.equal(result.supported, true);
++  assert.ok(result.samples > 0);
++  const self = result.processes.find((row) => row.pid === process.pid);
++  assert.ok(self.observedOsHighWaterRssKiB > 0);
++  assert.ok(self.sampledPeakRssKiB > 0);
++  assert.ok(result.sampledPeakConcurrentRssKiB >= self.sampledPeakRssKiB);
++});
 diff --git a/tools/spawn-room-localnet.md b/tools/spawn-room-localnet.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..f27491fbbce0b44b7ac2961d7edea6ee36c4d269
+index 0000000000000000000000000000000000000000..75240b3cfcddd9f14d63ea141b58cbb8918b80c0
 --- /dev/null
 +++ b/tools/spawn-room-localnet.md
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,152 @@
 +# Run the experimental room journey locally
 +
 +`run-spawn-room-localnet.mjs` runs a fresh local validator, Photon, ring indexer,
@@ -8481,10 +10036,17 @@ index 0000000000000000000000000000000000000000..f27491fbbce0b44b7ac2961d7edea6ee
 +
 +The native cache needs `transfer_ring_2_2.key` for genesis (included by the
 +custom-ring fetch command), plus `transfer_eddsa_ring_1_2.key` and
-+`transfer_eddsa_ring_2_2.key` for the hidden-owner rail. Obtain those exact artifacts using the pinned
-+Zolana key lock and downloader; do not download the full SPP catalog. The runner
-+checks the SHA256 and size of every cached native key against the two pinned
-+lockfiles before serving any keys.
++`transfer_eddsa_ring_2_2.key` for the hidden-owner rail. Fetch exactly the required
++extra keys with the pinned recipe, which verifies their hashes and sizes:
++
++```sh
++RING_EXTRA_SPP_KEY='transfer_eddsa_ring_1_2.key transfer_eddsa_ring_2_2.key' \
++  JUST_NO_DOTENV=true just fetch-custom-ring-keys
++```
++
++The runner independently checks the SHA256 and size of every cached native key
++against the two pinned lockfiles before serving any keys. It does not fetch the
++full SPP catalog.
 +
 +In this application checkout, install the pinned npm dependencies, prepare the
 +application keys/program/prover with `tools/prepare-spawn-room-localnet.sh`, and
@@ -8567,7 +10129,8 @@ index 0000000000000000000000000000000000000000..f27491fbbce0b44b7ac2961d7edea6ee
 +
 +- `run-receipt.json`: started/completed commands, artifact and key hashes,
 +  tracked and untracked source manifests, reference-host identity, resource
-+  settings, service ownership, cleanup status, and the final result.
++  settings, measured command durations, scope-labeled sampled process RSS and
++  OS high-water marks, service ownership, cleanup status, and the final result.
 +- `journey-evidence.json`: the actual journey's named checks and transaction
 +  signatures, written by the TypeScript test.
 +- `vitest-results.json`: the test runner's machine-readable result.
@@ -8581,6 +10144,13 @@ index 0000000000000000000000000000000000000000..f27491fbbce0b44b7ac2961d7edea6ee
 +executor is incomplete evidence, not a pass. An unsuccessful run retains its
 +logs for diagnosis and a fresh command creates a new isolated run directory.
 +These application receipts are separate from the upstream CR01 baseline.
++
++Resource measurements cover only the harness, its service/command process
++groups, and observed descendants. They exclude unrelated build and Go test
++lanes. The receipt distinguishes sampled concurrent RSS from each process's
++observed OS high-water mark, records the sampling interval and limitations, and
++keeps configured heap limits separate. The native workers also record their
++own process high-water marks before exiting. These are local-run measurements.
 +
 +The lightweight runner checks can be repeated without starting services:
 +

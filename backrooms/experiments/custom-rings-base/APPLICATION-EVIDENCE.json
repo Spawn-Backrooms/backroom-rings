@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "scope": "reviewed combined application, SDK/native adapter and runner; live validator journey pending",
+  "scope": "implemented combined application, SDK/native adapter and runner; partial real-validator progress; complete hidden-update/restart/reuse and final review remain unqualified",
   "sourcePins": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
     "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
     "backrooms": "08822c65254cd73c5f2dccbdf182ce1df2c7510a"
   },
-  "patchSha256": "3d46c4380633005bf2463fc1ab240932a7c097ab2aa61e2a6ebb6f35fcb491b8",
+  "patchSha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
   "keys": {
     "advance": {
       "sha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
@@ -78,6 +78,54 @@
     "cr01-stage-build-photon-20261124T010636Z.log": {
       "sha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de",
       "bytes": 14617
+    },
+    "full-note-go-tests.log": {
+      "sha256": "4ffaa8e10fada1e3bc88b10eb3abc9f55dbb3c3a3e9e6861731b53dea894960e",
+      "bytes": 2172
+    },
+    "application-green.log": {
+      "sha256": "c84528288047fdfe1925daedb369f42c871eee481b3cc247da27648e76bfba89",
+      "bytes": 1137
+    },
+    "genesis-green.log": {
+      "sha256": "95130801fa93129fd067da420197ea623ede1fb16d573b9878a8e20f79521bd5",
+      "bytes": 1007
+    },
+    "application-state-conformance.log": {
+      "sha256": "c39159f02bbe7e4d8a05f17aae89e5622f465274df12fb59e40f0d2abef7a261",
+      "bytes": 10954
+    },
+    "final-sdk-tests.log": {
+      "sha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41",
+      "bytes": 1034
+    },
+    "final-native-tests.log": {
+      "sha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758",
+      "bytes": 846
+    },
+    "final-app-harness-tests.log": {
+      "sha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee",
+      "bytes": 587
+    },
+    "final-sdk-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-journey-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-focused-lint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "cr01-stage-test-hermetic-20261124T014430Z.log": {
+      "sha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+      "bytes": 240436
+    },
+    "cr01-progress-parser-green.log": {
+      "sha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde",
+      "bytes": 1856
     }
   },
   "completed": [
@@ -86,24 +134,31 @@
     "real HTTP proof service for both exact key families",
     "strict full request witness round trip",
     "strict decode and full circuit solve of actual TypeScript SDK requests",
+    "all 14 non-opt-in TestSpawnRoom functions plus two TestSpawnRequests functions have terminal passing coverage",
+    "state gate: 5 top-level tests and 57 subcases (7 positive, 50 negative), zero failures/skips",
     "Rust verification of actual Go proof vectors with BSB22 commitments",
     "40 interface tests and 3 program entrypoint tests",
     "generic and unkeyed application build checks",
     "dedicated application SBF build",
-    "clean baseline just check-all",
-    "10 focused SDK tests and 2 actual native restart tests",
+    "18 focused SDK tests and 3 off-chain native/worker-launcher tests",
     "SDK/integration type checks and focused lint",
-    "3 independent localnet runner checks",
-    "final independent SDK/native/harness review; three Minor findings corrected",
-    "pristine upstream CLI and Photon builds",
-    "pristine upstream Go policy package under explicit timeout"
+    "5 focused localnet runner tests, zero failures/cancellations/skips",
+    "historical independent core, SDK/native, worker/resource reviews with their recorded corrections; not a review of later helper/corpus",
+    "clean pristine upstream just check-all, all eight native build stages, and just test-hermetic",
+    "15/18 upstream whole packages covered at unchanged source: nine test-package passes and six explicit no-test-files results",
+    "two actual eligible room notes recovered in second failed validator attempt",
+    "actual ledger-confirmed duplicate-genesis refusal with unchanged accepted state in second failed attempt",
+    "both exact upstream anonymous-validator cases passed with full command exit0 and unchanged source pins"
   ],
   "pending": [
-    "complete upstream Go suite with explicit resource-adjusted timeout",
-    "two exact upstream anonymous validator tests",
-    "live application create/advance/revoke/restart/reuse journey"
+    "complete upstream Go package coverage; latest transfer attempt failed after signal: killed",
+    "complete live application hidden-update/fresh-worker recovery/retry/reuse journey",
+    "live results for the implemented additional refusal corpus; full CR02/CR04 bullet remains broader than the named corpus",
+    "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
+    "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
+    "authorized native-maintainer developer-preview activation; no production activation"
   ],
-  "sourceFiles": 52,
+  "sourceFiles": 59,
   "finalTypeScriptRequestCheck": {
     "status": "complete",
     "command": [
@@ -173,5 +228,458 @@
     },
     "maxBytes": 4096,
     "liveSettlement": false
-  }
+  },
+  "patchBytes": 424108,
+  "patchGitBlobSha": "a44848b4b9ba6318cb0703b85a0ad59502922d56",
+  "publishedApplicationGoLogManifest": "evidence/application-go/manifest.json",
+  "focusedChecks": {
+    "sdk": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 8.921,
+      "passedTests": 18,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "logSha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41"
+    },
+    "native": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 9.684,
+      "passedTests": 3,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "logSha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758",
+      "scope": "Off-chain native fixtures and process-launcher behavior; does not establish validator settlement"
+    },
+    "runner": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 0.544,
+      "logSha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee",
+      "sourceUnchanged": true,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "sourceSha256": {
+        "tools/run-spawn-room-localnet.mjs": "4dd310b5f17598b70b4b8b1d81a9c0f2fa35c64aeac072bac78ca5e7e4beefe3",
+        "tools/run-spawn-room-localnet.test.mjs": "e5bf10ff3e0f612134a966f046e48ce428a803d005ee5e3fdc2082c41a5486aa",
+        "tools/localnet-resource-monitor.mjs": "6c7fafcbea91738b6955575b2e1f164a332a21c1b0707bd401c5df2a7c4fb646"
+      },
+      "scope": "existing lightweight local runner guard tests; no live validator journey or independent review"
+    },
+    "typesAndLint": [
+      {
+        "name": "sdk-types",
+        "command": [
+          "./node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "sdk-libs/ts/tsconfig.json"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 14.006,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "journey-types",
+        "command": [
+          "./node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "sdk-tests/spawn-room/tsconfig.json"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 9.769,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "focused-lint",
+        "command": [
+          "./node_modules/.bin/oxlint",
+          "--deny-warnings",
+          "sdk-libs/ts/src/experimental/spawn-room",
+          "sdk-libs/ts/test/experimental",
+          "sdk-tests/spawn-room"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.138,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "applicationStateConformance": {
+    "status": "passed",
+    "topLevelFunctions": 5,
+    "namedSubcases": 57,
+    "positiveSubcases": 7,
+    "negativeSubcases": 50,
+    "totalPassingEvents": 62,
+    "failed": 0,
+    "skipped": 0,
+    "packageSeconds": 4.704,
+    "commandWallSeconds": 9.084,
+    "sourceUnchanged": true,
+    "logSha256": "c39159f02bbe7e4d8a05f17aae89e5622f465274df12fb59e40f0d2abef7a261"
+  },
+  "liveValidatorAttempts": [
+    {
+      "attempt": "journey-y16s2B",
+      "status": "failed",
+      "startedAt": "2026-11-24T01:59:45.466Z",
+      "finishedAt": "2026-11-24T02:06:19.002Z",
+      "reason": "Primary revision-0 recovery timed out; fresh viewing history omitted application-ring registration.",
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "365",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "measuredDurationMs": 395518,
+      "sampledPeakConcurrentRssKiB": 2291320,
+      "lastSamplingError": null,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "fe4ac28c6f234094f0abe9a59b09b44a2b121e006050dcf10af7cabe5be10789",
+      "journeyEvidenceSha256": "eafa1c9284a06ed3528a987f7803a03ede041f61c1d13669d19a414ca55d1878",
+      "privateRunDirectoryPublished": false
+    },
+    {
+      "attempt": "journey-Xcz1rl",
+      "status": "failed",
+      "startedAt": "2026-11-24T02:13:00.153Z",
+      "finishedAt": "2026-11-24T02:16:12.085Z",
+      "reason": "First native worker indexed-transaction binding check failed; pinned Photon by-signature query omitted ring metadata.",
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "343",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        },
+        {
+          "name": "eligible-second-room",
+          "status": "passed",
+          "slot": "427",
+          "eligibleWriters": 2,
+          "unspentRoomNotes": 2
+        },
+        {
+          "name": "reject-duplicate-genesis",
+          "status": "passed",
+          "slot": "429",
+          "instructionError": "AccountAlreadyInitialized",
+          "acceptedRevision": "0"
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "measuredDurationMs": 193003,
+      "sampledPeakConcurrentRssKiB": 2860316,
+      "lastSamplingError": null,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "1c61ed04d6ca9a0e45dd959824e3e9621d0e3ec6199141b843bd6a783842a4ac",
+      "journeyEvidenceSha256": "e5772cae52c8e106e32f4d0eba159a36636b51d11b9412b699b304e9eedec9b4",
+      "privateRunDirectoryPublished": false
+    }
+  ],
+  "implementedUnexecutedLiveRefusals": [
+    "generic transfer/authority/merge/delegate bypasses",
+    "replay",
+    "revoked third grant after successful coherent simulation",
+    "wrong application-config account",
+    "wrong ring-policy account",
+    "unapproved settlement program",
+    "wrong operation key",
+    "reordered audit frame",
+    "peer-room input",
+    "bound output substitution",
+    "ciphertext substitution"
+  ],
+  "independentReview": {
+    "status": "incomplete",
+    "historicalReports": [
+      "APPLICATION-REVIEW.md",
+      "SDK-NATIVE-REVIEW.md",
+      "NATIVE-WORKER-REVIEW.md"
+    ],
+    "unreviewedDelta": [
+      "ring-aware indexed-note recovery helper",
+      "expanded live refusal corpus"
+    ],
+    "latestReview": "blocked by automated content review, including a narrower read-only request; possible cybersecurity risk cited",
+    "rejectionEstablishesCodeFinding": false,
+    "finalSignOff": false
+  },
+  "daybreakReview": {
+    "status": "setup-blocked",
+    "checkedAt": "2026-11-24T02:46:28.229739+00:00",
+    "repository": "Spawn-Backrooms/backroom-rings",
+    "githubConnected": true,
+    "repositoryVisible": true,
+    "access": "allowed",
+    "workflowsEnabled": true,
+    "matchingCloudEnvironment": null,
+    "usageAvailable": false,
+    "usageOutcome": "credits_exhausted",
+    "scanLaunched": false,
+    "requiredNextSteps": [
+      "Configure a Cloud environment containing the repository using the Daybreak app",
+      "Restore available scan credits",
+      "Select a supported review depth and exact final source target before launch"
+    ],
+    "scopeCaution": "A scan of the integration repository must explicitly account for the applied Custom Rings overlay; a scan of the unmodified base alone does not review the new profile."
+  },
+  "upstreamBaseline": {
+    "status": "incomplete",
+    "checkAll": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 38.226
+    },
+    "nativeBuildStages": [
+      {
+        "command": [
+          "just",
+          "build-photon"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 597.61,
+        "logSha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de"
+      },
+      {
+        "command": [
+          "just",
+          "build-programs"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 375.446,
+        "logSha256": "ec5ee2e0d5b5634941dc759bd5fe40041cc4d3a3f6be93723aea6c6beb629860"
+      },
+      {
+        "command": [
+          "just",
+          "build-prover-server"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 155.905,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "just",
+          "build-cli"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 369.407,
+        "logSha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75"
+      },
+      {
+        "command": [
+          "just",
+          "build-ring-indexer"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 297.652,
+        "logSha256": "72df6d04e57e508983d97a34eb4fd75bb5d5f1a75b81c2bd42e223fa8c472a55"
+      },
+      {
+        "command": [
+          "just",
+          "build-ring-rpc"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 127.996,
+        "logSha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee"
+      },
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--manifest-path",
+          "zolana/Cargo.toml",
+          "-p",
+          "xtask",
+          "--target-dir",
+          "zolana/target"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 343.445,
+        "logSha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d"
+      },
+      {
+        "command": [
+          "just",
+          "zolana::build-cli"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 882.376,
+        "logSha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698"
+      }
+    ],
+    "hermetic": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 1877.123,
+      "groups": [
+        {
+          "suite": "programs",
+          "passed": 149,
+          "defaultSkipped": 0
+        },
+        {
+          "suite": "sdk",
+          "passed": 1497,
+          "defaultSkipped": 33
+        },
+        {
+          "suite": "indexer",
+          "passed": 40,
+          "defaultSkipped": 4
+        }
+      ],
+      "logSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e"
+    },
+    "go": {
+      "status": "incomplete",
+      "requiredPackages": 18,
+      "retainedTerminalPassedPackages": 9,
+      "wholeSuitePass": false,
+      "latestTransferAttempt": {
+        "status": "failed",
+        "exitCode": 1,
+        "causeObserved": "signal: killed",
+        "underlyingKillCause": "not established",
+        "passedTestEventsBeforeFailure": 130,
+        "durationSeconds": 1126.731,
+        "logSha256": "dbfff8b10548193a1e8164f3cd1df3bb1133f0f04237df0e2b88567495a25bd6"
+      },
+      "earlierAttempts": [
+        "default 600-second package timeout",
+        "interrupted extended whole-suite command without terminal success receipt"
+      ],
+      "completedWholePackages": 15,
+      "explicitNoTestFilesPackages": 6,
+      "remainingPackages": [
+        "circuits/transfer",
+        "ring",
+        "ringtest"
+      ],
+      "latestLightPhase": {
+        "status": "awaiting-remaining-packages",
+        "newWholePackages": 9,
+        "testPackagesPassed": 3,
+        "explicitNoTestFilesPackages": 6,
+        "passedTestEvents": 30,
+        "failedTestEvents": 0,
+        "skippedTestEvents": 0,
+        "sourceBefore": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        },
+        "sourceAfter": {
+          "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+          "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+          "clean": true
+        }
+      }
+    },
+    "anonymousValidator": {
+      "status": "passed",
+      "command": [
+        "just",
+        "test-custom-ring-validator",
+        "test(an_anonymous_ring_hides_owners_and_preserves_auditor_access) | test(an_anonymous_policy_ring_screens_its_hidden_sender)",
+        "--color",
+        "never",
+        "--status-level",
+        "pass",
+        "--final-status-level",
+        "pass"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-11-24T02:55:01.336064+00:00",
+      "finishedAt": "2026-11-24T03:03:17.264737+00:00",
+      "durationSeconds": 495.928,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+      "passedCases": [
+        "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access",
+        "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender"
+      ],
+      "executedCases": 2,
+      "passedCaseCount": 2,
+      "otherCasesFilteredOut": 59,
+      "nextestDurationSeconds": 408.334,
+      "caseDurationsSeconds": {
+        "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender": 137.717,
+        "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access": 270.612
+      },
+      "scope": "Two required upstream anonymous-validator cases; not the complete validator test catalog or application journey."
+    },
+    "bootstrapChecks": {
+      "status": "passed",
+      "passedTests": 23,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "durationSeconds": 2.503,
+      "logSha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde",
+      "scope": "Controlled child output, not proof or validator execution"
+    }
+  },
+  "focusedCheckEvidenceDirectory": "evidence/focused-checks/"
 }

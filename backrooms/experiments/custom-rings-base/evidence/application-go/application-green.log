@@ -1,0 +1,16 @@
+=== RUN   TestSpawnRoomApplicationHonestAndBoundStatements
+=== RUN   TestSpawnRoomApplicationHonestAndBoundStatements/honest
+=== RUN   TestSpawnRoomApplicationHonestAndBoundStatements/changed_application_hash
+=== RUN   TestSpawnRoomApplicationHonestAndBoundStatements/revoked_grant_root
+=== RUN   TestSpawnRoomApplicationHonestAndBoundStatements/different_network
+--- PASS: TestSpawnRoomApplicationHonestAndBoundStatements (26.03s)
+    --- PASS: TestSpawnRoomApplicationHonestAndBoundStatements/honest (6.78s)
+    --- PASS: TestSpawnRoomApplicationHonestAndBoundStatements/changed_application_hash (6.19s)
+    --- PASS: TestSpawnRoomApplicationHonestAndBoundStatements/revoked_grant_root (7.01s)
+    --- PASS: TestSpawnRoomApplicationHonestAndBoundStatements/different_network (6.04s)
+=== RUN   TestSpawnRoomApplicationPublicWitnessHasOnlyTwoHashes
+--- PASS: TestSpawnRoomApplicationPublicWitnessHasOnlyTwoHashes (0.03s)
+=== RUN   TestSpawnRoomApplicationStatementMatchesRustVector
+--- PASS: TestSpawnRoomApplicationStatementMatchesRustVector (0.01s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	26.118s
