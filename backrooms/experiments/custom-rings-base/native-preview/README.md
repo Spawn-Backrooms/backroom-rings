@@ -40,6 +40,6 @@ node --test readiness.test.mjs
 node fixtures/run.mjs
 ```
 
-The [execution evidence](evidence/README.md) records the observed commands, complete outputs, source digests, and comparison with the published profile pins. These checks exercise the display contract with constructed inputs.
+The [historical execution evidence](evidence/README.md) records the commands, outputs, and source digests for the overlay before recovery pagination was bounded. These checks exercise the display contract with constructed inputs. The current descriptor pins the revised overlay.
 
 The CLI accepts a JSON pack path or `-` for stdin. The default pack is in [fixtures/cases.mjs](fixtures/cases.mjs). Every report and result is explicitly synthetic and non-qualifying. The CLI exits with code 1 for a malformed pack, an empty pack, or an expectation mismatch. The behavior suite checks the generated descriptor against its source. Regenerate it with `node descriptor.mjs > descriptor.json` after an approved contract edit.

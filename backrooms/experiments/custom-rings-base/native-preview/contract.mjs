@@ -60,7 +60,7 @@ export const publicPolicy = makePolicy(
     customRingsSource: "02bca33729051798834ecbb4d94e968cdc0ef9b8",
     zolanaSource: "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
     backroomsReferenceHost: "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
-    overlaySha256: "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+    overlaySha256: "3eeb21c1e2943ca3f32bbf3e0795e9932feb32b206f5b2c49b1360525ac2b15b",
     programId: "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
     programSha256: "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d",
     genesisKeySha256: "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",

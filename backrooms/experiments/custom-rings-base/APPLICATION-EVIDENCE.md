@@ -9,11 +9,14 @@ cleanup. Final independent review, broader conformance and native
 product activation are still separate gates. This is a recorded localnet pass,
 not final preview release approval.
 
-This checkpoint contains **59 source files** in the portable overlay. Its patch
-SHA-256 is
+The 25-step run used this historical **59-file** overlay at SHA-256
 `2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462`.
-The exact base commits and every resulting file digest are in
-[fork-overlay/application-core.manifest.json](fork-overlay/application-core.manifest.json).
+The base commits and file digests are in the
+[manifest from that checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/16e208b296ca6e67e8de552066fae830cf548f3a/backrooms/experiments/custom-rings-base/fork-overlay/application-core.manifest.json).
+The [current overlay manifest](fork-overlay/application-core.manifest.json)
+records a later recovery change. The lookup uses the SDK page cap, reports
+incomplete index coverage as retryable, and runs within a native caller
+deadline. The historical validator run predates this change.
 [APPLICATION-EVIDENCE.json](APPLICATION-EVIDENCE.json) records the artifact
 identities, execution results and outstanding gates. The earlier synthetic
 composition oracle and initial uncompiled two-file candidate are historical

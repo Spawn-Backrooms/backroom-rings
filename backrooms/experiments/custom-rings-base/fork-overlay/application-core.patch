@@ -5497,15 +5497,26 @@ index 0000000000000000000000000000000000000000..75648d7cb7cdc1b19feb965d56f43ce0
 +}
 diff --git a/sdk-libs/ts/src/experimental/spawn-room/recovery.ts b/sdk-libs/ts/src/experimental/spawn-room/recovery.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..971794c1b9cf81091f5164ea22311608a4adf5d9
+index 0000000000000000000000000000000000000000..713d9e7050288d5ac8d380550da731d15f561161
 --- /dev/null
 +++ b/sdk-libs/ts/src/experimental/spawn-room/recovery.ts
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,73 @@
 +/** Confirmed-note lookup through the pinned indexer's ring-aware history query. */
 +import type { Address, Bytes32, RequestContext, Signature } from "@heliuslabs/spr";
 +import type { IndexerReader, IndexerRpcConfig } from "@heliuslabs/spr/client";
 +import { equalBytes } from "@heliuslabs/spr/internal";
 +import type { IndexedShieldedTransaction } from "@heliuslabs/spr/transaction";
++import { scanLimits } from "../../rpc/history.js";
++
++const { pageSize, maxPages } = scanLimits({});
++
++export class SpawnRoomIndexIncomplete extends Error {
++  readonly retryable = true;
++
++  constructor(code: "spawn_observed_note_incomplete_index" | "spawn_observed_note_page_limit") {
++    super(code);
++  }
++}
 +
 +/**
 + * Pinned Photon omits ring metadata from its by-signature SELECT. The by-ring
@@ -5528,20 +5539,21 @@ index 0000000000000000000000000000000000000000..971794c1b9cf81091f5164ea22311608
 +    throw new Error("spawn_observed_note_slot");
 +  let paginationToken: string | undefined;
 +  const seen = new Set<string>();
-+  for (;;) {
++  for (let pageNumber = 0; pageNumber < maxPages; pageNumber++) {
++    context?.signal?.throwIfAborted();
 +    const page = await input.client.getShieldedTransactionsByTags(
 +      {
 +        tags: [],
 +        ringProgramId: input.ringProgramId,
 +        filters: { slot: { gte: input.slot, lte: input.slot } },
-+        limit: 1_000,
++        limit: pageSize,
 +        ...(paginationToken === undefined ? {} : { paginationToken }),
 +      },
 +      input.config,
 +      context,
 +    );
 +    if (page.context.slot < input.config.requireSlot)
-+      throw new Error("spawn_observed_note_incomplete_index");
++      throw new SpawnRoomIndexIncomplete("spawn_observed_note_incomplete_index");
 +    for (const group of page.data) {
 +      if (group.slot !== input.slot || group.signature !== input.signature) continue;
 +      for (const transaction of group.events)
@@ -5560,6 +5572,7 @@ index 0000000000000000000000000000000000000000..971794c1b9cf81091f5164ea22311608
 +    seen.add(page.paginationToken);
 +    paginationToken = page.paginationToken;
 +  }
++  throw new SpawnRoomIndexIncomplete("spawn_observed_note_page_limit");
 +}
 diff --git a/sdk-libs/ts/src/experimental/spawn-room/staging.ts b/sdk-libs/ts/src/experimental/spawn-room/staging.ts
 new file mode 100644
@@ -6089,15 +6102,16 @@ index 0000000000000000000000000000000000000000..f410f2d8fb59aebb5b26e832ce5de887
 +});
 diff --git a/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts b/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..d1c95e9e95e63bbd8ae426cc948d947f27f26887
+index 0000000000000000000000000000000000000000..f544648d7e3c7f4957d6a10c439c337cafc43789
 --- /dev/null
 +++ b/sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts
-@@ -0,0 +1,132 @@
+@@ -0,0 +1,152 @@
 +import { describe, expect, it } from "vitest";
 +import type { GetShieldedTransactionsByTagsResponse, IndexerReader } from "@heliuslabs/spr/client";
 +import type { IndexedShieldedTransaction } from "@heliuslabs/spr/transaction";
 +import { findSpawnRoomIndexedNote } from "../../src/experimental/spawn-room/recovery.js";
 +import { encodeRingBodyOutput } from "../../src/protocol/transaction/output.js";
++import { scanLimits } from "../../src/rpc/history.js";
 +import { randomAddress, TREE } from "../helpers/ring-pipeline.js";
 +import { signature } from "../helpers/ring-scan.js";
 +import { spawnPayloadFixture } from "./spawn-room-fixture.js";
@@ -6207,6 +6221,25 @@ index 0000000000000000000000000000000000000000..d1c95e9e95e63bbd8ae426cc948d947f
 +        },
 +      }),
 +    ).rejects.toThrow("spawn_observed_note_incomplete_index");
++  });
++
++  it("reports an incomplete, retryable lookup when it reaches the history page limit", async () => {
++    const f = indexedFixture();
++    const { maxPages } = scanLimits({});
++    let pageNumber = 0;
++    await expect(
++      findSpawnRoomIndexedNote({
++        ...f.input,
++        client: {
++          getShieldedTransactionsByTags: async () => ({
++            context: { slot: 29n, blockTime: 0n },
++            data: [],
++            paginationToken: `page-${++pageNumber}`,
++          }),
++        },
++      }),
++    ).rejects.toMatchObject({ message: "spawn_observed_note_page_limit", retryable: true });
++    expect(pageNumber).toBe(maxPages);
 +  });
 +
 +  it("refuses a repeated page token instead of hanging or assuming coverage", async () => {
@@ -8431,10 +8464,10 @@ index 0000000000000000000000000000000000000000..6454eb4b99d74e4543a462432c9da73a
 +}, 60_000);
 diff --git a/sdk-tests/spawn-room/native-worker.test.ts b/sdk-tests/spawn-room/native-worker.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..078b3d1cbf12bc55a97d1790ed841a254350f09b
+index 0000000000000000000000000000000000000000..23d540eaa3fa3857bf15ed2b3342c5662fe2c0a3
 --- /dev/null
 +++ b/sdk-tests/spawn-room/native-worker.test.ts
-@@ -0,0 +1,406 @@
+@@ -0,0 +1,409 @@
 +/** Invoked by a fresh Vitest process, never imported into the proof coordinator. */
 +import { readFile, writeFile } from "node:fs/promises";
 +import { join, resolve } from "node:path";
@@ -8670,14 +8703,17 @@ index 0000000000000000000000000000000000000000..078b3d1cbf12bc55a97d1790ed841a25
 +      `actual note revision ${job.expectedRevision}`,
 +    );
 +    // Independently bind the recovered note to the recorded successful transaction.
-+    await findSpawnRoomIndexedNote({
-+      client,
-+      ringProgramId,
-+      signature: observedSignature,
-+      slot: observedSlot,
-+      commitment: recovered.room.commitment,
-+      config: { ...client.indexerConfig, requireSlot: recovered.contextSlot },
-+    });
++    await findSpawnRoomIndexedNote(
++      {
++        client,
++        ringProgramId,
++        signature: observedSignature,
++        slot: observedSlot,
++        commitment: recovered.room.commitment,
++        config: { ...client.indexerConfig, requireSlot: recovered.contextSlot },
++      },
++      { signal: AbortSignal.timeout(30_000) },
++    );
 +    const marker = await spawnRoomGenesisAddress(
 +      ringProgramId,
 +      spawnRoomIdentity(recovered.room.state),
