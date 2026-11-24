@@ -1,11 +1,11 @@
 {
   "schema": "cr01-durable-go-requalification-v1",
-  "generatedAt": "2026-11-24T12:15:28.424682+00:00",
+  "generatedAt": "2026-11-24T13:13:21.124951+00:00",
   "status": "incomplete",
   "executionMode": "18-separate-unfiltered-package-commands",
   "requiredPackageCount": 18,
-  "verifiedTerminalPackageCount": 15,
-  "passedTestPackageCount": 9,
+  "verifiedTerminalPackageCount": 16,
+  "passedTestPackageCount": 10,
   "explicitNoTestFilesPackageCount": 6,
   "source": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
@@ -144,6 +144,28 @@
       "receiptSha256": "86eeddeb51c3059213b3f065121cc7981a9510fadb24aabc7a7ce9425266975a"
     },
     {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ring",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 3192.277,
+      "passEvents": 197,
+      "topLevelPasses": 21,
+      "skipEvents": 6,
+      "skippedTests": [
+        "TestExportAeglosRingFixtures",
+        "TestRingRpcEscrowFixture",
+        "TestStorageFixtures",
+        "TestWriteConstraintPins",
+        "TestWriteGoldenRequests",
+        "TestWriteRequestFixtures"
+      ],
+      "logSha256": "64653a502d17b15877e95095e5b1a8af3db9ea9b3f5f3b20ea7964f238d38722",
+      "logBytes": 212667,
+      "sampledConcurrentRssPeakKiB": 2313264,
+      "receipt": "packages/ring-20261124T121545Z.json",
+      "receiptSha256": "dbb5eb78d9721aba069ef69798d9062e79ea8ef8f4e0e3f25028fefdea290366"
+    },
+    {
       "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest/ringaudit",
       "status": "passed",
       "exitCode": 0,
@@ -251,7 +273,6 @@
   ],
   "missingPackages": [
     "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
-    "github.com/helius-labs/zolana-custom-rings/prover/ring",
     "github.com/helius-labs/zolana-custom-rings/prover/ringtest"
   ],
   "incompleteAttempts": [],

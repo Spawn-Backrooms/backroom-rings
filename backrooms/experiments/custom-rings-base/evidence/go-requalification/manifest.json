@@ -1,16 +1,16 @@
 {
   "schema": "cr01-go-requalification-manifest-v1",
-  "generatedAt": "2026-11-24T12:15:28.424682+00:00",
+  "generatedAt": "2026-11-24T13:13:21.124951+00:00",
   "qualificationStatus": "incomplete",
-  "verifiedTerminalPackageCount": 15,
+  "verifiedTerminalPackageCount": 16,
   "requiredPackageCount": 18,
-  "summarySha256": "6860025950bb5e3bf22e7212037488cb5be0202b991435f614d52c254c72c0c4",
+  "summarySha256": "fe813c37684073ebb0feddb61fc7df4e69ac1c8067bf05601d53bf6b9dc051a7",
   "files": [
     {
       "path": "README.md",
-      "bytes": 2352,
-      "sha256": "a0748095ac479389b50ea4f0b8e4a208595c9bd8e302a08b454627a47ab68ed3",
-      "gitBlobSha1": "2784fb5c3b4f96e17f29e87f73490dd178343e1c"
+      "bytes": 2354,
+      "sha256": "7cef4b36d5ea170a8ee71a96608edfe8d8a42dfe600912d722b247b6cc4f3755",
+      "gitBlobSha1": "fc189b5786a3a90e1ded70524b8e06c19ac8678f"
     },
     {
       "path": "daybreak-status.json",
@@ -47,6 +47,12 @@
       "bytes": 10311,
       "sha256": "56a518cbf02cd3c434c7a65d17e0033ec3e400449bfd409ea30e787d43901bc7",
       "gitBlobSha1": "aad47e21fa55cac1261415a427eee0c5a5d6c4f7"
+    },
+    {
+      "path": "inspection/terminal-ring-log.json",
+      "bytes": 11198,
+      "sha256": "e9ae2b2e6246056778d5ac3309e9b3778cd3ebf47545cb841a3baba9f194b919",
+      "gitBlobSha1": "ad502b7616c7f7a1e8b55724619fbef5ec1aa933"
     },
     {
       "path": "keys-recovery.json",
@@ -211,6 +217,24 @@
       "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
     {
+      "path": "packages/ring-20261124T121545Z.json",
+      "bytes": 6383,
+      "sha256": "dbb5eb78d9721aba069ef69798d9062e79ea8ef8f4e0e3f25028fefdea290366",
+      "gitBlobSha1": "381ee19eb7acb3a53cf8b5206e0c303937908a96"
+    },
+    {
+      "path": "packages/ring-20261124T121545Z.jsonl",
+      "bytes": 212667,
+      "sha256": "64653a502d17b15877e95095e5b1a8af3db9ea9b3f5f3b20ea7964f238d38722",
+      "gitBlobSha1": "2ba39114f7f24bbe8be092ead45443f41389fa9b"
+    },
+    {
+      "path": "packages/ring-20261124T121545Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
       "path": "packages/ringtest-ringaudit-20261124T114534Z.json",
       "bytes": 4708,
       "sha256": "1e099078fc2fee9904152118f6a3d217b955be4bedf57a5ac9f4a8967b02f405",
@@ -350,9 +374,9 @@
     },
     {
       "path": "summary.json",
-      "bytes": 10749,
-      "sha256": "6860025950bb5e3bf22e7212037488cb5be0202b991435f614d52c254c72c0c4",
-      "gitBlobSha1": "c3864da1c81d75e3ca4e25034282cb50dd21ec90"
+      "bytes": 11484,
+      "sha256": "fe813c37684073ebb0feddb61fc7df4e69ac1c8067bf05601d53bf6b9dc051a7",
+      "gitBlobSha1": "e3755e228a2cb9add911b4b585501b6564968fb3"
     },
     {
       "path": "verification-guards.json",
