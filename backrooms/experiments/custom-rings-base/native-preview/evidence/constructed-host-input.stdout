@@ -1,0 +1,122 @@
+{
+  "schema": "cr05-constructed-host-input-check.v1",
+  "synthetic": true,
+  "qualifying": false,
+  "observations": "Constructed inputs; no live services were probed.",
+  "current": {
+    "kind": "host-observation",
+    "purpose": "display-only",
+    "activationAuthorized": false,
+    "productionAvailable": false,
+    "status": "blocked",
+    "primaryAction": {
+      "code": "obtain-cr02-acceptance",
+      "label": "Obtain independent CR02 acceptance"
+    },
+    "reasons": [
+      {
+        "check": "cr02-independent-acceptance",
+        "code": "qualification-open",
+        "message": "Independent CR02 acceptance is open."
+      },
+      {
+        "check": "cr03-dependency",
+        "code": "qualification-open",
+        "message": "CR03 dependency acceptance is open."
+      },
+      {
+        "check": "cr04-independent-acceptance",
+        "code": "qualification-open",
+        "message": "Independent CR04 acceptance is open."
+      },
+      {
+        "check": "native-integration",
+        "code": "qualification-open",
+        "message": "The exact maintainer-approved native source, build, and integration evidence are open."
+      }
+    ],
+    "disclosures": [
+      "public-enrollment-and-genesis",
+      "public-global-config-and-root-changes",
+      "public-payer-and-timing",
+      "designated-auditor-ring-access",
+      "native-host-private-originals-and-learning-state",
+      "operator-provider-and-network-anonymity-unqualified",
+      "multiple-eligible-note-owners-required-for-journey",
+      "insecure-keys-localnet-only"
+    ]
+  },
+  "syntheticInputAtHostApi": {
+    "kind": "host-observation",
+    "purpose": "display-only",
+    "activationAuthorized": false,
+    "productionAvailable": false,
+    "status": "blocked",
+    "primaryAction": {
+      "code": "check-artifacts",
+      "label": "Check the local preview artifacts"
+    },
+    "reasons": [
+      {
+        "check": "artifacts",
+        "code": "scope-mismatch",
+        "message": "The artifact observation is for a different profile scope."
+      },
+      {
+        "check": "cr02-independent-acceptance",
+        "code": "qualification-open",
+        "message": "Independent CR02 acceptance is open."
+      },
+      {
+        "check": "cr03-dependency",
+        "code": "qualification-open",
+        "message": "CR03 dependency acceptance is open."
+      },
+      {
+        "check": "cr04-independent-acceptance",
+        "code": "qualification-open",
+        "message": "Independent CR04 acceptance is open."
+      },
+      {
+        "check": "native-integration",
+        "code": "qualification-open",
+        "message": "The exact maintainer-approved native source, build, and integration evidence are open."
+      },
+      {
+        "check": "runtime",
+        "code": "scope-mismatch",
+        "message": "The runtime observation is for a different profile scope."
+      },
+      {
+        "check": "validator",
+        "code": "scope-mismatch",
+        "message": "The validator observation is for a different profile scope."
+      },
+      {
+        "check": "prover",
+        "code": "scope-mismatch",
+        "message": "The prover observation is for a different profile scope."
+      },
+      {
+        "check": "indexer",
+        "code": "scope-mismatch",
+        "message": "The indexer observation is for a different profile scope."
+      },
+      {
+        "check": "recovery",
+        "code": "scope-mismatch",
+        "message": "The recovery observation is for a different profile scope."
+      }
+    ],
+    "disclosures": [
+      "public-enrollment-and-genesis",
+      "public-global-config-and-root-changes",
+      "public-payer-and-timing",
+      "designated-auditor-ring-access",
+      "native-host-private-originals-and-learning-state",
+      "operator-provider-and-network-anonymity-unqualified",
+      "multiple-eligible-note-owners-required-for-journey",
+      "insecure-keys-localnet-only"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "status": "failed",
+  "wrapperExitCode": 1,
+  "stage": "parse-behavior-output",
+  "reason": "Node default reporter produced spec output while collector expected TAP. Raw outputs retained; no initial terminal receipt was produced.",
+  "correction": "Select the TAP reporter explicitly and checkpoint each command receipt before parsing."
+}

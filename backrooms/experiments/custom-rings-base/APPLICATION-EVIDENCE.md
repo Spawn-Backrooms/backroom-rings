@@ -147,6 +147,29 @@ Use [QUICKSTART.md](QUICKSTART.md) for source preparation and invocation, and
 [NATIVE-ADAPTER-HANDOFF.md](NATIVE-ADAPTER-HANDOFF.md) for the native persistence,
 retry, process and product-readiness contracts.
 
+## Public CR05 readiness contract
+
+The [native preview package](native-preview/README.md) now supplies the explicit
+anonymous localnet profile, ordered readiness blockers, action labels, privacy
+disclosures, and a digest-only maintainer return envelope. The descriptor pins
+the existing public source, program, proving keys, and seeded runtime. This
+package sits outside the unchanged 59-file application overlay.
+
+The [execution evidence](native-preview/evidence/README.md) records **16 passing
+behavior tests and 47 passing synthetic fixtures**, with zero failures or skips.
+One fixture exercises the ready display. A direct call with constructed matching
+host observations still reports CR02, CR03, CR04, and native integration as open;
+optimistic references and synthetic inputs cannot upgrade that policy. All
+results retain display-only capabilities, with native activation and production
+availability false.
+
+The generated descriptor is byte-identical to its source. Eight artifact
+identities and both runtime commitments match the existing public application
+records. The exact commands, raw outputs, source hashes, and corrected attempts
+are retained in the evidence packet. This work adds display-contract checks;
+it does not add proof execution, validator evidence, independent application
+acceptance, or native host/UI activation.
+
 ## Review and baseline gates
 
 The [acceptance status map](ACCEPTANCE-STATUS.md) links all five CR02 and four

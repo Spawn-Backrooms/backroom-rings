@@ -14,8 +14,10 @@ The public application journey now has a real-validator pass. Its 25 steps
 include two hidden updates, fresh-process confirmation recovery, a deliberate
 post-receipt interruption and retry, retained-lesson reuse, and 15 expected
 ledger refusals. The [live evidence](evidence/spawn-room-live-pass.json) records
-that run. Final independent review and the remaining upstream baseline gates
-are still open; this run does not activate the private native host or UI.
+that run. The [upstream baseline](https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/README.md)
+now records complete qualification, including all 18 required Go packages.
+Final independent application acceptance remains open. These results do not
+activate the private native host or UI.
 
 | Boundary | Exact selection |
 | --- | --- |
@@ -244,6 +246,16 @@ separate qualification levels.
 
 ## Readiness and UI handoff
 
+The [public readiness package](native-preview/README.md) supplies the versioned
+profile, ordered blockers, action labels, privacy disclosures, and digest-only
+maintainer return envelope. Its [descriptor](native-preview/descriptor.json)
+pins the published source, program, keys, and seeded runtime. The host passes
+fresh observations to `evaluateReadiness` and renders the returned primary
+action and reasons. The current policy reports CR02, CR03, CR04, and native
+integration as open, even when the supplied local observations match. Its
+synthetic fixtures exercise ready and blocked displays; every result retains
+`activationAuthorized: false` and `productionAvailable: false`.
+
 The native maintainer should select this profile explicitly in a developer
 preview. Enable local actions only for a matching qualified profile with the
 expected program, key fingerprints, native runtime binding, reachable local
@@ -265,13 +277,16 @@ second owner without a live eligible note is insufficient for that fixture.
 
 ## Evidence the native maintainer should return
 
-After the remaining independent review and baseline gates pass, use the exact
-approved public overlay and qualified key/program digests.
+The upstream baseline is complete. After the remaining independent application
+acceptance passes, use the exact approved public overlay and qualified key and
+program digests.
 Return content-safe references to the actual native source revision, explicit
 profile selection/readiness behavior, create/work/review/remember/restart/reuse
 trace, actual proof/chain signatures and recovered revision, and UI checks for
 local readiness and blocked states. Separate code review, proof verification,
 validator execution and native product activation in those records.
+The public package's `prepareEvidenceEnvelope` checks the shape of that return
+record. A valid envelope supplies context and does not grant acceptance.
 
 The public conformance sources include coherent circuit/state/grant negatives,
 strict request tests, real encrypted payload recovery, original/grant retry

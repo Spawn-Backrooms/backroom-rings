@@ -1,0 +1,70 @@
+{
+  "schema": "cr05-display-contract-evidence-manifest.v1",
+  "scope": "Synthetic public display-contract verification only",
+  "files": {
+    "README.md": {
+      "bytes": 3360,
+      "sha256": "7126500b031e56748e31a6288a6482b7cf4ac8411c39ba83e120e25ec7e0d0a7"
+    },
+    "behavior.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "behavior.stdout": {
+      "bytes": 3761,
+      "sha256": "7c3a6f70c645780b343ea8aee7fd498b29cf72f37e9d032465cc688835ab69bb"
+    },
+    "collector-failure.json": {
+      "bytes": 343,
+      "sha256": "2d66e50a3be2af4f83d4fbb15d6756dbc02f3997cd410149031fb403154c1c37"
+    },
+    "collector-initial-behavior.log": {
+      "bytes": 1654,
+      "sha256": "087c218479d124d80d109765498392d71217a6bf8134f3024fd977935dc05562"
+    },
+    "constructed-host-input.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "constructed-host-input.stdout": {
+      "bytes": 3923,
+      "sha256": "5f2003331b97a6e9de5d2dcfa3b996da45e813494f9f3b19c6450fd953b0d96a"
+    },
+    "descriptor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "descriptor.stdout": {
+      "bytes": 16618,
+      "sha256": "3e7e50d44026eec2c91925232427c67b52fda8e21a12fbaa74b4b02510514353"
+    },
+    "fixtures.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fixtures.stdout": {
+      "bytes": 60762,
+      "sha256": "8187b86f0379c654322c5e3f275a4526a3dfe8ff9e7e3cc92024ec9dc56857f1"
+    },
+    "node-version.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "node-version.stdout": {
+      "bytes": 9,
+      "sha256": "4409d3bfa08b82f385bd424eeda65fc63b756129f0e89e82df77f1fecafccc14"
+    },
+    "owner-initial-behavior.log": {
+      "bytes": 2591,
+      "sha256": "817b1c77618570089797ec3e3e6d665d826d99689ac5be33516f309fc1ab479c"
+    },
+    "public-profile-comparison.json": {
+      "bytes": 2664,
+      "sha256": "e7df1217a5abef34c747bd575e837e6b2baa3d5555ec2956fb97b44732b1ab30"
+    },
+    "verification-receipt.json": {
+      "bytes": 8721,
+      "sha256": "3562db491e45540621b9abec22f56afdf6b8f3ee87d16626f848ce86c2fad117"
+    }
+  }
+}

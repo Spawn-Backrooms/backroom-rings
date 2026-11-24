@@ -151,7 +151,8 @@
     "two eligible room notes, both actual hidden updates and retained-lesson reuse settled on the local validator",
     "fresh-process interrupted-confirmation recovery, controlled post-receipt failure/retry and completed-job re-entry preserved exact records without repeated inference",
     "15 named ledger-confirmed refusal transactions retained accepted account, wallet-note and peer-room state",
-    "five owned service groups stopped and application, Zolana and reference-host source remained unchanged"
+    "five owned service groups stopped and application, Zolana and reference-host source remained unchanged",
+    "public CR05 display-readiness contract: 16 behavior tests and 47 explicitly synthetic fixtures passed; no independent application acceptance or native activation"
   ],
   "pending": [
     "complete the broader CR02/CR04 qualification listed in ACCEPTANCE-STATUS.md; the executed named live corpus does not establish every acceptance variant",
@@ -1291,5 +1292,48 @@
     "status": "passed",
     "count": 18,
     "required": 18
+  },
+  "publicNativePreviewContract": {
+    "schema": "cr05-public-contract-checkpoint.v1",
+    "status": "implemented-and-tested-display-contract-only",
+    "packagePath": "native-preview/",
+    "descriptor": "native-preview/descriptor.json",
+    "evidenceDirectory": "native-preview/evidence/",
+    "publicProfileSourceRevision": "d1abad088b9d6f9ed80330b5c002b6d733fd3dca",
+    "node": "v24.22.3",
+    "verifiedPackageFiles": 11,
+    "behavior": {
+      "tests": 16,
+      "pass": 16,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "fixtures": {
+      "status": "passed",
+      "passed": 47,
+      "failed": 0,
+      "readyCases": 1,
+      "synthetic": true,
+      "qualifying": false
+    },
+    "publicArtifactIdentitiesMatched": 8,
+    "publicRuntimeCommitmentsMatched": 2,
+    "descriptorByteEqual": true,
+    "sourceUnchangedDuringVerification": true,
+    "displayOnly": true,
+    "applicationOverlayChanged": false,
+    "independentApplicationAcceptance": false,
+    "nativeActivation": false,
+    "productionAvailable": false,
+    "currentOpenGates": [
+      "cr02-independent-acceptance",
+      "cr03-dependency",
+      "cr04-independent-acceptance",
+      "native-integration"
+    ],
+    "verificationReceiptSha256": "3562db491e45540621b9abec22f56afdf6b8f3ee87d16626f848ce86c2fad117",
+    "evidenceManifestSha256": "39f33317e65709a4789811bead169842349012ae03d8a80034efda777a76d4be"
   }
 }

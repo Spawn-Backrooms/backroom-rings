@@ -1,0 +1,242 @@
+{
+  "schema": "cr05-display-contract-verification.v1",
+  "status": "passed",
+  "scope": "Public display contract, synthetic fixtures, and public fingerprint comparison only.",
+  "synthetic": true,
+  "qualifying": false,
+  "nativeActivation": false,
+  "applicationAcceptance": false,
+  "node": "v24.22.3",
+  "nodeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "commands": [
+    {
+      "name": "node-version",
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "cwd": "backrooms/experiments/custom-rings-base/native-preview",
+      "startedAt": "2026-11-24T16:39:10.660462+00:00",
+      "finishedAt": "2026-11-24T16:39:10.682484+00:00",
+      "exitCode": 0,
+      "stdout": {
+        "path": "node-version.stdout",
+        "bytes": 9,
+        "sha256": "4409d3bfa08b82f385bd424eeda65fc63b756129f0e89e82df77f1fecafccc14"
+      },
+      "stderr": {
+        "path": "node-version.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "behavior",
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "readiness.test.mjs"
+      ],
+      "cwd": "backrooms/experiments/custom-rings-base/native-preview",
+      "startedAt": "2026-11-24T16:39:10.683469+00:00",
+      "finishedAt": "2026-11-24T16:39:12.824222+00:00",
+      "exitCode": 0,
+      "stdout": {
+        "path": "behavior.stdout",
+        "bytes": 3761,
+        "sha256": "7c3a6f70c645780b343ea8aee7fd498b29cf72f37e9d032465cc688835ab69bb"
+      },
+      "stderr": {
+        "path": "behavior.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "node",
+        "fixtures/run.mjs"
+      ],
+      "cwd": "backrooms/experiments/custom-rings-base/native-preview",
+      "startedAt": "2026-11-24T16:39:12.825843+00:00",
+      "finishedAt": "2026-11-24T16:39:12.976715+00:00",
+      "exitCode": 0,
+      "stdout": {
+        "path": "fixtures.stdout",
+        "bytes": 60762,
+        "sha256": "8187b86f0379c654322c5e3f275a4526a3dfe8ff9e7e3cc92024ec9dc56857f1"
+      },
+      "stderr": {
+        "path": "fixtures.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "descriptor",
+      "argv": [
+        "node",
+        "descriptor.mjs"
+      ],
+      "cwd": "backrooms/experiments/custom-rings-base/native-preview",
+      "startedAt": "2026-11-24T16:39:12.978379+00:00",
+      "finishedAt": "2026-11-24T16:39:13.145044+00:00",
+      "exitCode": 0,
+      "stdout": {
+        "path": "descriptor.stdout",
+        "bytes": 16618,
+        "sha256": "3e7e50d44026eec2c91925232427c67b52fda8e21a12fbaa74b4b02510514353"
+      },
+      "stderr": {
+        "path": "descriptor.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "constructed-host-input",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { evaluateReadiness } from './readiness.mjs';\nimport descriptor from './descriptor.json' with { type: 'json' };\nimport { healthyInput, optimisticReferences, scenarios } from './fixtures/inputs.mjs';\nconst input = healthyInput(descriptor.profile);\ninput.qualification = optimisticReferences(descriptor.profile.scopeSha256);\nconst current = evaluateReadiness(input);\nassert.equal(current.status, 'blocked');\nassert.deepEqual(current.reasons.map(({check}) => check), ['cr02-independent-acceptance', 'cr03-dependency', 'cr04-independent-acceptance', 'native-integration']);\nassert.equal(current.activationAuthorized, false);\nassert.equal(current.productionAvailable, false);\nconst syntheticInputAtHostApi = evaluateReadiness(healthyInput(scenarios.qualified));\nassert.equal(syntheticInputAtHostApi.status, 'blocked');\nassert.equal(syntheticInputAtHostApi.activationAuthorized, false);\nprocess.stdout.write(JSON.stringify({schema:'cr05-constructed-host-input-check.v1',synthetic:true,qualifying:false,observations:'Constructed inputs; no live services were probed.',current,syntheticInputAtHostApi}, null, 2) + '\\n');"
+      ],
+      "cwd": "backrooms/experiments/custom-rings-base/native-preview",
+      "startedAt": "2026-11-24T16:39:13.146453+00:00",
+      "finishedAt": "2026-11-24T16:39:13.272192+00:00",
+      "exitCode": 0,
+      "stdout": {
+        "path": "constructed-host-input.stdout",
+        "bytes": 3923,
+        "sha256": "5f2003331b97a6e9de5d2dcfa3b996da45e813494f9f3b19c6450fd953b0d96a"
+      },
+      "stderr": {
+        "path": "constructed-host-input.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "checks": {
+    "allCommandsExitedZero": true,
+    "allCommandStderrEmpty": true,
+    "node24": true,
+    "behavior": {
+      "tests": 16,
+      "pass": 16,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "fixtures": {
+      "status": "passed",
+      "passed": 47,
+      "failed": 0,
+      "readyCases": 1,
+      "synthetic": true,
+      "qualifying": false
+    },
+    "descriptorByteEqual": true,
+    "publicPinsMatch": true,
+    "sourceUnchangedDuringVerification": true
+  },
+  "sourceBefore": {
+    "DESIGN.md": {
+      "bytes": 2099,
+      "sha256": "7df4cc932cf6d2be2feddf479a98e86ce6bcc7630188770896f462188f1d816d"
+    },
+    "README.md": {
+      "bytes": 3643,
+      "sha256": "d671316504dc92ac1c670dcd83eca38eae512d3d462fed3e1c1e05526fd65f92"
+    },
+    "contract.mjs": {
+      "bytes": 16583,
+      "sha256": "6461a43240950163223a9a147da1f3689b5b1bfc96cf862dd3df63354e74b6d5"
+    },
+    "descriptor.json": {
+      "bytes": 16618,
+      "sha256": "3e7e50d44026eec2c91925232427c67b52fda8e21a12fbaa74b4b02510514353"
+    },
+    "descriptor.mjs": {
+      "bytes": 124,
+      "sha256": "d7405c20e2ff2cab6a80d7050460d6084cfb7f298882e287bf25da444c424da2"
+    },
+    "fixtures/cases.mjs": {
+      "bytes": 7334,
+      "sha256": "7a392a8dc682c7d6c22fbf935a7b9fd71966b58569c79b94f6da14f43c64fccc"
+    },
+    "fixtures/inputs.mjs": {
+      "bytes": 2156,
+      "sha256": "98738dccfb100a7f018e7fab4d72fc7fab4a3e091130887c2f012000487aa8bd"
+    },
+    "fixtures/run.mjs": {
+      "bytes": 3439,
+      "sha256": "40035e06dd6911f4f33b2dad47bc6f8d4e44b2eea3bc72c8869c70a6689b9a79"
+    },
+    "package.json": {
+      "bytes": 356,
+      "sha256": "402f519e0487bbdf3c19dbc9348e2f22e4c14a0c49ff94d7ddbf46ebce2b5b82"
+    },
+    "readiness.mjs": {
+      "bytes": 1192,
+      "sha256": "ebf5f6877630eed1d1de20bb40babd5c49faf6a4e1b879ad914a9d59ef42c3fd"
+    },
+    "readiness.test.mjs": {
+      "bytes": 16027,
+      "sha256": "368aabb15116efd265baca9d5666cafddc60c84a1da12f3de5bfb40385f10723"
+    }
+  },
+  "sourceAfter": {
+    "DESIGN.md": {
+      "bytes": 2099,
+      "sha256": "7df4cc932cf6d2be2feddf479a98e86ce6bcc7630188770896f462188f1d816d"
+    },
+    "README.md": {
+      "bytes": 3643,
+      "sha256": "d671316504dc92ac1c670dcd83eca38eae512d3d462fed3e1c1e05526fd65f92"
+    },
+    "contract.mjs": {
+      "bytes": 16583,
+      "sha256": "6461a43240950163223a9a147da1f3689b5b1bfc96cf862dd3df63354e74b6d5"
+    },
+    "descriptor.json": {
+      "bytes": 16618,
+      "sha256": "3e7e50d44026eec2c91925232427c67b52fda8e21a12fbaa74b4b02510514353"
+    },
+    "descriptor.mjs": {
+      "bytes": 124,
+      "sha256": "d7405c20e2ff2cab6a80d7050460d6084cfb7f298882e287bf25da444c424da2"
+    },
+    "fixtures/cases.mjs": {
+      "bytes": 7334,
+      "sha256": "7a392a8dc682c7d6c22fbf935a7b9fd71966b58569c79b94f6da14f43c64fccc"
+    },
+    "fixtures/inputs.mjs": {
+      "bytes": 2156,
+      "sha256": "98738dccfb100a7f018e7fab4d72fc7fab4a3e091130887c2f012000487aa8bd"
+    },
+    "fixtures/run.mjs": {
+      "bytes": 3439,
+      "sha256": "40035e06dd6911f4f33b2dad47bc6f8d4e44b2eea3bc72c8869c70a6689b9a79"
+    },
+    "package.json": {
+      "bytes": 356,
+      "sha256": "402f519e0487bbdf3c19dbc9348e2f22e4c14a0c49ff94d7ddbf46ebce2b5b82"
+    },
+    "readiness.mjs": {
+      "bytes": 1192,
+      "sha256": "ebf5f6877630eed1d1de20bb40babd5c49faf6a4e1b879ad914a9d59ef42c3fd"
+    },
+    "readiness.test.mjs": {
+      "bytes": 16027,
+      "sha256": "368aabb15116efd265baca9d5666cafddc60c84a1da12f3de5bfb40385f10723"
+    }
+  },
+  "previousAttempt": {
+    "scope": "Implementation-owner behavior run before stdin fix",
+    "result": "14 passed, 1 failed; custom stdin path corrected to read fd 0. Final suite adds the valid-stdin regression check."
+  }
+}

@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: the published descriptor matches the evaluator and specifies every check in order
+ok 1 - the published descriptor matches the evaluator and specifies every check in order
+  ---
+  duration_ms: 3.999495
+  type: 'test'
+  ...
+# Subtest: only readiness and the envelope validator form the host API
+ok 2 - only readiness and the envelope validator form the host API
+  ---
+  duration_ms: 1.852669
+  type: 'test'
+  ...
+# Subtest: healthy public observations, historical passes and optimistic references leave current gates open
+ok 3 - healthy public observations, historical passes and optimistic references leave current gates open
+  ---
+  duration_ms: 4.003639
+  type: 'test'
+  ...
+# Subtest: current gates remain in order alongside independently applicable blockers
+ok 4 - current gates remain in order alongside independently applicable blockers
+  ---
+  duration_ms: 0.825932
+  type: 'test'
+  ...
+# Subtest: an observation exactly 60 seconds old is fresh, and older observations are stale
+ok 5 - an observation exactly 60 seconds old is fresh, and older observations are stale
+  ---
+  duration_ms: 1.200911
+  type: 'test'
+  ...
+# Subtest: service addresses use explicit HTTP or HTTPS loopback authority
+ok 6 - service addresses use explicit HTTP or HTTPS loopback authority
+  ---
+  duration_ms: 7.216174
+  type: 'test'
+  ...
+# Subtest: malformed inputs refuse with fixed display output and cannot expose private fields
+ok 7 - malformed inputs refuse with fixed display output and cannot expose private fields
+  ---
+  duration_ms: 2.175958
+  type: 'test'
+  ...
+# Subtest: the validity of synthetic inputs gives the public evaluator no qualification
+ok 8 - the validity of synthetic inputs gives the public evaluator no qualification
+  ---
+  duration_ms: 0.820111
+  type: 'test'
+  ...
+# Subtest: the evaluator accepts neither missing fingerprint fields nor malformed scope and clock values
+ok 9 - the evaluator accepts neither missing fingerprint fields nor malformed scope and clock values
+  ---
+  duration_ms: 0.520714
+  type: 'test'
+  ...
+# Subtest: modifying a returned object leaves later results and the input intact
+ok 10 - modifying a returned object leaves later results and the input intact
+  ---
+  duration_ms: 22.582045
+  type: 'test'
+  ...
+# Subtest: the return envelope accepts separate digest-only stage outcomes and keeps qualification open
+ok 11 - the return envelope accepts separate digest-only stage outcomes and keeps qualification open
+  ---
+  duration_ms: 1.674981
+  type: 'test'
+  ...
+# Subtest: the return envelope refuses empty, unscoped, unknown, private, and raw fields
+ok 12 - the return envelope refuses empty, unscoped, unknown, private, and raw fields
+  ---
+  duration_ms: 2.056172
+  type: 'test'
+  ...
+# Subtest: the built-in pack has a ready case, open gates and exact non-qualifying expectations
+ok 13 - the built-in pack has a ready case, open gates and exact non-qualifying expectations
+  ---
+  duration_ms: 5.336054
+  type: 'test'
+  ...
+# Subtest: the direct runner evaluates a valid JSON pack from stdin
+ok 14 - the direct runner evaluates a valid JSON pack from stdin
+  ---
+  duration_ms: 218.204941
+  type: 'test'
+  ...
+# Subtest: the direct runner exits nonzero for an empty or malformed fixture pack
+ok 15 - the direct runner exits nonzero for an empty or malformed fixture pack
+  ---
+  duration_ms: 848.367061
+  type: 'test'
+  ...
+# Subtest: the direct runner exits nonzero when an expected action, reason order, or disclosure differs
+ok 16 - the direct runner exits nonzero when an expected action, reason order, or disclosure differs
+  ---
+  duration_ms: 563.940468
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1945.502492
