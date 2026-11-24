@@ -170,14 +170,14 @@ reported `credits_exhausted` and no Cloud environment containing this repository
 overlay, rather than treating a scan of the unmodified base as review of this
 profile. This checkpoint carries no final independent sign-off or merge approval.
 
-CR01 still needs complete fresh Go package coverage. The [fresh qualification packet](https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md)
-contains verified terminal evidence for **15/18 whole packages**: 9
+CR01 still needs complete fresh Go package coverage. The [fresh qualification packet](https://github.com/Spawn-Backrooms/backroom-rings/blob/ae8f8f7ceb5c06c20db24706ebeba67d8821cb5a/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md)
+contains verified terminal evidence for **16/18 whole packages**: 10
 passing test packages and 6 packages explicitly reporting no test files.
-The [machine-readable summary](https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json) records every exact unfiltered
+The [machine-readable summary](https://github.com/Spawn-Backrooms/backroom-rings/blob/ae8f8f7ceb5c06c20db24706ebeba67d8821cb5a/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json) records every exact unfiltered
 command, complete raw-log digest, terminal exit and unchanged clean source pins.
 Default fixture/service/population opt-ins remain unset, with named skips retained.
 
-The [recovery checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/4e6bc4edb08aefc620489d23429b1073c2bcd5b8/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md) preserves the prior history. Public
+The [recovery checkpoint](https://github.com/Spawn-Backrooms/backroom-rings/blob/ae8f8f7ceb5c06c20db24706ebeba67d8821cb5a/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md) preserves the prior history. Public
 summaries had recorded 15/18 and later local observations reached 17/18, but the
 unpublished working files became unavailable before the final ring result was
 observed. The final old ring attempt has no recovered terminal receipt. Those
