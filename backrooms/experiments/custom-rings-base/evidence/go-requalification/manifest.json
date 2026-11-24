@@ -1,16 +1,16 @@
 {
   "schema": "cr01-go-requalification-manifest-v1",
-  "generatedAt": "2026-11-24T11:56:09.056722+00:00",
+  "generatedAt": "2026-11-24T12:15:28.424682+00:00",
   "qualificationStatus": "incomplete",
-  "verifiedTerminalPackageCount": 14,
+  "verifiedTerminalPackageCount": 15,
   "requiredPackageCount": 18,
-  "summarySha256": "62ec53b9335d1016c255d95bd2667c864f97e5e460783044fe0740dadb608961",
+  "summarySha256": "6860025950bb5e3bf22e7212037488cb5be0202b991435f614d52c254c72c0c4",
   "files": [
     {
       "path": "README.md",
-      "bytes": 2351,
-      "sha256": "b9e32c12329651309f67bfb0a9b5c1bf882a380dac39f8f1bdad2e317264d886",
-      "gitBlobSha1": "b54f563f88ffa51d1b4c5631a99bca6d8a1cfc9f"
+      "bytes": 2352,
+      "sha256": "a0748095ac479389b50ea4f0b8e4a208595c9bd8e302a08b454627a47ab68ed3",
+      "gitBlobSha1": "2784fb5c3b4f96e17f29e87f73490dd178343e1c"
     },
     {
       "path": "daybreak-status.json",
@@ -41,6 +41,12 @@
       "bytes": 44281,
       "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4",
       "gitBlobSha1": "91bc965adf560efba79ac954386d31f55686a87f"
+    },
+    {
+      "path": "inspection/terminal-policy-log.json",
+      "bytes": 10311,
+      "sha256": "56a518cbf02cd3c434c7a65d17e0033ec3e400449bfd409ea30e787d43901bc7",
+      "gitBlobSha1": "aad47e21fa55cac1261415a427eee0c5a5d6c4f7"
     },
     {
       "path": "keys-recovery.json",
@@ -92,6 +98,24 @@
     },
     {
       "path": "packages/circuits-audit-20261124T115055Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-policy-20261124T115642Z.json",
+      "bytes": 7841,
+      "sha256": "aeef021fa67d4f16add7f5320ee888c64a7061509c946e3e539e7ec83d7a4adf",
+      "gitBlobSha1": "fafdac9cdfed874e1be8f8305e9983341dfdd1b4"
+    },
+    {
+      "path": "packages/circuits-policy-20261124T115642Z.jsonl",
+      "bytes": 434158,
+      "sha256": "fb0169a31e6d06bde7e854bccc7ce796582a2d3b60102aa86d5902f9bd177d3c",
+      "gitBlobSha1": "ba01ee643ae2217291f15e3dac42136e4cb510fa"
+    },
+    {
+      "path": "packages/circuits-policy-20261124T115642Z.stderr.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
@@ -326,9 +350,9 @@
     },
     {
       "path": "summary.json",
-      "bytes": 10224,
-      "sha256": "62ec53b9335d1016c255d95bd2667c864f97e5e460783044fe0740dadb608961",
-      "gitBlobSha1": "4cee5600046ae42f9e92a9e6e6adbdf4791b5a6b"
+      "bytes": 10749,
+      "sha256": "6860025950bb5e3bf22e7212037488cb5be0202b991435f614d52c254c72c0c4",
+      "gitBlobSha1": "c3864da1c81d75e3ca4e25034282cb50dd21ec90"
     },
     {
       "path": "verification-guards.json",
