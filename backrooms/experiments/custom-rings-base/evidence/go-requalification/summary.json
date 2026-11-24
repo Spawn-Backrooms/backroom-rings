@@ -1,11 +1,11 @@
 {
   "schema": "cr01-durable-go-requalification-v1",
-  "generatedAt": "2026-11-24T13:22:45.984168+00:00",
-  "status": "incomplete",
+  "generatedAt": "2026-11-24T14:18:12.734871+00:00",
+  "status": "passed",
   "executionMode": "18-separate-unfiltered-package-commands",
   "requiredPackageCount": 18,
-  "verifiedTerminalPackageCount": 17,
-  "passedTestPackageCount": 11,
+  "verifiedTerminalPackageCount": 18,
+  "passedTestPackageCount": 12,
   "explicitNoTestFilesPackageCount": 6,
   "source": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
@@ -112,6 +112,21 @@
       "sampledConcurrentRssPeakKiB": 2564,
       "receipt": "packages/circuits-shared-20261124T115019Z.json",
       "receiptSha256": "564ebaff37ee08cd006b94e9c85432391b9ab8c21641878111d423958334e95c"
+    },
+    {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer",
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 3203.231,
+      "passEvents": 244,
+      "topLevelPasses": 44,
+      "skipEvents": 0,
+      "skippedTests": [],
+      "logSha256": "abc3a03cb3424e73035598ef53319714843e9d06d2c2aadfc6b7e2edc86fdbbf",
+      "logBytes": 287556,
+      "sampledConcurrentRssPeakKiB": 1700596,
+      "receipt": "packages/circuits-transfer-20261124T132336Z.json",
+      "receiptSha256": "b0a07370d0c42dd422510ee4f933b71175abecd13d1641c7c3caa73823aa9ad7"
     },
     {
       "package": "github.com/helius-labs/zolana-custom-rings/prover/cmd/catalog",
@@ -286,9 +301,7 @@
       "receiptSha256": "18d5071771f2d84af05029e747d261d653c02642855cc3227c74ff57510880ae"
     }
   ],
-  "missingPackages": [
-    "github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer"
-  ],
+  "missingPackages": [],
   "incompleteAttempts": [],
   "historicalMetadataCountedAsNewExecution": false,
   "wholeSuiteSingleCommandExitClaimed": false,

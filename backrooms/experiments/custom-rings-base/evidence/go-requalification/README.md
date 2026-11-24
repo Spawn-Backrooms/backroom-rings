@@ -1,6 +1,6 @@
 # Fresh Go qualification
 
-**17/18 whole packages have verified terminal evidence. Status: incomplete.**
+**18/18 whole packages have verified terminal evidence. Status: passed.**
 
 This packet records fresh unfiltered package commands after unpublished working files became unavailable. Historical success summaries do not replace a new raw log or exit receipt. Every completed package has exact argv, clean source pins, complete log hashes and terminal event checks. The complete gate remains open until all 18 actual catalog entries qualify.
 
@@ -12,7 +12,7 @@ This packet records fresh unfiltered package commands after unpublished working 
 | `circuits/registry` | passed | 147 | 1 | 115.283 |
 | `circuits/ringgadget` | passed | 8 | 0 | 2.227 |
 | `circuits/shared` | passed | 5 | 0 | 1.222 |
-| `circuits/transfer` | pending | — | — | — |
+| `circuits/transfer` | passed | 244 | 0 | 3203.231 |
 | `cmd/catalog` | no-tests | 0 | 0 | 101.472 |
 | `cmd/prover` | no-tests | 0 | 0 | 65.997 |
 | `ring` | passed | 197 | 6 | 3192.277 |

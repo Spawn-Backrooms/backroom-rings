@@ -1,22 +1,22 @@
 {
   "schema": "cr01-go-requalification-manifest-v1",
-  "generatedAt": "2026-11-24T13:22:45.984168+00:00",
-  "qualificationStatus": "incomplete",
-  "verifiedTerminalPackageCount": 17,
+  "generatedAt": "2026-11-24T14:18:12.734871+00:00",
+  "qualificationStatus": "passed",
+  "verifiedTerminalPackageCount": 18,
   "requiredPackageCount": 18,
-  "summarySha256": "e79962d33f845677de248623ee67a7496719bcce5b120af966c715298bd5b1ab",
+  "summarySha256": "63c69c9de9cfb6f1045019e74068d18d6ec4b8d234ab2e1cf5076e0a8517b3d6",
   "files": [
     {
       "path": "README.md",
-      "bytes": 2353,
-      "sha256": "77b91db8d72179173aa75007156c0d415003bc0e9d9976f0e4eacd71f527bf31",
-      "gitBlobSha1": "f4afc10e8d5db1e065af241fc7345afb3c52cd31"
+      "bytes": 2351,
+      "sha256": "b039a2d1d03528f841f6e98d5e207ad37112fcf7c228013331fb8729f85e7b33",
+      "gitBlobSha1": "ed84faa95d5c83869d03e6a80ac067c85f501169"
     },
     {
       "path": "daybreak-status.json",
-      "bytes": 579,
-      "sha256": "17931a822a876678c8adba91e7450a6abfe93919af1d86a47d425b3dc04df459",
-      "gitBlobSha1": "9e3399ff20d271ed1f418c6af51d1111fc197b4a"
+      "bytes": 1246,
+      "sha256": "98cdcd2c207897dbf9cb75d7daa0f29a9fe27e263984d5289df9f3c4bdd980f3",
+      "gitBlobSha1": "f0fb5356d859421c4972bb29e2a71ac198cc639a"
     },
     {
       "path": "default-skips.json",
@@ -59,6 +59,12 @@
       "bytes": 8092,
       "sha256": "a1128e3582ab495b960913b5e96a4a81fc478c5e0b83daaf7006c6a4b71eb17b",
       "gitBlobSha1": "6363c263c8c71b5d72191233bd03705fb0423f6d"
+    },
+    {
+      "path": "inspection/terminal-transfer-log.json",
+      "bytes": 16363,
+      "sha256": "817afe142bcec08d98d8b1d85d19d057986c9dd87b414f9cab77d04e639b06b6",
+      "gitBlobSha1": "861aae7e5053134b8f08401117df0fdfbe9af391"
     },
     {
       "path": "keys-recovery.json",
@@ -182,6 +188,24 @@
     },
     {
       "path": "packages/circuits-shared-20261124T115019Z.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "packages/circuits-transfer-20261124T132336Z.json",
+      "bytes": 6904,
+      "sha256": "b0a07370d0c42dd422510ee4f933b71175abecd13d1641c7c3caa73823aa9ad7",
+      "gitBlobSha1": "f93b63719c7e4f7075e743aed88756791f240b09"
+    },
+    {
+      "path": "packages/circuits-transfer-20261124T132336Z.jsonl",
+      "bytes": 287556,
+      "sha256": "abc3a03cb3424e73035598ef53319714843e9d06d2c2aadfc6b7e2edc86fdbbf",
+      "gitBlobSha1": "75fe626782f5140b98feffab6725d5e89f71eecd"
+    },
+    {
+      "path": "packages/circuits-transfer-20261124T132336Z.stderr.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
@@ -398,9 +422,9 @@
     },
     {
       "path": "summary.json",
-      "bytes": 11997,
-      "sha256": "e79962d33f845677de248623ee67a7496719bcce5b120af966c715298bd5b1ab",
-      "gitBlobSha1": "4a1336305b0cf607cc5b419d62ffde49ef6a8f7f"
+      "bytes": 12519,
+      "sha256": "63c69c9de9cfb6f1045019e74068d18d6ec4b8d234ab2e1cf5076e0a8517b3d6",
+      "gitBlobSha1": "177fd13a18a51d15235ab7da20acd6fb2e3c6323"
     },
     {
       "path": "verification-guards.json",

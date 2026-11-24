@@ -10,11 +10,30 @@
   "remainingUsd": "0",
   "environmentCount": 7,
   "matchingRepositoryEnvironmentCount": 0,
+  "targetRepository": "Spawn-Backrooms/backroom-rings",
   "scanLaunched": false,
-  "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+  "recordedAt": "2026-11-24T14:01:06.844Z",
   "observationWindow": {
-    "date": "2026-11-24",
-    "completedBeforeUtc": "11:39:32",
-    "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+    "scope": "Fresh read-only bootstrap, usage and complete environment-inventory responses; no scan launched and no server event timestamps returned"
+  },
+  "previousCheck": {
+    "schema": "cr01-recovery-daybreak-status-v1",
+    "access": "allowed",
+    "githubConnected": true,
+    "workflowsEnabled": true,
+    "usageStatus": {
+      "available": false,
+      "outcome": "credits_exhausted"
+    },
+    "remainingUsd": "0",
+    "environmentCount": 7,
+    "matchingRepositoryEnvironmentCount": 0,
+    "scanLaunched": false,
+    "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+    "observationWindow": {
+      "date": "2026-11-24",
+      "completedBeforeUtc": "11:39:32",
+      "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+    }
   }
 }
