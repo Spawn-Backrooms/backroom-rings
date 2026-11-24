@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "scope": "core proof and SBF checkpoint; validator journey still pending",
+  "scope": "reviewed combined application, SDK/native adapter and runner; live validator journey pending",
   "sourcePins": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
     "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
     "backrooms": "08822c65254cd73c5f2dccbdf182ce1df2c7510a"
   },
-  "patchSha256": "8372b467214fb9e3f1bc04a2ac9aaf6f9b4ff99fdc2340d8e80e93243fb4956f",
+  "patchSha256": "3d46c4380633005bf2463fc1ab240932a7c097ab2aa61e2a6ebb6f35fcb491b8",
   "keys": {
     "advance": {
       "sha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
@@ -66,6 +66,18 @@
     "cr01-check-all-resume.log": {
       "sha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3",
       "bytes": 1160
+    },
+    "typescript-go-final-request-solve.log": {
+      "sha256": "05c7a59ae208dd02fb6ae74082deb7a4973587f9a360eba585f5a7092070e847",
+      "bytes": 501
+    },
+    "cr01-stage-build-zolana-cli-20261124T005153Z.log": {
+      "sha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698",
+      "bytes": 19305
+    },
+    "cr01-stage-build-photon-20261124T010636Z.log": {
+      "sha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de",
+      "bytes": 14617
     }
   },
   "completed": [
@@ -78,12 +90,88 @@
     "40 interface tests and 3 program entrypoint tests",
     "generic and unkeyed application build checks",
     "dedicated application SBF build",
-    "clean baseline just check-all"
+    "clean baseline just check-all",
+    "10 focused SDK tests and 2 actual native restart tests",
+    "SDK/integration type checks and focused lint",
+    "3 independent localnet runner checks",
+    "final independent SDK/native/harness review; three Minor findings corrected",
+    "pristine upstream CLI and Photon builds",
+    "pristine upstream Go policy package under explicit timeout"
   ],
   "pending": [
     "complete upstream Go suite with explicit resource-adjusted timeout",
     "two exact upstream anonymous validator tests",
-    "live application create/advance/revoke/restart/reuse journey",
-    "final SDK/native/harness independent review"
-  ]
+    "live application create/advance/revoke/restart/reuse journey"
+  ],
+  "sourceFiles": 52,
+  "finalTypeScriptRequestCheck": {
+    "status": "complete",
+    "command": [
+      "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+      "test",
+      "-p",
+      "1",
+      "./circuits/transfer",
+      "-run",
+      "^TestSpawnRoomTypeScriptRequestFixtures$",
+      "-count=1",
+      "-v"
+    ],
+    "startedEpoch": 1795482947.7886453,
+    "privateFixtureSha256": {
+      "typescript-advance.request.json": "e669775ccb590095560fb8788f2596033d76252f5774c19bf415535705de2700",
+      "typescript-genesis.request.json": "afa329fdfa1038d5fcb4a62401affdb77b39d17eec38847a9cd8517db8d5c92c"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 22.923484802246094,
+    "unchangedFixtures": true,
+    "logSha256": "05c7a59ae208dd02fb6ae74082deb7a4973587f9a360eba585f5a7092070e847"
+  },
+  "nativeFixture": {
+    "schema": "spawn-room-native-fixture-v1",
+    "status": "passed",
+    "implementation": "actual FlueResidents + ReferenceAuthority + EncryptedSqliteRecords",
+    "provider": "existing deterministicInferenceFixture; no external provider",
+    "chainSettlement": false,
+    "first": {
+      "selectedProcedure": 0,
+      "procedure": "take-first",
+      "value": 9,
+      "memoryRevision": "0",
+      "lessonUsed": ""
+    },
+    "firstOriginalDigest": "31cdb6c5f06735459b4c03bba9f072b0167155c5ccf24ba15a4e0667a32ec9c0",
+    "acceptedScores": [
+      40,
+      50
+    ],
+    "retainedNonceMatches": true,
+    "second": {
+      "selectedProcedure": 1,
+      "procedure": "sort-and-take-median",
+      "value": 5,
+      "memoryRevision": "1",
+      "lessonUsed": "Sort inputs before selecting the median."
+    },
+    "nextScores": [
+      40,
+      60
+    ],
+    "seedCommitment": "33be649119e365fa0fd1922f794c9903c4cf5cf30f5e82474d5a6a63e512a138",
+    "membershipCommitment": "4bffd551c58ebd26411ceb47ff0da6b79aba1d3ccd074f636c7afd9e86735eba"
+  },
+  "transactionFixtures": {
+    "genesis": {
+      "bytes": 2740,
+      "signers": 2
+    },
+    "advance": {
+      "bytes": 2639,
+      "signers": 1,
+      "explicitWriterAccount": false,
+      "roomMarkerAccount": false
+    },
+    "maxBytes": 4096,
+    "liveSettlement": false
+  }
 }

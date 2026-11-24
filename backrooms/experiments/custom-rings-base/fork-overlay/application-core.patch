@@ -3775,6 +3775,816 @@ index 0000000000000000000000000000000000000000..6226dd92c215b393c9cfea457f71b2b9
 +		})
 +	}
 +}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/codec.ts b/sdk-libs/ts/src/experimental/spawn-room/codec.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..150dff48e31a364429f0133d55e8092742bfbef7
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/codec.ts
+@@ -0,0 +1,564 @@
++/**
++ * Experimental v1 application codec. Its bytes are private recipient data, not
++ * public instruction fields. Hashes exactly match prover/circuits/transfer/
++ * spawn_room_state.go; they do not use the earlier Backrooms v0 JSON codec.
++ */
++import type { Bytes32 } from "@heliuslabs/spr";
++import {
++  BN254_MODULUS_DEC,
++  bytesToBigInt,
++  equalBytes,
++  hashChain4,
++  isZero,
++  poseidon,
++} from "@heliuslabs/spr/internal";
++
++export const SPAWN_ROOM_STATE_BYTES = 516;
++export const SPAWN_ACCEPTANCE_GRANT_BYTES = 349;
++export const SPAWN_ROOM_LESSON_BYTES = 96;
++export const SPAWN_GRANT_TREE_HEIGHT = 13;
++const FIELD = BigInt(BN254_MODULUS_DEC);
++const U64_MAX = (1n << 64n) - 1n;
++const text = new TextEncoder();
++const ID_DOMAIN = 0x5350524944303031n;
++const STATE_DOMAIN = 0x5350525354303031n;
++const MEMORY_DOMAIN = 0x5350524d454d3031n;
++const GRANT_DOMAIN = 0x5350524752303031n;
++
++/** Raw digests retain all 256 bits. Scalar identities are separate bigint fields. */
++export interface SpawnRoomDomain {
++  readonly network: Uint8Array;
++  readonly applicationID: bigint;
++  readonly ringProgramID: bigint;
++}
++export interface SpawnRoomContext extends SpawnRoomDomain {
++  readonly grantRoot: bigint;
++  readonly grantEpoch: bigint;
++}
++export interface SpawnRoomBinding extends SpawnRoomDomain {
++  readonly creationNonce: Uint8Array;
++}
++export interface SpawnAcceptedMemory {
++  /** The used prefix only. The binary encoding supplies a checked zero suffix. */
++  readonly lesson: Uint8Array;
++  readonly scope: 0;
++  readonly episode: Uint8Array;
++  readonly originalResult: Uint8Array;
++  readonly candidate: Uint8Array;
++}
++export interface SpawnLearnedPolicy {
++  readonly id: bigint;
++  readonly scores: readonly [number, number];
++}
++export interface SpawnRoomState {
++  readonly binding: SpawnRoomBinding;
++  readonly seedManifest: Uint8Array;
++  readonly fixedMembers: Uint8Array;
++  readonly writer: bigint;
++  readonly revision: bigint;
++  readonly memory: SpawnAcceptedMemory;
++  readonly policy: SpawnLearnedPolicy;
++  readonly predecessor: bigint;
++  readonly authorization: bigint;
++  readonly lastAuthorizationEpoch: bigint;
++}
++export interface SpawnAcceptanceGrant {
++  readonly roomIdentity: bigint;
++  readonly actor: bigint;
++  readonly epoch: bigint;
++  readonly predecessor: bigint;
++  readonly ordinal: bigint;
++  readonly memory: SpawnAcceptedMemory;
++  readonly selectedProcedure: 0 | 1;
++  readonly negative: boolean;
++  readonly magnitude: number;
++  readonly nonce: Uint8Array;
++}
++export interface SpawnGrantPath {
++  readonly index: number;
++  /** Bottom-up, each row omits the child selected by that level's base-4 digit. */
++  readonly siblings: readonly (readonly [Bytes32, Bytes32, Bytes32])[];
++}
++
++function integer(value: number, maximum: number, name: string): void {
++  if (!Number.isInteger(value) || value < 0 || value > maximum)
++    throw new Error(`spawn_${name}_range`);
++}
++function u64(value: bigint): void {
++  if (typeof value !== "bigint" || value < 0n || value > U64_MAX)
++    throw new Error("spawn_u64_range");
++}
++function scalar(value: bigint): void {
++  if (typeof value !== "bigint" || value < 0n || value >= FIELD)
++    throw new Error("spawn_scalar_noncanonical");
++}
++function digest(value: Uint8Array): void {
++  if (!(value instanceof Uint8Array) || value.length !== 32) throw new Error("spawn_digest_length");
++}
++function writeInteger(target: Uint8Array, offset: number, length: number, value: bigint): void {
++  for (let i = length - 1; i >= 0; i--) {
++    target[offset + i] = Number(value & 255n);
++    value >>= 8n;
++  }
++}
++export function spawnScalarBytes(value: bigint): Bytes32 {
++  scalar(value);
++  const bytes = new Uint8Array(32);
++  writeInteger(bytes, 0, 32, value);
++  return bytes as Bytes32;
++}
++export function spawnDigestLimbs(value: Uint8Array): readonly [bigint, bigint] {
++  digest(value);
++  return [bytesToBigInt(value.subarray(0, 16)), bytesToBigInt(value.subarray(16))];
++}
++export function assertSpawnRoomDomain(domain: SpawnRoomDomain): void {
++  digest(domain.network);
++  scalar(domain.applicationID);
++  scalar(domain.ringProgramID);
++  if (domain.applicationID === 0n || domain.ringProgramID === 0n)
++    throw new Error("spawn_domain_zero");
++}
++export function assertSpawnRoomDomainMatches(
++  actual: SpawnRoomDomain,
++  expected: SpawnRoomDomain,
++): void {
++  assertSpawnRoomDomain(actual);
++  assertSpawnRoomDomain(expected);
++  if (
++    !equalBytes(actual.network, expected.network) ||
++    actual.applicationID !== expected.applicationID ||
++    actual.ringProgramID !== expected.ringProgramID
++  )
++    throw new Error("spawn_domain_mismatch");
++}
++function memoryValid(memory: SpawnAcceptedMemory, accepted = false): void {
++  if (
++    !(memory.lesson instanceof Uint8Array) ||
++    memory.lesson.length > SPAWN_ROOM_LESSON_BYTES ||
++    (accepted && memory.lesson.length === 0)
++  )
++    throw new Error("spawn_lesson_length");
++  if (memory.scope !== 0) throw new Error("spawn_memory_scope");
++  digest(memory.episode);
++  digest(memory.originalResult);
++  digest(memory.candidate);
++}
++function stateValid(state: SpawnRoomState): void {
++  assertSpawnRoomDomain(state.binding);
++  digest(state.binding.creationNonce);
++  digest(state.seedManifest);
++  digest(state.fixedMembers);
++  scalar(state.writer);
++  if (state.writer === 0n) throw new Error("spawn_writer_zero");
++  u64(state.revision);
++  u64(state.lastAuthorizationEpoch);
++  memoryValid(state.memory);
++  if (state.policy.id !== 1n || state.policy.scores.length !== 2)
++    throw new Error("spawn_policy_schema");
++  for (const score of state.policy.scores) integer(score, 100, "policy_score");
++  scalar(state.predecessor);
++  scalar(state.authorization);
++}
++function grantValid(grant: SpawnAcceptanceGrant): void {
++  scalar(grant.roomIdentity);
++  scalar(grant.actor);
++  scalar(grant.predecessor);
++  if (grant.actor === 0n) throw new Error("spawn_actor_zero");
++  u64(grant.epoch);
++  u64(grant.ordinal);
++  memoryValid(grant.memory, true);
++  integer(grant.selectedProcedure, 1, "procedure");
++  if (typeof grant.negative !== "boolean") throw new Error("spawn_feedback_sign");
++  integer(grant.magnitude, 10, "magnitude");
++  digest(grant.nonce);
++  if (isZero(grant.nonce)) throw new Error("spawn_nonce_zero");
++}
++
++class Writer {
++  readonly bytes: Uint8Array;
++  #offset = 0;
++  constructor(length: number, magic: string) {
++    this.bytes = new Uint8Array(length);
++    this.raw(text.encode(magic));
++  }
++  raw(bytes: Uint8Array): void {
++    this.bytes.set(bytes, this.#offset);
++    this.#offset += bytes.length;
++  }
++  field(value: bigint): void {
++    this.raw(spawnScalarBytes(value));
++  }
++  u64(value: bigint): void {
++    u64(value);
++    writeInteger(this.bytes, this.#offset, 8, value);
++    this.#offset += 8;
++  }
++  byte(value: number): void {
++    integer(value, 255, "byte");
++    this.bytes[this.#offset++] = value;
++  }
++  finish(): Uint8Array {
++    if (this.#offset !== this.bytes.length) throw new Error("spawn_codec_layout");
++    return this.bytes;
++  }
++}
++class Reader {
++  #offset = 8;
++  constructor(
++    readonly bytes: Uint8Array,
++    length: number,
++    magic: string,
++  ) {
++    if (!(bytes instanceof Uint8Array) || bytes.length !== length)
++      throw new Error("spawn_codec_length");
++    if (!equalBytes(bytes.subarray(0, 8), text.encode(magic)))
++      throw new Error("spawn_codec_schema");
++  }
++  raw(length: number): Uint8Array {
++    const result = this.bytes.slice(this.#offset, this.#offset + length);
++    this.#offset += length;
++    return result;
++  }
++  field(): bigint {
++    const result = bytesToBigInt(this.raw(32));
++    scalar(result);
++    return result;
++  }
++  u64(): bigint {
++    return bytesToBigInt(this.raw(8));
++  }
++  byte(): number {
++    return this.raw(1)[0]!;
++  }
++  finish(): void {
++    if (this.#offset !== this.bytes.length) throw new Error("spawn_codec_layout");
++  }
++}
++function writeMemory(writer: Writer, memory: SpawnAcceptedMemory): void {
++  writer.byte(memory.lesson.length);
++  writer.byte(memory.scope);
++  const padded = new Uint8Array(SPAWN_ROOM_LESSON_BYTES);
++  padded.set(memory.lesson);
++  writer.raw(padded);
++  writer.raw(memory.episode);
++  writer.raw(memory.originalResult);
++  writer.raw(memory.candidate);
++}
++function readMemory(reader: Reader): SpawnAcceptedMemory {
++  const length = reader.byte();
++  const scope = reader.byte();
++  const padded = reader.raw(SPAWN_ROOM_LESSON_BYTES);
++  if (length > SPAWN_ROOM_LESSON_BYTES) throw new Error("spawn_lesson_length");
++  if (scope !== 0) throw new Error("spawn_memory_scope");
++  if (!isZero(padded.subarray(length))) throw new Error("spawn_lesson_padding");
++  return {
++    lesson: padded.slice(0, length),
++    scope,
++    episode: reader.raw(32),
++    originalResult: reader.raw(32),
++    candidate: reader.raw(32),
++  };
++}
++export function encodeSpawnRoomState(state: SpawnRoomState): Uint8Array {
++  stateValid(state);
++  const writer = new Writer(SPAWN_ROOM_STATE_BYTES, "SPRST001");
++  writer.raw(state.binding.network);
++  writer.field(state.binding.applicationID);
++  writer.field(state.binding.ringProgramID);
++  writer.raw(state.binding.creationNonce);
++  writer.raw(state.seedManifest);
++  writer.raw(state.fixedMembers);
++  writer.field(state.writer);
++  writer.u64(state.revision);
++  writeMemory(writer, state.memory);
++  writer.u64(state.policy.id);
++  writer.byte(state.policy.scores[0]);
++  writer.byte(state.policy.scores[1]);
++  writer.field(state.predecessor);
++  writer.field(state.authorization);
++  writer.u64(state.lastAuthorizationEpoch);
++  return writer.finish();
++}
++export function decodeSpawnRoomState(bytes: Uint8Array): SpawnRoomState {
++  const reader = new Reader(bytes, SPAWN_ROOM_STATE_BYTES, "SPRST001");
++  const result: SpawnRoomState = {
++    binding: {
++      network: reader.raw(32),
++      applicationID: reader.field(),
++      ringProgramID: reader.field(),
++      creationNonce: reader.raw(32),
++    },
++    seedManifest: reader.raw(32),
++    fixedMembers: reader.raw(32),
++    writer: reader.field(),
++    revision: reader.u64(),
++    memory: readMemory(reader),
++    policy: { id: reader.u64(), scores: [reader.byte(), reader.byte()] },
++    predecessor: reader.field(),
++    authorization: reader.field(),
++    lastAuthorizationEpoch: reader.u64(),
++  };
++  reader.finish();
++  stateValid(result);
++  return result;
++}
++export function encodeSpawnAcceptanceGrant(grant: SpawnAcceptanceGrant): Uint8Array {
++  grantValid(grant);
++  const writer = new Writer(SPAWN_ACCEPTANCE_GRANT_BYTES, "SPRGR001");
++  writer.field(grant.roomIdentity);
++  writer.field(grant.actor);
++  writer.u64(grant.epoch);
++  writer.field(grant.predecessor);
++  writer.u64(grant.ordinal);
++  writeMemory(writer, grant.memory);
++  writer.byte(grant.selectedProcedure);
++  writer.byte(Number(grant.negative));
++  writer.byte(grant.magnitude);
++  writer.raw(grant.nonce);
++  return writer.finish();
++}
++export function decodeSpawnAcceptanceGrant(bytes: Uint8Array): SpawnAcceptanceGrant {
++  const reader = new Reader(bytes, SPAWN_ACCEPTANCE_GRANT_BYTES, "SPRGR001");
++  const common = {
++    roomIdentity: reader.field(),
++    actor: reader.field(),
++    epoch: reader.u64(),
++    predecessor: reader.field(),
++    ordinal: reader.u64(),
++    memory: readMemory(reader),
++  };
++  const selectedProcedure = reader.byte();
++  const negative = reader.byte();
++  if ((selectedProcedure !== 0 && selectedProcedure !== 1) || negative > 1)
++    throw new Error("spawn_grant_flag");
++  const result: SpawnAcceptanceGrant = {
++    ...common,
++    selectedProcedure,
++    negative: negative === 1,
++    magnitude: reader.byte(),
++    nonce: reader.raw(32),
++  };
++  reader.finish();
++  grantValid(result);
++  return result;
++}
++function hash(fields: readonly bigint[]): Bytes32 {
++  return hashChain4([...fields, BigInt(fields.length + 1)].map(spawnScalarBytes));
++}
++export function spawnRoomIdentity(state: SpawnRoomState): Bytes32 {
++  stateValid(state);
++  return hash([
++    ID_DOMAIN,
++    1n,
++    ...spawnDigestLimbs(state.binding.network),
++    state.binding.applicationID,
++    state.binding.ringProgramID,
++    ...spawnDigestLimbs(state.binding.creationNonce),
++    state.writer,
++  ]);
++}
++function memoryHash(memory: SpawnAcceptedMemory): bigint {
++  memoryValid(memory);
++  const padded = new Uint8Array(SPAWN_ROOM_LESSON_BYTES);
++  padded.set(memory.lesson);
++  return bytesToBigInt(
++    hash([
++      MEMORY_DOMAIN,
++      BigInt(memory.lesson.length),
++      0n,
++      ...[0, 24, 48, 72].map((start) => bytesToBigInt(padded.subarray(start, start + 24))),
++      ...spawnDigestLimbs(memory.episode),
++      ...spawnDigestLimbs(memory.originalResult),
++      ...spawnDigestLimbs(memory.candidate),
++    ]),
++  );
++}
++export function hashSpawnRoomState(state: SpawnRoomState): Bytes32 {
++  stateValid(state);
++  return hash([
++    STATE_DOMAIN,
++    1n,
++    bytesToBigInt(spawnRoomIdentity(state)),
++    ...spawnDigestLimbs(state.seedManifest),
++    ...spawnDigestLimbs(state.fixedMembers),
++    state.revision,
++    memoryHash(state.memory),
++    state.policy.id,
++    ...state.policy.scores.map(BigInt),
++    state.predecessor,
++    state.authorization,
++    state.lastAuthorizationEpoch,
++  ]);
++}
++export function hashSpawnAcceptanceGrant(
++  domain: SpawnRoomDomain,
++  grant: SpawnAcceptanceGrant,
++): Bytes32 {
++  assertSpawnRoomDomain(domain);
++  grantValid(grant);
++  return hash([
++    GRANT_DOMAIN,
++    1n,
++    ...spawnDigestLimbs(domain.network),
++    domain.applicationID,
++    domain.ringProgramID,
++    grant.roomIdentity,
++    grant.actor,
++    grant.epoch,
++    grant.predecessor,
++    grant.ordinal,
++    memoryHash(grant.memory),
++    BigInt(grant.selectedProcedure),
++    BigInt(grant.negative),
++    BigInt(grant.magnitude),
++    ...spawnDigestLimbs(grant.nonce),
++  ]);
++}
++export function hashSpawnApplicationStatement(
++  context: SpawnRoomContext,
++  upstreamStatement: bigint,
++): Bytes32 {
++  assertSpawnRoomDomain(context);
++  scalar(context.grantRoot);
++  u64(context.grantEpoch);
++  scalar(upstreamStatement);
++  if (context.grantRoot === 0n) throw new Error("spawn_grant_root_zero");
++  return hash([
++    0x53505241n,
++    ...spawnDigestLimbs(context.network),
++    context.applicationID,
++    context.ringProgramID,
++    upstreamStatement,
++    context.grantRoot,
++    context.grantEpoch,
++    1n,
++  ]);
++}
++export function spawnGrantRoot(leaf: Bytes32, path: SpawnGrantPath): Bytes32 {
++  digest(leaf);
++  scalar(bytesToBigInt(leaf));
++  integer(path.index, (1 << 26) - 1, "grant_index");
++  if (path.siblings.length !== SPAWN_GRANT_TREE_HEIGHT) throw new Error("spawn_grant_path_length");
++  let root = leaf;
++  let index = path.index;
++  for (const siblings of path.siblings) {
++    if (siblings.length !== 3) throw new Error("spawn_grant_path_width");
++    for (const sibling of siblings) {
++      digest(sibling);
++      scalar(bytesToBigInt(sibling));
++    }
++    const children = [...siblings];
++    children.splice(index % 4, 0, root);
++    root = poseidon(children);
++    index = Math.floor(index / 4);
++  }
++  return root;
++}
++
++/** Computes the proposed next state. Current-root membership is a separate proof obligation. */
++export function deriveSpawnRoomAdvance(
++  context: SpawnRoomContext,
++  old: SpawnRoomState,
++  inputNoteCommitment: bigint,
++  grant: SpawnAcceptanceGrant,
++): SpawnRoomState {
++  stateValid(old);
++  grantValid(grant);
++  scalar(inputNoteCommitment);
++  assertSpawnRoomDomainMatches(old.binding, context);
++  u64(context.grantEpoch);
++  if (old.lastAuthorizationEpoch > context.grantEpoch || grant.epoch !== context.grantEpoch)
++    throw new Error("spawn_grant_epoch");
++  if (
++    grant.roomIdentity !== bytesToBigInt(spawnRoomIdentity(old)) ||
++    grant.actor !== old.writer ||
++    grant.predecessor !== inputNoteCommitment ||
++    grant.ordinal !== old.revision + 1n
++  )
++    throw new Error("spawn_grant_binding");
++  const scores: [number, number] = [...old.policy.scores];
++  const selected = grant.selectedProcedure;
++  scores[selected] = Math.max(
++    0,
++    Math.min(100, scores[selected] + (grant.negative ? -grant.magnitude : grant.magnitude)),
++  );
++  // Canonical encode/decode owns every byte and rejects revision overflow.
++  return decodeSpawnRoomState(
++    encodeSpawnRoomState({
++      ...old,
++      revision: grant.ordinal,
++      memory: grant.memory,
++      policy: { id: 1n, scores },
++      predecessor: inputNoteCommitment,
++      authorization: bytesToBigInt(hashSpawnAcceptanceGrant(context, grant)),
++      lastAuthorizationEpoch: context.grantEpoch,
++    }),
++  );
++}
++
++/** The native interface uses UTF-8 text; refuse lossy surrogate replacement. */
++export function spawnLessonBytes(lesson: string): Uint8Array {
++  if (typeof lesson !== "string") throw new Error("spawn_lesson_text");
++  const bytes = text.encode(lesson);
++  if (
++    bytes.length === 0 ||
++    bytes.length > SPAWN_ROOM_LESSON_BYTES ||
++    new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes) !== lesson
++  )
++    throw new Error("spawn_lesson_text");
++  return bytes;
++}
++
++export function createSpawnRoomGenesis(input: {
++  binding: SpawnRoomBinding;
++  seedManifest: Uint8Array;
++  fixedMembers: Uint8Array;
++  writer: bigint;
++}): SpawnRoomState {
++  for (const value of [input.binding.creationNonce, input.seedManifest, input.fixedMembers]) {
++    digest(value);
++    if (isZero(value)) throw new Error("spawn_genesis_zero_digest");
++  }
++  const state: SpawnRoomState = {
++    ...input,
++    revision: 0n,
++    memory: {
++      lesson: new Uint8Array(),
++      scope: 0,
++      episode: new Uint8Array(32),
++      originalResult: new Uint8Array(32),
++      candidate: new Uint8Array(32),
++    },
++    policy: { id: 1n, scores: [50, 50] },
++    predecessor: 0n,
++    authorization: 0n,
++    lastAuthorizationEpoch: 0n,
++  };
++  return decodeSpawnRoomState(encodeSpawnRoomState(state));
++}
++
++export function assertSpawnRoomGenesis(state: SpawnRoomState): void {
++  const canonical = createSpawnRoomGenesis(state);
++  if (!equalBytes(encodeSpawnRoomState(state), encodeSpawnRoomState(canonical)))
++    throw new Error("spawn_genesis_profile");
++}
++
++export function hashSpawnGenesisStatement(
++  domain: SpawnRoomDomain,
++  upstreamStatement: bigint,
++  state: SpawnRoomState,
++): Bytes32 {
++  assertSpawnRoomGenesis(state);
++  assertSpawnRoomDomainMatches(state.binding, domain);
++  scalar(upstreamStatement);
++  return hash([
++    0x53505247n,
++    ...spawnDigestLimbs(domain.network),
++    domain.applicationID,
++    domain.ringProgramID,
++    upstreamStatement,
++    bytesToBigInt(spawnRoomIdentity(state)),
++    state.writer,
++    1n,
++  ]);
++}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/instructions.ts b/sdk-libs/ts/src/experimental/spawn-room/instructions.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..63328cf9fc602c54b4b01c114cd98c2c2f5744af
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/instructions.ts
+@@ -0,0 +1,234 @@
++/** Wire boundary for the dedicated program built with spawn-room-v1. */
++import {
++  AccountRole,
++  getProgramDerivedAddress,
++  type AccountMeta,
++  type Address,
++  type Instruction,
++} from "@solana/kit";
++import type { Bytes32, RequestContext } from "@heliuslabs/spr";
++import type { ChainReader } from "@heliuslabs/spr/client";
++import {
++  bytesToBigInt,
++  encodeBase58,
++  equalBytes,
++  isZero,
++  SYSTEM_PROGRAM,
++} from "@heliuslabs/spr/internal";
++import { ringIdField } from "../../crypto/derivation/ring-stream.js";
++import { ringProgramDataAddress } from "../../protocol/membership/config.js";
++import type { ProvenRingTransfer } from "../../operations/workflow/pipeline.js";
++import {
++  assertSpawnRoomDomain,
++  assertSpawnRoomGenesis,
++  hashSpawnRoomState,
++  spawnRoomIdentity,
++  spawnScalarBytes,
++  type SpawnRoomContext,
++  type SpawnRoomState,
++} from "./codec.js";
++
++const encoder = new TextEncoder();
++export const SpawnRoomInstructionTag = Object.freeze({
++  initialize: 0x80,
++  updateGrantRoot: 0x81,
++  genesis: 0x82,
++  advance: 0x83,
++});
++const readonly = (address: Address): AccountMeta => ({ address, role: AccountRole.READONLY });
++const writable = (address: Address): AccountMeta => ({ address, role: AccountRole.WRITABLE });
++const signer = (address: Address, writes = false): AccountMeta => ({
++  address,
++  role: writes ? AccountRole.WRITABLE_SIGNER : AccountRole.READONLY_SIGNER,
++});
++
++export async function spawnRoomConfigAddress(program: Address): Promise<Address> {
++  return (
++    await getProgramDerivedAddress({
++      programAddress: program,
++      seeds: [encoder.encode("spawn-room-config-v1")],
++    })
++  )[0];
++}
++export async function spawnRoomGenesisAddress(
++  program: Address,
++  identity: Bytes32,
++): Promise<Address> {
++  if (!equalBytes(spawnScalarBytes(bytesToBigInt(identity)), identity) || isZero(identity))
++    throw new Error("spawn_genesis_identity");
++  return (
++    await getProgramDerivedAddress({
++      programAddress: program,
++      seeds: [encoder.encode("spawn-room-genesis-v1"), identity],
++    })
++  )[0];
++}
++export interface SpawnRoomConfig extends SpawnRoomContext {
++  readonly publisher: Address;
++}
++export function decodeSpawnRoomConfig(bytes: Uint8Array, program: Address): SpawnRoomConfig {
++  if (bytes.length !== 144 || !equalBytes(bytes.subarray(0, 8), encoder.encode("SPRCFG01")))
++    throw new Error("spawn_config_schema");
++  const network = bytes.slice(8, 40);
++  const applicationID = bytesToBigInt(bytes.subarray(40, 72));
++  const publisherBytes = bytes.slice(72, 104);
++  const grantRoot = bytesToBigInt(bytes.subarray(104, 136));
++  spawnScalarBytes(applicationID);
++  spawnScalarBytes(grantRoot);
++  if (isZero(publisherBytes)) throw new Error("spawn_config_publisher_zero");
++  const result = {
++    network,
++    applicationID,
++    publisher: encodeBase58(publisherBytes),
++    grantRoot,
++    grantEpoch: new DataView(bytes.buffer, bytes.byteOffset + 136, 8).getBigUint64(0, true),
++    ringProgramID: bytesToBigInt(ringIdField(program)),
++  };
++  assertSpawnRoomDomain(result);
++  return result;
++}
++export async function fetchSpawnRoomConfig(
++  client: Pick<ChainReader, "getAccount">,
++  program: Address,
++  context?: RequestContext,
++): Promise<SpawnRoomConfig> {
++  const account = await client.getAccount(await spawnRoomConfigAddress(program), context);
++  if (account === undefined || account.owner !== program) throw new Error("spawn_config_account");
++  return decodeSpawnRoomConfig(account.data, program);
++}
++function epochBytes(epoch: bigint): Uint8Array {
++  if (typeof epoch !== "bigint" || epoch < 0n || epoch >= 1n << 64n)
++    throw new Error("spawn_epoch_u64");
++  const bytes = new Uint8Array(8);
++  new DataView(bytes.buffer).setBigUint64(0, epoch, true);
++  return bytes;
++}
++export async function initializeSpawnRoomConfigInstruction(input: {
++  program: Address;
++  payer: Address;
++  upgradeAuthority: Address;
++  publisher: Address;
++  network: Uint8Array;
++  applicationID: bigint;
++  grantRoot: bigint;
++}): Promise<Instruction> {
++  assertSpawnRoomDomain({ ...input, ringProgramID: bytesToBigInt(ringIdField(input.program)) });
++  return {
++    programAddress: input.program,
++    accounts: [
++      signer(input.payer, true),
++      signer(input.upgradeAuthority),
++      signer(input.publisher),
++      writable(await spawnRoomConfigAddress(input.program)),
++      readonly(SYSTEM_PROGRAM),
++      readonly(input.program),
++      readonly(await ringProgramDataAddress(input.program)),
++    ],
++    data: Uint8Array.of(
++      SpawnRoomInstructionTag.initialize,
++      ...input.network,
++      ...spawnScalarBytes(input.applicationID),
++      ...spawnScalarBytes(input.grantRoot),
++    ),
++  };
++}
++export async function updateSpawnRoomGrantRootInstruction(input: {
++  program: Address;
++  publisher: Address;
++  expectedEpoch: bigint;
++  newRoot: bigint;
++}): Promise<Instruction> {
++  return {
++    programAddress: input.program,
++    accounts: [signer(input.publisher), writable(await spawnRoomConfigAddress(input.program))],
++    data: Uint8Array.of(
++      SpawnRoomInstructionTag.updateGrantRoot,
++      ...epochBytes(input.expectedEpoch),
++      ...spawnScalarBytes(input.newRoot),
++    ),
++  };
++}
++
++function frameProfile(proven: ProvenRingTransfer, state: SpawnRoomState, genesis: boolean): void {
++  const frame = proven.data;
++  const output = proven.outputs[0];
++  if (
++    frame.rail !== "anonymous" ||
++    frame.publicOwners !== genesis ||
++    frame.noSpend !== genesis ||
++    frame.entry ||
++    frame.vouched ||
++    frame.interfaceTransfers.length !== 0 ||
++    frame.extensions.dataHash !== undefined ||
++    frame.extensions.ringDataHash !== undefined ||
++    (frame.extensions.messages?.length ?? 0) !== 0 ||
++    frame.extensions.cache !== undefined ||
++    proven.accounts.delegate !== undefined ||
++    proven.accounts.withdrawal !== undefined ||
++    (proven.accounts.deposits?.length ?? 0) !== 0 ||
++    proven.accounts.cache !== undefined
++  )
++    throw new Error("spawn_instruction_frame_profile");
++  if (
++    proven.outputs.length !== 2 ||
++    output === undefined ||
++    output.isDummy() ||
++    output.amount !== 0n ||
++    output.ringProgramId !== proven.ringProgramId ||
++    (output.ringDataHash !== undefined && !isZero(output.ringDataHash)) ||
++    output.dataHash === undefined ||
++    !equalBytes(output.dataHash, hashSpawnRoomState(state)) ||
++    !proven.outputs[1]!.isDummy()
++  )
++    throw new Error("spawn_instruction_note_profile");
++  if (
++    bytesToBigInt(ringIdField(proven.ringProgramId)) !== state.binding.ringProgramID ||
++    output.ownerAddress === undefined ||
++    bytesToBigInt(output.ownerAddress.signingPublicKey.ownerProofInputHash()) !== state.writer
++  )
++    throw new Error("spawn_instruction_state_binding");
++  if (proven.accounts.ownerSigners.length !== (genesis ? 1 : 0))
++    throw new Error("spawn_instruction_owner_signers");
++}
++
++/** Changes only the outer tag and account prefix; both proof-carrying frames remain byte-exact. */
++export async function spawnRoomAdvanceInstruction(
++  proven: ProvenRingTransfer,
++  next: SpawnRoomState,
++): Promise<Instruction> {
++  frameProfile(proven, next, false);
++  const base = await proven.instruction();
++  if (base.data?.[0] !== 55) throw new Error("spawn_instruction_base_tag");
++  return {
++    ...base,
++    accounts: [
++      readonly(await spawnRoomConfigAddress(proven.ringProgramId)),
++      ...(base.accounts ?? []),
++    ],
++    data: Uint8Array.of(SpawnRoomInstructionTag.advance, ...base.data.subarray(1)),
++  };
++}
++export async function spawnRoomGenesisInstruction(
++  proven: ProvenRingTransfer,
++  state: SpawnRoomState,
++  rentPayer: Address,
++): Promise<Instruction> {
++  assertSpawnRoomGenesis(state);
++  frameProfile(proven, state, true);
++  const base = await proven.instruction();
++  if (base.data?.[0] !== 55) throw new Error("spawn_instruction_base_tag");
++  const writer = proven.accounts.ownerSigners[0]!;
++  const identity = spawnRoomIdentity(state);
++  return {
++    ...base,
++    accounts: [
++      readonly(await spawnRoomConfigAddress(proven.ringProgramId)),
++      signer(writer),
++      writable(await spawnRoomGenesisAddress(proven.ringProgramId, identity)),
++      signer(rentPayer, true),
++      readonly(SYSTEM_PROGRAM),
++      ...(base.accounts ?? []),
++    ],
++    data: Uint8Array.of(SpawnRoomInstructionTag.genesis, ...identity, ...base.data.subarray(1)),
++  };
++}
 diff --git a/sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts b/sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..6aaf94d0220b9d0d549ef3222a547d18cb9e7fb4
@@ -3795,6 +4605,3146 @@ index 0000000000000000000000000000000000000000..6aaf94d0220b9d0d549ef3222a547d18
 +    sha256: "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
 +    size: 287934208,
 +  }),
++});
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/native-adapter.ts b/sdk-libs/ts/src/experimental/spawn-room/native-adapter.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..2e24afad8ab2dac8e47e999aec09cc13693420ab
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/native-adapter.ts
+@@ -0,0 +1,492 @@
++/**
++ * Adapts the existing native EpisodeAuthority and PrivateRecordStore contracts.
++ * This module neither decides which original is acceptable nor publishes a root.
++ * Persisted grants remain pending until the configured publisher admits their
++ * exact leaf into the live epoch's authenticated root.
++ */
++import { bytesToBigInt, equalBytes } from "@heliuslabs/spr/internal";
++import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
++import {
++  assertSpawnRoomDomainMatches,
++  decodeSpawnAcceptanceGrant,
++  decodeSpawnRoomState,
++  deriveSpawnRoomAdvance,
++  encodeSpawnAcceptanceGrant,
++  encodeSpawnRoomState,
++  hashSpawnAcceptanceGrant,
++  spawnLessonBytes,
++  spawnRoomIdentity,
++  spawnScalarBytes,
++  type SpawnAcceptanceGrant,
++  type SpawnRoomDomain,
++  type SpawnRoomState,
++} from "./codec.js";
++import { verifySpawnRoomNote, type OpenedSpawnRoom } from "./payload.js";
++
++// Structural copies of backrooms/client/contracts.ts, allowing the existing
++// native implementation to be supplied without making it an SDK dependency.
++export interface NativeCheckpoint {
++  roomId: string;
++  uniqueAddress: string;
++  stateCommitment: string;
++  revision: string;
++}
++export interface NativeEpisodeBinding {
++  roomId: string;
++  episodeId: string;
++  episodeCommitment: string;
++  predecessor: NativeCheckpoint;
++  ordinal: string;
++  minimumConfirmedSlot: string;
++  residentIds: readonly [string, string];
++}
++export interface NativeProposal {
++  lesson: string;
++  selectedProcedure: 0 | 1;
++  feedback: { negative: boolean; magnitude: number };
++}
++export interface NativeOriginalResult {
++  episodeId: string;
++  originalResultCommitment: string;
++  candidateCommitment: string;
++  investigator: string;
++  critic: string;
++  proposal: NativeProposal;
++}
++export interface NativeAcceptanceAuthorization extends NativeProposal {
++  acceptanceNonce: string;
++  episodeId: string;
++  operationId: string;
++  roomId: string;
++  expectedPredecessor: string;
++  ordinal: string;
++  episodeCommitment: string;
++  originalResultCommitment: string;
++  candidateCommitment: string;
++  minimumConfirmedSlot: string;
++}
++export interface NativeEpisodeAuthority {
++  resolveEpisode(binding: NativeEpisodeBinding): Promise<NativeEpisodeBinding>;
++  getOriginalResult(episodeId: string): Promise<NativeOriginalResult | undefined>;
++  captureOriginalResult(
++    binding: NativeEpisodeBinding,
++    result: NativeOriginalResult,
++  ): Promise<NativeOriginalResult>;
++  authorizeAcceptance(
++    binding: NativeEpisodeBinding,
++    result: NativeOriginalResult,
++  ): Promise<NativeAcceptanceAuthorization>;
++}
++export interface NativePrivateRecordStore {
++  read<T>(key: string): Promise<{ value: T; version: number } | undefined>;
++  create<T>(key: string, value: T): Promise<boolean>;
++  replace<T>(key: string, expectedVersion: number, value: T): Promise<boolean>;
++}
++/** Values produced by the existing seeded resident runtime, including its key-bound membership digest. */
++export interface NativeResidentBinding {
++  readonly seedCommitment: string;
++  readonly membershipCommitment: string;
++  readonly residentIds: readonly [string, string];
++}
++export interface RetainedSpawnAcceptance {
++  readonly binding: NativeEpisodeBinding;
++  /** The complete native JSON object is retained, including provider/CID extensions. */
++  readonly original: NativeOriginalResult;
++  readonly authorization: NativeAcceptanceAuthorization;
++  readonly oldState: SpawnRoomState;
++  readonly nextState: SpawnRoomState;
++  readonly predecessor: bigint;
++  readonly grant: SpawnAcceptanceGrant;
++  readonly grantLeaf: Uint8Array;
++}
++interface StoredAcceptance {
++  schema: "spawn-room-acceptance-v1";
++  binding: NativeEpisodeBinding;
++  original: NativeOriginalResult;
++  authorization: NativeAcceptanceAuthorization;
++  oldState: string;
++  nextState: string;
++  predecessor: string;
++  grant: string;
++  grantLeaf: string;
++}
++export interface SpawnConfirmedObservation {
++  /** Must come from the caller's completed upstream recovery snapshot. */
++  recoveryStatus: "Complete";
++  slot: bigint;
++  contextSlot: bigint;
++  signature: string;
++}
++
++/** The existing native runtime's view contract; artifactVersion names the new chain format. */
++export interface SpawnNativeRoomView {
++  protocolVersion: "backrooms.v0";
++  operationId: string;
++  status: "recovered";
++  checkpoint: NativeCheckpoint;
++  memory: {
++    lesson: string;
++    episodeCommitment: string;
++    originalResultCommitment: string;
++    candidateCommitment: string;
++    predecessorCommitment: string;
++    authorizationCommitment: string;
++  };
++  policy: { policyId: "1"; scores: [number, number] };
++  slot: string;
++  contextSlot: string;
++  signature: string;
++  seedManifestCommitment: string;
++  fixedMembersCommitment: string;
++  writerIdentity: string;
++  artifactVersion: string;
++}
++
++/** Translate a verified private note for the unmodified native resident runner. */
++export function spawnRoomNativeView(input: {
++  room: OpenedSpawnRoom;
++  uniqueAddress: string;
++  operationId: string;
++  observed: SpawnConfirmedObservation;
++}): SpawnNativeRoomView {
++  const room = verifySpawnRoomNote(
++    input.room.note,
++    input.room.treeId,
++    input.room.state.binding,
++    input.room.commitment,
++  );
++  const state = room.state;
++  digest(input.uniqueAddress);
++  decimal(input.observed.slot.toString());
++  decimal(input.observed.contextSlot.toString());
++  if (
++    input.observed.recoveryStatus !== "Complete" ||
++    input.observed.contextSlot < input.observed.slot ||
++    input.observed.signature.length === 0
++  )
++    throw new Error("spawn_native_incomplete_recovery");
++  return {
++    protocolVersion: "backrooms.v0",
++    operationId: input.operationId,
++    status: "recovered",
++    checkpoint: {
++      roomId: bytesToHex(spawnRoomIdentity(state)),
++      uniqueAddress: input.uniqueAddress,
++      stateCommitment: bytesToHex(room.commitment),
++      revision: state.revision.toString(),
++    },
++    memory: {
++      lesson: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(
++        state.memory.lesson,
++      ),
++      episodeCommitment: bytesToHex(state.memory.episode),
++      originalResultCommitment: bytesToHex(state.memory.originalResult),
++      candidateCommitment: bytesToHex(state.memory.candidate),
++      predecessorCommitment: bytesToHex(spawnScalarBytes(state.predecessor)),
++      authorizationCommitment: bytesToHex(spawnScalarBytes(state.authorization)),
++    },
++    policy: { policyId: "1", scores: [...state.policy.scores] },
++    slot: input.observed.slot.toString(),
++    contextSlot: input.observed.contextSlot.toString(),
++    signature: input.observed.signature,
++    seedManifestCommitment: bytesToHex(state.seedManifest),
++    fixedMembersCommitment: bytesToHex(state.fixedMembers),
++    writerIdentity: bytesToHex(spawnScalarBytes(state.writer)),
++    artifactVersion: "spawn-room.v1",
++  };
++}
++
++function canonical(value: unknown): string {
++  if (value === null || typeof value === "string" || typeof value === "boolean")
++    return JSON.stringify(value);
++  if (typeof value === "number" && Number.isSafeInteger(value)) return String(value);
++  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
++  if (typeof value !== "object" || Object.getPrototypeOf(value) !== Object.prototype)
++    throw new Error("spawn_native_noncanonical_json");
++  const object = value as Record<string, unknown>;
++  return `{${Object.keys(object)
++    .sort()
++    .map((key) => `${JSON.stringify(key)}:${canonical(object[key])}`)
++    .join(",")}}`;
++}
++function same(left: unknown, right: unknown, error: string): void {
++  if (canonical(left) !== canonical(right)) throw new Error(error);
++}
++function snapshot<T>(value: T): T {
++  return JSON.parse(canonical(value)) as T;
++}
++function digest(value: string): Uint8Array {
++  if (typeof value !== "string" || !/^[0-9a-f]{64}$/u.test(value))
++    throw new Error("spawn_native_digest");
++  return hexToBytes(value);
++}
++function decimal(value: string): bigint {
++  if (
++    typeof value !== "string" ||
++    !/^(0|[1-9][0-9]{0,19})$/u.test(value) ||
++    BigInt(value) > (1n << 64n) - 1n
++  )
++    throw new Error("spawn_native_u64");
++  return BigInt(value);
++}
++function operationKey(operationId: string): string {
++  if (!/^[A-Za-z0-9._:/-]{1,200}$/u.test(operationId)) throw new Error("spawn_native_operation_id");
++  return `spawn-room-v1/acceptance/${operationId}`;
++}
++function checkBinding(
++  binding: NativeEpisodeBinding,
++  old: SpawnRoomState,
++  predecessor: bigint,
++): void {
++  const roomId = bytesToHex(spawnRoomIdentity(old));
++  if (
++    binding.roomId !== roomId ||
++    binding.predecessor.roomId !== roomId ||
++    binding.predecessor.stateCommitment !== bytesToHex(spawnScalarBytes(predecessor)) ||
++    decimal(binding.predecessor.revision) !== old.revision ||
++    decimal(binding.ordinal) !== old.revision + 1n
++  )
++    throw new Error("spawn_native_checkpoint_mismatch");
++  digest(binding.episodeCommitment);
++  digest(binding.predecessor.uniqueAddress);
++  decimal(binding.minimumConfirmedSlot);
++  if (binding.residentIds.length !== 2 || new Set(binding.residentIds).size !== 2)
++    throw new Error("spawn_native_residents");
++}
++function nativeGrant(
++  binding: NativeEpisodeBinding,
++  original: NativeOriginalResult,
++  authorization: NativeAcceptanceAuthorization,
++  old: SpawnRoomState,
++  predecessor: bigint,
++  epoch: bigint,
++): SpawnAcceptanceGrant {
++  checkBinding(binding, old, predecessor);
++  if (
++    original.episodeId !== binding.episodeId ||
++    authorization.episodeId !== binding.episodeId ||
++    authorization.roomId !== binding.roomId ||
++    authorization.expectedPredecessor !== binding.predecessor.stateCommitment ||
++    authorization.ordinal !== binding.ordinal ||
++    authorization.episodeCommitment !== binding.episodeCommitment ||
++    authorization.originalResultCommitment !== original.originalResultCommitment ||
++    authorization.candidateCommitment !== original.candidateCommitment ||
++    authorization.minimumConfirmedSlot !== binding.minimumConfirmedSlot
++  )
++    throw new Error("spawn_native_authorization_mismatch");
++  same(
++    {
++      lesson: authorization.lesson,
++      selectedProcedure: authorization.selectedProcedure,
++      feedback: authorization.feedback,
++    },
++    original.proposal,
++    "spawn_native_proposal_mismatch",
++  );
++  operationKey(authorization.operationId);
++  const grant: SpawnAcceptanceGrant = {
++    roomIdentity: bytesToBigInt(spawnRoomIdentity(old)),
++    actor: old.writer,
++    epoch,
++    predecessor,
++    ordinal: decimal(binding.ordinal),
++    memory: {
++      lesson: spawnLessonBytes(authorization.lesson),
++      scope: 0,
++      episode: digest(binding.episodeCommitment),
++      originalResult: digest(original.originalResultCommitment),
++      candidate: digest(original.candidateCommitment),
++    },
++    selectedProcedure: authorization.selectedProcedure,
++    negative: authorization.feedback.negative,
++    magnitude: authorization.feedback.magnitude,
++    nonce: digest(authorization.acceptanceNonce),
++  };
++  // Validates all byte, scalar and feedback bounds before retaining anything.
++  encodeSpawnAcceptanceGrant(grant);
++  return grant;
++}
++
++/** Supply the native host's authenticated encrypted store, not a plaintext cache. */
++export class SpawnRoomNativeAdapter {
++  readonly #domain: SpawnRoomDomain;
++  readonly #residents: NativeResidentBinding;
++  constructor(
++    readonly authority: NativeEpisodeAuthority,
++    readonly records: NativePrivateRecordStore,
++    domain: SpawnRoomDomain,
++    residents: NativeResidentBinding,
++  ) {
++    this.#domain = { ...domain, network: domain.network.slice() };
++    digest(residents.seedCommitment);
++    digest(residents.membershipCommitment);
++    if (residents.residentIds.length !== 2 || new Set(residents.residentIds).size !== 2)
++      throw new Error("spawn_native_residents");
++    this.#residents = snapshot({
++      seedCommitment: residents.seedCommitment,
++      membershipCommitment: residents.membershipCommitment,
++      residentIds: [...residents.residentIds] as [string, string],
++    });
++  }
++
++  #bindResidents(state: SpawnRoomState, binding: NativeEpisodeBinding): void {
++    if (
++      bytesToHex(state.seedManifest) !== this.#residents.seedCommitment ||
++      bytesToHex(state.fixedMembers) !== this.#residents.membershipCommitment
++    )
++      throw new Error("spawn_native_resident_manifest_mismatch");
++    same(binding.residentIds, this.#residents.residentIds, "spawn_native_resident_order_mismatch");
++  }
++
++  async prepare(input: {
++    binding: NativeEpisodeBinding;
++    room: OpenedSpawnRoom;
++    grantEpoch: bigint;
++  }): Promise<RetainedSpawnAcceptance> {
++    const room = verifySpawnRoomNote(
++      input.room.note,
++      input.room.treeId,
++      this.#domain,
++      input.room.commitment,
++    );
++    const predecessor = bytesToBigInt(room.commitment);
++    const requested = snapshot(input.binding);
++    checkBinding(requested, room.state, predecessor);
++    this.#bindResidents(room.state, requested);
++    const binding = await this.authority.resolveEpisode(requested);
++    same(binding, requested, "spawn_native_episode_changed");
++    const original = await this.authority.getOriginalResult(binding.episodeId);
++    if (original === undefined) throw new Error("spawn_native_original_not_captured");
++    const authorization = await this.authority.authorizeAcceptance(binding, original);
++    const grant = nativeGrant(
++      binding,
++      original,
++      authorization,
++      room.state,
++      predecessor,
++      input.grantEpoch,
++    );
++    const context = { ...this.#domain, grantEpoch: input.grantEpoch, grantRoot: 0n };
++    const nextState = deriveSpawnRoomAdvance(context, room.state, predecessor, grant);
++    const stored: StoredAcceptance = {
++      schema: "spawn-room-acceptance-v1",
++      binding: snapshot(binding),
++      original: snapshot(original),
++      authorization: snapshot(authorization),
++      oldState: bytesToHex(encodeSpawnRoomState(room.state)),
++      nextState: bytesToHex(encodeSpawnRoomState(nextState)),
++      predecessor: bytesToHex(room.commitment),
++      grant: bytesToHex(encodeSpawnAcceptanceGrant(grant)),
++      grantLeaf: bytesToHex(hashSpawnAcceptanceGrant(this.#domain, grant)),
++    };
++    const key = operationKey(authorization.operationId);
++    await this.records.create(key, stored);
++    const retained = await this.records.read<StoredAcceptance>(key);
++    if (retained === undefined) throw new Error("spawn_native_acceptance_missing");
++    // A retry at a later epoch must not silently resurrect a revoked leaf.
++    same(retained.value, stored, "spawn_native_acceptance_changed_requires_readmission");
++    return this.#open(retained.value);
++  }
++
++  async read(operationId: string): Promise<RetainedSpawnAcceptance | undefined> {
++    const retained = await this.records.read<StoredAcceptance>(operationKey(operationId));
++    if (retained === undefined) return undefined;
++    if (retained.value.authorization.operationId !== operationId)
++      throw new Error("spawn_native_operation_mismatch");
++    return this.#open(retained.value);
++  }
++
++  #open(stored: StoredAcceptance): RetainedSpawnAcceptance {
++    if (stored.schema !== "spawn-room-acceptance-v1") throw new Error("spawn_native_record_schema");
++    const oldState = decodeSpawnRoomState(hexToBytes(stored.oldState));
++    const nextState = decodeSpawnRoomState(hexToBytes(stored.nextState));
++    assertSpawnRoomDomainMatches(oldState.binding, this.#domain);
++    this.#bindResidents(oldState, stored.binding);
++    const predecessor = bytesToBigInt(digest(stored.predecessor));
++    const grant = decodeSpawnAcceptanceGrant(hexToBytes(stored.grant));
++    const expectedGrant = nativeGrant(
++      stored.binding,
++      stored.original,
++      stored.authorization,
++      oldState,
++      predecessor,
++      grant.epoch,
++    );
++    if (!equalBytes(encodeSpawnAcceptanceGrant(grant), encodeSpawnAcceptanceGrant(expectedGrant)))
++      throw new Error("spawn_native_grant_mismatch");
++    const expected = deriveSpawnRoomAdvance(
++      { ...this.#domain, grantEpoch: grant.epoch, grantRoot: 0n },
++      oldState,
++      predecessor,
++      grant,
++    );
++    if (!equalBytes(encodeSpawnRoomState(expected), encodeSpawnRoomState(nextState)))
++      throw new Error("spawn_native_next_state_mismatch");
++    const grantLeaf = hashSpawnAcceptanceGrant(this.#domain, grant);
++    if (bytesToHex(grantLeaf) !== stored.grantLeaf)
++      throw new Error("spawn_native_grant_leaf_mismatch");
++    return {
++      binding: snapshot(stored.binding),
++      original: snapshot(stored.original),
++      authorization: snapshot(stored.authorization),
++      oldState,
++      nextState,
++      predecessor,
++      grant,
++      grantLeaf,
++    };
++  }
++
++  /**
++   * Only call after the chain observer has confirmed the supplied commitment and
++   * completed its frozen recovery coverage. The existing native authority reads
++   * this receipt before reserving the next episode; it keeps the same nonce and
++   * exact checkpoint comparison used by the reference host.
++   */
++  async retainConfirmed(
++    operationId: string,
++    opened: OpenedSpawnRoom,
++    observed: SpawnConfirmedObservation,
++  ): Promise<NativeCheckpoint> {
++    const retained = await this.read(operationId);
++    if (retained === undefined) throw new Error("spawn_native_acceptance_missing");
++    const room = verifySpawnRoomNote(opened.note, opened.treeId, this.#domain, opened.commitment);
++    if (!equalBytes(encodeSpawnRoomState(room.state), encodeSpawnRoomState(retained.nextState)))
++      throw new Error("spawn_native_recovered_state_mismatch");
++    if (
++      observed.recoveryStatus !== "Complete" ||
++      observed.slot < decimal(retained.binding.minimumConfirmedSlot) ||
++      observed.contextSlot < observed.slot ||
++      observed.signature.length === 0
++    )
++      throw new Error("spawn_native_incomplete_recovery");
++    decimal(observed.slot.toString());
++    decimal(observed.contextSlot.toString());
++    const checkpoint: NativeCheckpoint = {
++      roomId: retained.binding.roomId,
++      uniqueAddress: retained.binding.predecessor.uniqueAddress,
++      stateCommitment: bytesToHex(room.commitment),
++      revision: room.state.revision.toString(),
++    };
++    const receipt = {
++      authorization: retained.authorization,
++      room: spawnRoomNativeView({
++        room,
++        uniqueAddress: checkpoint.uniqueAddress,
++        operationId,
++        observed,
++      }),
++    };
++    const key = `receipt/${operationId}`;
++    await this.records.create(key, receipt);
++    const prior = await this.records.read<typeof receipt>(key);
++    if (prior === undefined) throw new Error("spawn_native_receipt_missing");
++    // A later recovery may observe a later contextSlot; the confirmed transaction
++    // and state must remain exactly the same.
++    same(prior.value.authorization, receipt.authorization, "spawn_native_receipt_authorization");
++    const { contextSlot: _oldContext, ...oldReceipt } = prior.value.room;
++    const { contextSlot: _newContext, ...newReceipt } = receipt.room;
++    same(oldReceipt, newReceipt, "spawn_native_receipt_conflict");
++    return checkpoint;
++  }
++}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/payload.ts b/sdk-libs/ts/src/experimental/spawn-room/payload.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..3a5a32dfc67245704db48ada23b58d35a1d0c3f5
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/payload.ts
+@@ -0,0 +1,101 @@
++/** Application validation after the existing anonymous recipient cipher opens. */
++import type { Bytes32 } from "@heliuslabs/spr";
++import {
++  bytesToBigInt,
++  equalBytes,
++  isCanonicalField,
++  isZero,
++  ZERO_NULLIFIER_PK,
++} from "@heliuslabs/spr/internal";
++import type { TreeId } from "@heliuslabs/spr/transaction";
++import type { ApplicationData } from "../../operations/payments/anonymous.js";
++import { openOutputSlot } from "../../crypto/audit/ring-disclosure.js";
++import {
++  openRecipientNote,
++  type OpenedRingNote,
++  type RingOutputReader,
++} from "../../crypto/derivation/blinding.js";
++import { ringIdField } from "../../crypto/derivation/ring-stream.js";
++import {
++  assertSpawnRoomDomainMatches,
++  decodeSpawnRoomState,
++  encodeSpawnRoomState,
++  hashSpawnRoomState,
++  type SpawnRoomDomain,
++  type SpawnRoomState,
++} from "./codec.js";
++
++export interface OpenedSpawnRoom {
++  readonly state: SpawnRoomState;
++  readonly stateHash: Bytes32;
++  readonly note: OpenedRingNote;
++  readonly treeId: TreeId;
++  readonly commitment: Bytes32;
++}
++
++/** Pass directly as AnonymousPayment.data.application; the SDK seals it for the recipient. */
++export function createSpawnRoomApplicationData(state: SpawnRoomState): ApplicationData {
++  const bytes = encodeSpawnRoomState(state);
++  return Object.freeze({ hash: hashSpawnRoomState(decodeSpawnRoomState(bytes)), bytes });
++}
++
++/**
++ * A successful opening proves these bytes match this note commitment. It does
++ * not establish chain inclusion, finality, or unspent status: retain the SDK's
++ * frozen recovery coverage and nullifier checks before selecting the note.
++ */
++export function verifySpawnRoomNote(
++  note: OpenedRingNote,
++  treeId: TreeId,
++  domain: SpawnRoomDomain,
++  publishedCommitment: Bytes32,
++): OpenedSpawnRoom {
++  if (!isCanonicalField(publishedCommitment) || !equalBytes(note.utxoHash, publishedCommitment))
++    throw new Error("spawn_note_commitment");
++  if (
++    note.utxo.amount !== 0n ||
++    note.utxo.ringProgramId === undefined ||
++    (note.ringDataHash !== undefined && !isZero(note.ringDataHash))
++  )
++    throw new Error("spawn_note_profile");
++  if (
++    !isCanonicalField(note.nullifierPublicKey) ||
++    isZero(note.nullifierPublicKey) ||
++    equalBytes(note.nullifierPublicKey, ZERO_NULLIFIER_PK)
++  )
++    throw new Error("spawn_note_nullifier_key");
++  if (note.dataHash === undefined || !isCanonicalField(note.dataHash) || isZero(note.dataHash))
++    throw new Error("spawn_state_hash_missing");
++  const bytes = note.utxo.data.utxoData();
++  if (bytes === undefined) throw new Error("spawn_state_bytes_missing");
++  const state = decodeSpawnRoomState(bytes);
++  assertSpawnRoomDomainMatches(state.binding, domain);
++  if (
++    bytesToBigInt(ringIdField(note.utxo.ringProgramId)) !== domain.ringProgramID ||
++    state.writer !== bytesToBigInt(note.utxo.owner.ownerProofInputHash())
++  )
++    throw new Error("spawn_note_owner_or_ring");
++  const stateHash = hashSpawnRoomState(state);
++  if (!equalBytes(stateHash, note.dataHash)) throw new Error("spawn_state_hash_mismatch");
++  const rebuilt = note.utxo.hash(note.nullifierPublicKey, treeId, stateHash, note.ringDataHash);
++  if (!equalBytes(rebuilt, publishedCommitment)) throw new Error("spawn_note_commitment");
++  return Object.freeze({ state, stateHash, note, treeId, commitment: rebuilt });
++}
++
++/** Uses CRING/rcp and the same commitment-based opening as ordinary anonymous notes. */
++export function openSpawnRoomOutput(
++  reader: RingOutputReader,
++  slotSecret: Bytes32,
++  ciphertext: Uint8Array,
++  domain: SpawnRoomDomain,
++): OpenedSpawnRoom | undefined {
++  try {
++    const note = openRecipientNote(reader, openOutputSlot(slotSecret, ciphertext));
++    return note === undefined
++      ? undefined
++      : verifySpawnRoomNote(note, reader.treeId, domain, reader.commitment);
++  } catch {
++    // A scan encounters other recipients and malformed bodies; neither is a room.
++    return undefined;
++  }
++}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/prover.ts b/sdk-libs/ts/src/experimental/spawn-room/prover.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..75648d7cb7cdc1b19feb965d56f43ce0603fe310
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/prover.ts
+@@ -0,0 +1,278 @@
++/** Separate experimental circuit families; ordinary ring and SPP keys stay unchanged. */
++import type { RequestContext } from "@heliuslabs/spr";
++import {
++  bytesToBigInt,
++  equalBytes,
++  isZero,
++  parseCheckedProof,
++  ProverClient,
++  type ExpectedProvingKey,
++} from "@heliuslabs/spr/internal";
++import { bytesToHex } from "@noble/hashes/utils.js";
++import type { RingProver } from "../../rpc/ports.js";
++import { customRingProof } from "../../rpc/prover/proof.js";
++import {
++  ringProofCircuit,
++  ringProofRequestBody,
++  type RingProofRequest,
++  type TransferProofRequest,
++} from "../../rpc/prover/ring.js";
++import { extended } from "../../operations/workflow/extended.js";
++import {
++  assertSpawnRoomDomainMatches,
++  assertSpawnRoomGenesis,
++  deriveSpawnRoomAdvance,
++  encodeSpawnRoomState,
++  hashSpawnApplicationStatement,
++  hashSpawnGenesisStatement,
++  hashSpawnRoomState,
++  hashSpawnAcceptanceGrant,
++  spawnDigestLimbs,
++  spawnGrantRoot,
++  spawnScalarBytes,
++  type SpawnAcceptanceGrant,
++  type SpawnAcceptedMemory,
++  type SpawnGrantPath,
++  type SpawnRoomContext,
++  type SpawnRoomDomain,
++  type SpawnRoomState,
++} from "./codec.js";
++import { SPAWN_ROOM_LOCALNET_KEYS } from "./localnet-keys.js";
++
++export type SpawnRoomProofSelection =
++  | { readonly kind: "genesis"; readonly domain: SpawnRoomDomain; readonly state: SpawnRoomState }
++  | {
++      readonly kind: "advance";
++      readonly context: SpawnRoomContext;
++      readonly old: SpawnRoomState;
++      readonly next: SpawnRoomState;
++      readonly grant: SpawnAcceptanceGrant;
++      readonly grantPath: SpawnGrantPath;
++    };
++
++const field = (value: bigint): string => `0x${bytesToHex(spawnScalarBytes(value))}`;
++const limbs = (value: Uint8Array): readonly string[] => spawnDigestLimbs(value).map(field);
++function memory(value: SpawnAcceptedMemory) {
++  const padded = new Uint8Array(96);
++  padded.set(value.lesson);
++  return {
++    lesson: `0x${bytesToHex(padded)}`,
++    length: value.lesson.length,
++    scope: value.scope,
++    episode: limbs(value.episode),
++    originalResult: limbs(value.originalResult),
++    candidate: limbs(value.candidate),
++  };
++}
++function domain(value: SpawnRoomDomain) {
++  return {
++    network: limbs(value.network),
++    applicationId: field(value.applicationID),
++    ringProgramId: field(value.ringProgramID),
++  };
++}
++/** JSON uint64s remain bigint until the exact-number serializer below. */
++export function spawnStateParams(value: SpawnRoomState) {
++  encodeSpawnRoomState(value);
++  return {
++    binding: { ...domain(value.binding), creationNonce: limbs(value.binding.creationNonce) },
++    seedManifest: limbs(value.seedManifest),
++    fixedMembers: limbs(value.fixedMembers),
++    writer: field(value.writer),
++    revision: value.revision,
++    memory: memory(value.memory),
++    policy: { id: value.policy.id, scores: [...value.policy.scores] },
++    predecessor: field(value.predecessor),
++    authorization: field(value.authorization),
++    lastAuthorizationEpoch: value.lastAuthorizationEpoch,
++  };
++}
++function grant(value: SpawnAcceptanceGrant) {
++  return {
++    roomIdentity: field(value.roomIdentity),
++    actor: field(value.actor),
++    epoch: value.epoch,
++    predecessor: field(value.predecessor),
++    ordinal: value.ordinal,
++    memory: memory(value.memory),
++    selectedProcedure: value.selectedProcedure,
++    negative: Number(value.negative),
++    magnitude: value.magnitude,
++    nonce: limbs(value.nonce),
++  };
++}
++
++/** Exact Go uint64 JSON numbers, including 2^64-1. Never convert through Number. */
++export function stringifySpawnProofRequest(value: unknown): string {
++  const json = JSON as typeof JSON & { rawJSON(text: string): unknown };
++  if (typeof json.rawJSON !== "function") throw new Error("spawn_node24_json_required");
++  return JSON.stringify(value, (_key, item: unknown) => {
++    if (typeof item === "bigint") {
++      if (item < 0n || item >= 1n << 64n) throw new Error("spawn_json_u64_range");
++      return json.rawJSON(item.toString());
++    }
++    if (typeof item === "number" && !Number.isSafeInteger(item))
++      throw new Error("spawn_json_unsafe_number");
++    return item;
++  });
++}
++
++function profile(request: TransferProofRequest, selection: SpawnRoomProofSelection): void {
++  const state = selection.kind === "genesis" ? selection.state : selection.next;
++  const shape = ringProofCircuit(request);
++  if (
++    shape.family !== "transfer" ||
++    shape.class !== 24 ||
++    shape.outputs !== 2 ||
++    shape.owners !== 4 ||
++    shape.withdrawals !== 4 ||
++    shape.entry ||
++    shape.wide ||
++    request.inProof ||
++    request.delegate ||
++    request.layout.entry ||
++    request.layout.vouched ||
++    request.withdrawalCount !== 0 ||
++    request.publicAmounts.some((value) => !isZero(value)) ||
++    request.publicGross.some((value) => !isZero(value)) ||
++    isZero(request.policyHash) ||
++    isZero(request.trackingRoot)
++  )
++    throw new Error("spawn_proof_frame_profile");
++  if (
++    request.hidden !== (selection.kind === "advance") ||
++    request.signerCount !== (selection.kind === "genesis" ? 1 : 0)
++  )
++    throw new Error("spawn_proof_owner_profile");
++  if (
++    request.inputs
++      .slice(selection.kind === "genesis" ? 0 : 1)
++      .some((slot) => bytesToBigInt(slot.domain) !== 1n) ||
++    request.outputs.slice(1).some((slot) => bytesToBigInt(slot.output.domain) !== 1n)
++  )
++    throw new Error("spawn_proof_dummy_profile");
++  const output = request.outputs[0]!.output;
++  if (
++    bytesToBigInt(output.domain) !== 3n ||
++    !isZero(output.amount) ||
++    !isZero(output.ringDataHash) ||
++    bytesToBigInt(output.ownerPkHash) !== state.writer ||
++    bytesToBigInt(output.ringProgramId) !== state.binding.ringProgramID ||
++    !equalBytes(output.dataHash, hashSpawnRoomState(state))
++  )
++    throw new Error("spawn_proof_output_state");
++  if (selection.kind === "genesis") {
++    if (bytesToBigInt(request.signers[0]!) !== state.writer)
++      throw new Error("spawn_proof_genesis_writer");
++  } else {
++    const input = request.inputs[0]!;
++    if (
++      bytesToBigInt(input.domain) !== 3n ||
++      !isZero(input.amount) ||
++      !isZero(input.ringDataHash) ||
++      !equalBytes(input.dataHash, hashSpawnRoomState(selection.old)) ||
++      !equalBytes(input.ownerPkHash, output.ownerPkHash) ||
++      !equalBytes(input.nullifierPk, output.nullifierPk) ||
++      !equalBytes(input.asset, output.asset)
++    )
++      throw new Error("spawn_proof_input_state");
++  }
++}
++
++export function spawnRoomProofRequestBody(
++  request: TransferProofRequest,
++  selection: SpawnRoomProofSelection,
++): Readonly<Record<string, unknown>> {
++  profile(request, selection);
++  const upstream = ringProofRequestBody(request);
++  if (selection.kind === "genesis") {
++    assertSpawnRoomGenesis(selection.state);
++    assertSpawnRoomDomainMatches(selection.state.binding, selection.domain);
++    return {
++      ...upstream,
++      circuitType: "spawn-room-genesis-v1",
++      genesisStatementHash: `0x${bytesToHex(hashSpawnGenesisStatement(selection.domain, bytesToBigInt(request.publicInputHash), selection.state))}`,
++      context: domain(selection.domain),
++      state: spawnStateParams(selection.state),
++    };
++  }
++  const { context, old, next, grant: authorization, grantPath } = selection;
++  const expected = deriveSpawnRoomAdvance(context, old, authorization.predecessor, authorization);
++  if (!equalBytes(encodeSpawnRoomState(expected), encodeSpawnRoomState(next)))
++    throw new Error("spawn_proof_next_state");
++  if (
++    bytesToBigInt(spawnGrantRoot(hashSpawnAcceptanceGrant(context, authorization), grantPath)) !==
++    context.grantRoot
++  )
++    throw new Error("spawn_proof_grant_membership");
++  return {
++    ...upstream,
++    circuitType: "spawn-room-advance-v1",
++    applicationStatementHash: `0x${bytesToHex(hashSpawnApplicationStatement(context, bytesToBigInt(request.publicInputHash)))}`,
++    context: {
++      ...domain(context),
++      grantRoot: field(context.grantRoot),
++      grantEpoch: context.grantEpoch,
++    },
++    advance: {
++      old: spawnStateParams(old),
++      next: spawnStateParams(next),
++      grant: grant(authorization),
++      grantPath: {
++        index: grantPath.index,
++        siblings: grantPath.siblings.map((row) => row.map((value) => field(bytesToBigInt(value)))),
++      },
++    },
++  };
++}
++
++export class SpawnRoomLocalnetProver {
++  readonly #prover: ProverClient;
++  constructor(input: {
++    url: string | URL;
++    localnetTestKeys: true;
++    fetch?: typeof globalThis.fetch;
++  }) {
++    const url = new URL(input.url);
++    if (
++      input.localnetTestKeys !== true ||
++      !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) ||
++      url.username !== "" ||
++      url.password !== ""
++    )
++      throw new Error("spawn_prover_localnet_only");
++    this.#prover = new ProverClient({
++      url,
++      ...(input.fetch === undefined ? {} : { fetch: input.fetch }),
++    });
++  }
++  async prove(
++    request: TransferProofRequest,
++    selection: SpawnRoomProofSelection,
++    context?: RequestContext,
++  ): Promise<Uint8Array> {
++    const name =
++      selection.kind === "genesis" ? "spawn_room_genesis_v1.key" : "spawn_room_advance_v1.key";
++    const pin = SPAWN_ROOM_LOCALNET_KEYS[name];
++    if (pin === undefined) throw new Error("spawn_localnet_key_pin_missing");
++    const key: ExpectedProvingKey = { name, sha256: pin.sha256 };
++    const body = stringifySpawnProofRequest(spawnRoomProofRequestBody(request, selection));
++    return customRingProof(
++      parseCheckedProof(await this.#prover.send(body, "queued", key, context), key),
++    );
++  }
++}
++
++/** Existing SPP proof/signing/indexer methods stay bound to their original client. */
++export function withSpawnRoomProof<T extends RingProver>(
++  client: T,
++  prover: SpawnRoomLocalnetProver,
++  selection: SpawnRoomProofSelection,
++): T {
++  return extended(client, {
++    proveRing: (request: RingProofRequest, context?: RequestContext): Promise<Uint8Array> =>
++      request.kind === "transfer"
++        ? prover.prove(request, selection, context)
++        : client.proveRing(request, context),
++  });
++}
+diff --git a/sdk-libs/ts/src/experimental/spawn-room/staging.ts b/sdk-libs/ts/src/experimental/spawn-room/staging.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..cf94df6c2c48b9cde0145d0cc4dda4863456e5ed
+--- /dev/null
++++ b/sdk-libs/ts/src/experimental/spawn-room/staging.ts
+@@ -0,0 +1,144 @@
++/** Exact one-note staging, isolated from ordinary payment/change behavior. */
++import type { Address, Bytes32 } from "@heliuslabs/spr";
++import type { WalletKeys } from "@heliuslabs/spr/client";
++import { bytesToBigInt, encodeBase58, equalBytes } from "@heliuslabs/spr/internal";
++import {
++  ConfidentialTransfer,
++  createProofOutput,
++  SOL_MINT,
++  type AssetRegistry,
++  type ProofInputUtxo,
++  type TreeId,
++} from "@heliuslabs/spr/transaction";
++import { RingAddress } from "../../crypto/keys/ring-address.js";
++import { ringIdField } from "../../crypto/derivation/ring-stream.js";
++import type { AnonymousSpendSigner } from "../../operations/payments/anonymous.js";
++import {
++  CustomRingTransfer,
++  type AnonymousTransfer,
++  type PublicOwnerTransfer,
++} from "../../operations/payments/transfer-rails.js";
++import { assertSpawnRoomGenesis, hashSpawnRoomState, type SpawnRoomState } from "./codec.js";
++import { createSpawnRoomApplicationData } from "./payload.js";
++
++interface SpawnStaging {
++  readonly ringProgramId: Address;
++  readonly keys: WalletKeys;
++  readonly listSalt: Bytes32;
++  readonly payer: Address;
++  readonly outputTreeId: TreeId;
++  readonly assets: AssetRegistry;
++  readonly state: SpawnRoomState;
++}
++
++/**
++ * RingOutputRail normally promotes unused ring-tagged padding into sender change.
++ * This exact profile has one application note and zero change. Ordinary dummy
++ * outputs need no ring binding, so build only their padding with the upstream
++ * createProofOutput primitive and leave all live outputs and blindings intact.
++ */
++function exactPadding(transfer: ConfidentialTransfer, ring: Address, genesis: boolean): void {
++  const prepare = transfer.prepare.bind(transfer);
++  transfer.prepare = () => {
++    const prepared = prepare();
++    const output = prepared.outputs[0];
++    if (
++      prepared.outputs.length !== 1 ||
++      prepared.senderOutputCount !== 0 ||
++      prepared.interfaceTransfers.length !== 0 ||
++      prepared.shape.outputs !== 2 ||
++      output?.amount !== 0n ||
++      output.ringProgramId !== ring ||
++      output.ownerAddress === undefined ||
++      !equalBytes(output.ownerAddress.toBytes(), prepared.owner.toBytes())
++    )
++      throw new Error("spawn_staging_output_profile");
++    if (
++      genesis
++        ? prepared.inputs.some((input) => !input.isDummy())
++        : prepared.inputs.length !== 1 ||
++          prepared.inputs[0]!.isDummy() ||
++          prepared.inputs[0]!.utxo.amount !== 0n ||
++          prepared.inputs[0]!.utxo.ringProgramId !== ring
++    )
++      throw new Error("spawn_staging_input_profile");
++    return Object.freeze({
++      ...prepared,
++      proofOutputs: () =>
++        Object.freeze(
++          prepared
++            .proofOutputs()
++            .map((slot) =>
++              slot.isDummy()
++                ? createProofOutput({
++                    asset: slot.asset,
++                    amount: 0n,
++                    blinding: slot.blinding,
++                    ...(slot.compact === undefined ? {} : { compact: slot.compact }),
++                  })
++                : slot,
++            ),
++        ),
++    });
++  };
++}
++
++function prepare(
++  input: SpawnStaging,
++  transfer: ConfidentialTransfer,
++  genesis: boolean,
++): CustomRingTransfer {
++  const owner = input.keys.address();
++  if (
++    input.state.writer !== bytesToBigInt(owner.signingPublicKey.ownerProofInputHash()) ||
++    input.state.binding.ringProgramID !== bytesToBigInt(ringIdField(input.ringProgramId))
++  )
++    throw new Error("spawn_staging_owner_or_ring");
++  hashSpawnRoomState(input.state);
++  transfer.withOutputTreeId(input.outputTreeId).withShape({ inputs: 2, outputs: 2 });
++  exactPadding(transfer, input.ringProgramId, genesis);
++  return CustomRingTransfer.new({
++    ringProgramId: input.ringProgramId,
++    keys: input.keys,
++    transfer,
++    assets: input.assets,
++  });
++}
++function payment(input: SpawnStaging, asset: Address) {
++  return {
++    to: new RingAddress({
++      recipient: input.keys.address(),
++      ringProgramId: input.ringProgramId,
++      listSalt: input.listSalt,
++    }),
++    asset,
++    amount: 0n,
++    reply: null,
++    data: { application: createSpawnRoomApplicationData(input.state) },
++  } as const;
++}
++
++/** One true dummy input, no deposit leg, one visibly signing creator. */
++export function stageSpawnRoomGenesis(input: SpawnStaging): PublicOwnerTransfer {
++  assertSpawnRoomGenesis(input.state);
++  const owner = input.keys.address();
++  return prepare(
++    input,
++    ConfidentialTransfer.newDeposit(owner, input.outputTreeId, input.payer),
++    true,
++  )
++    .spendPublic(encodeBase58(owner.signingPublicKey.ed25519()))
++    .withPayment(payment(input, SOL_MINT));
++}
++
++/** One live zero-value input; the existing anonymous SPP signer authorizes it. */
++export function stageSpawnRoomAdvance(
++  input: SpawnStaging & { input: ProofInputUtxo; signer: AnonymousSpendSigner },
++): AnonymousTransfer {
++  const owner = input.keys.address();
++  if (input.payer === encodeBase58(owner.signingPublicKey.ed25519()))
++    throw new Error("spawn_hidden_writer_is_payer");
++  return prepare(input, new ConfidentialTransfer(owner, [input.input], input.payer), false)
++    .withAnonymousSigner(input.signer)
++    .withPayment(payment(input, input.input.utxo.asset));
++}
+diff --git a/sdk-libs/ts/test/experimental/spawn-room-codec.test.ts b/sdk-libs/ts/test/experimental/spawn-room-codec.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e4a36f144b6fdabcb2da527feb4689cea7b4dadb
+--- /dev/null
++++ b/sdk-libs/ts/test/experimental/spawn-room-codec.test.ts
+@@ -0,0 +1,206 @@
++import { beforeAll, describe, expect, it } from "vitest";
++import { initializePoseidon } from "@heliuslabs/spr";
++import { BN254_MODULUS_DEC, bytesToBigInt, poseidon } from "@heliuslabs/spr/internal";
++import { bytesToHex } from "@noble/hashes/utils.js";
++
++import {
++  decodeSpawnAcceptanceGrant,
++  decodeSpawnRoomState,
++  deriveSpawnRoomAdvance,
++  encodeSpawnAcceptanceGrant,
++  encodeSpawnRoomState,
++  hashSpawnAcceptanceGrant,
++  hashSpawnRoomState,
++  spawnGrantRoot,
++  spawnRoomIdentity,
++  spawnScalarBytes,
++  type SpawnAcceptanceGrant,
++  type SpawnRoomContext,
++  type SpawnRoomState,
++} from "../../src/experimental/spawn-room/codec.js";
++
++const limbs = (hi: bigint, lo: bigint): Uint8Array => {
++  const result = new Uint8Array(32);
++  for (let i = 15; i >= 0; i--) {
++    result[i] = Number(hi & 255n);
++    result[16 + i] = Number(lo & 255n);
++    hi >>= 8n;
++    lo >>= 8n;
++  }
++  return result;
++};
++const memory = (lesson: string, n: bigint) => ({
++  lesson: new TextEncoder().encode(lesson),
++  scope: 0 as const,
++  episode: limbs(n, n + 1n),
++  originalResult: limbs(n + 2n, n + 3n),
++  candidate: limbs(n + 4n, n + 5n),
++});
++const hex = (value: string): string => value.padStart(64, "0");
++
++/** Independent fixed vector also pinned in Go TestSpawnRoomStateCommitmentVector. */
++export function spawnCodecFixture() {
++  const context: SpawnRoomContext = {
++    network: limbs((1n << 128n) - 1n, 17n),
++    applicationID: 19n,
++    ringProgramID: 13n,
++    grantEpoch: 3n,
++    grantRoot: BigInt("0x0f8cc20607a23f72c265a41beafa6d2bd6b6a4b08576178bb67428d8d02b7137"),
++  };
++  const old: SpawnRoomState = {
++    binding: {
++      network: context.network,
++      applicationID: 19n,
++      ringProgramID: 13n,
++      creationNonce: limbs(23n, 29n),
++    },
++    seedManifest: limbs(31n, 37n),
++    fixedMembers: limbs(41n, 43n),
++    writer: 7n,
++    revision: 4n,
++    memory: memory("older lesson", 47n),
++    policy: { id: 1n, scores: [50, 50] },
++    predecessor: 79n,
++    authorization: 83n,
++    lastAuthorizationEpoch: 2n,
++  };
++  const predecessor = BigInt("0x06110d28d75875638ee363ebcdf97744e212548624e61580ad629af4a3d82bff");
++  const grant: SpawnAcceptanceGrant = {
++    roomIdentity: BigInt("0x0004dcf13babfaf817fabe56ad5c79da37f1e9c69e5f3ff8c4b5e3535c2453aa"),
++    actor: 7n,
++    epoch: 3n,
++    predecessor,
++    ordinal: 5n,
++    memory: memory("Use a bounded retry.", 53n),
++    selectedProcedure: 0,
++    negative: false,
++    magnitude: 7,
++    nonce: limbs(89n, 97n),
++  };
++  return { context, old, grant, predecessor };
++}
++
++describe("experimental Spawn room canonical codec", () => {
++  beforeAll(initializePoseidon);
++
++  it("reproduces the independent Go identity/state/grant/new-state vectors", () => {
++    const { context, old, grant, predecessor } = spawnCodecFixture();
++    expect(bytesToHex(spawnRoomIdentity(old))).toBe(
++      hex("0004dcf13babfaf817fabe56ad5c79da37f1e9c69e5f3ff8c4b5e3535c2453aa"),
++    );
++    expect(bytesToHex(hashSpawnRoomState(old))).toBe(
++      hex("2e4305dcc6f85eb7b3785632ff5a58b9a36c586e4ba03e6f329d6ab8bc7b9e2e"),
++    );
++    expect(bytesToHex(hashSpawnAcceptanceGrant(context, grant))).toBe(
++      hex("1d41673a7393fb1daf7ab1405ae78183dfab22864d679265536e624c3d9c931c"),
++    );
++    const next = deriveSpawnRoomAdvance(context, old, predecessor, grant);
++    expect(next.policy.scores).toEqual([57, 50]);
++    expect(bytesToHex(hashSpawnRoomState(next))).toBe(
++      hex("0a0077d99d38d457ec84647a8617f98e4e4f53637865e39a671bdb876a00fba6"),
++    );
++    let empty = spawnScalarBytes(0n);
++    const siblings = Array.from({ length: 13 }, () => {
++      const layer = [empty, empty, empty] as const;
++      empty = poseidon([empty, empty, empty, empty]);
++      return layer;
++    });
++    expect(
++      bytesToBigInt(
++        spawnGrantRoot(hashSpawnAcceptanceGrant(context, grant), { index: 37, siblings }),
++      ),
++    ).toBe(context.grantRoot);
++  });
++
++  it("pins the exact byte layout and retains every digest bit, including values above q", () => {
++    const { old, grant } = spawnCodecFixture();
++    const state = {
++      ...old,
++      seedManifest: new Uint8Array(32).fill(255),
++      revision: (1n << 64n) - 1n,
++    };
++    const encoded = encodeSpawnRoomState(state);
++    expect(encoded.length).toBe(516);
++    expect(new TextDecoder().decode(encoded.subarray(0, 8))).toBe("SPRST001");
++    expect(encoded.slice(136, 168)).toEqual(state.seedManifest);
++    expect(encoded.slice(232, 240)).toEqual(new Uint8Array(8).fill(255));
++    expect(encoded[240]).toBe(12);
++    expect(encoded[241]).toBe(0);
++    expect(encoded.slice(242, 254)).toEqual(new TextEncoder().encode("older lesson"));
++    expect(decodeSpawnRoomState(encoded)).toEqual(state);
++    const encodedGrant = encodeSpawnAcceptanceGrant(grant);
++    expect(encodedGrant.length).toBe(349);
++    expect(new TextDecoder().decode(encodedGrant.subarray(0, 8))).toBe("SPRGR001");
++    expect(decodeSpawnAcceptanceGrant(encodedGrant)).toEqual(grant);
++    const highDigest = { ...old, seedManifest: limbs(0n, 1n) };
++    // Add q as a raw 256-bit digest: field reduction would make these collide.
++    const aliasDigest = {
++      ...old,
++      seedManifest: limbs(
++        (BigInt(BN254_MODULUS_DEC) + 1n) >> 128n,
++        (BigInt(BN254_MODULUS_DEC) + 1n) & ((1n << 128n) - 1n),
++      ),
++    };
++    expect(hashSpawnRoomState(highDigest)).not.toEqual(hashSpawnRoomState(aliasDigest));
++  });
++
++  it("rejects scalar aliases, trailing data, nonzero lesson padding and overlong lessons", () => {
++    const { old, grant } = spawnCodecFixture();
++    const encoded = encodeSpawnRoomState(old);
++    const q = BigInt(BN254_MODULUS_DEC);
++    const alias = limbs(q >> 128n, q & ((1n << 128n) - 1n));
++    const badScalar = encoded.slice();
++    badScalar.set(alias, 40);
++    expect(() => decodeSpawnRoomState(badScalar)).toThrow(/scalar/);
++    expect(() => decodeSpawnRoomState(Uint8Array.of(...encoded, 0))).toThrow(/length/);
++    const padding = encoded.slice();
++    padding[337] = 1;
++    expect(() => decodeSpawnRoomState(padding)).toThrow(/padding/);
++    expect(() =>
++      encodeSpawnRoomState({ ...old, memory: { ...old.memory, lesson: new Uint8Array(97) } }),
++    ).toThrow(/lesson/);
++    expect(() =>
++      encodeSpawnAcceptanceGrant({
++        ...grant,
++        memory: { ...grant.memory, lesson: new Uint8Array() },
++      }),
++    ).toThrow(/lesson/);
++    expect(() => encodeSpawnAcceptanceGrant({ ...grant, nonce: new Uint8Array(32) })).toThrow(
++      /nonce/,
++    );
++    expect(() => encodeSpawnRoomState({ ...old, writer: q + old.writer })).toThrow(/scalar/);
++    expect(() => encodeSpawnRoomState({ ...old, revision: 1n << 64n })).toThrow(/u64/);
++  });
++
++  it("binds an advance to its exact original, ordinal, owner and current epoch", () => {
++    const { context, old, grant, predecessor } = spawnCodecFixture();
++    for (const changed of [
++      { ...grant, actor: 8n },
++      { ...grant, roomIdentity: 4n },
++      { ...grant, predecessor: predecessor + 1n },
++      { ...grant, ordinal: 6n },
++      { ...grant, epoch: 2n },
++    ])
++      expect(() => deriveSpawnRoomAdvance(context, old, predecessor, changed)).toThrow();
++    expect(() =>
++      deriveSpawnRoomAdvance({ ...context, grantEpoch: 1n }, old, predecessor, {
++        ...grant,
++        epoch: 1n,
++      }),
++    ).toThrow(/epoch/);
++    const next = deriveSpawnRoomAdvance(
++      context,
++      { ...old, policy: { id: 1n, scores: [97, 3] } },
++      predecessor,
++      grant,
++    );
++    expect(next.policy.scores).toEqual([100, 3]);
++    const negative = deriveSpawnRoomAdvance(context, old, predecessor, {
++      ...grant,
++      selectedProcedure: 1,
++      negative: true,
++    });
++    expect(negative.policy.scores).toEqual([50, 43]);
++    expect(negative.memory.originalResult).toEqual(grant.memory.originalResult);
++  });
++});
+diff --git a/sdk-libs/ts/test/experimental/spawn-room-fixture.ts b/sdk-libs/ts/test/experimental/spawn-room-fixture.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..61ddb44dd6e5a5093a6850674e21a264a81c1240
+--- /dev/null
++++ b/sdk-libs/ts/test/experimental/spawn-room-fixture.ts
+@@ -0,0 +1,90 @@
++import { SOL_MINT, type Bytes32 } from "@heliuslabs/spr";
++import { bytesToBigInt } from "@heliuslabs/spr/internal";
++import { ShieldedPublicKey } from "@heliuslabs/spr/keypair";
++import { AssetRegistry, Data, Utxo } from "@heliuslabs/spr/transaction";
++import { address } from "@solana/kit";
++
++import { ringIdField } from "../../src/crypto/derivation/ring-stream.js";
++import { sealOutputSlot } from "../../src/crypto/audit/ring-disclosure.js";
++import { RecordKind, UNPUBLISHED_RECORD_KEY } from "../../src/protocol/codec/audit-stream.js";
++import {
++  encodeSpawnRoomState,
++  hashSpawnRoomState,
++  spawnScalarBytes,
++  type SpawnRoomState,
++} from "../../src/experimental/spawn-room/codec.js";
++
++export function spawnPayloadFixture() {
++  const ring = address("11111111111111111111111111111112");
++  const owner = ShieldedPublicKey.fromEd25519(new Uint8Array(32).fill(5) as Bytes32);
++  const domain = {
++    network: new Uint8Array(32).fill(0xff),
++    applicationID: 19n,
++    ringProgramID: bytesToBigInt(ringIdField(ring)),
++  };
++  const empty = () => new Uint8Array(32);
++  const state: SpawnRoomState = {
++    binding: { ...domain, creationNonce: new Uint8Array(32).fill(4) },
++    seedManifest: new Uint8Array(32).fill(9),
++    fixedMembers: new Uint8Array(32).fill(10),
++    writer: bytesToBigInt(owner.ownerProofInputHash()),
++    revision: 0n,
++    memory: {
++      lesson: new Uint8Array(),
++      scope: 0,
++      episode: empty(),
++      originalResult: empty(),
++      candidate: empty(),
++    },
++    policy: { id: 1n, scores: [50, 50] },
++    predecessor: 0n,
++    authorization: 0n,
++    lastAuthorizationEpoch: 0n,
++  };
++  const treeId = 3;
++  const nullifierPublicKey = spawnScalarBytes(17n);
++  const blinding = spawnScalarBytes(11n);
++  const dataHash = hashSpawnRoomState(state);
++  const bytes = encodeSpawnRoomState(state);
++  const utxo = new Utxo({
++    owner,
++    asset: SOL_MINT,
++    amount: 0n,
++    blinding,
++    data: new Data([{ kind: "utxoData", bytes }]),
++    ringProgramId: ring,
++  });
++  const commitment = utxo.hash(nullifierPublicKey, treeId, dataHash);
++  const reader = {
++    owner: { signingPublicKey: owner, nullifierPublicKey },
++    ring,
++    treeId,
++    commitment,
++    assets: new AssetRegistry(),
++  };
++  const secret = new Uint8Array(32).fill(37) as Bytes32;
++  const record = {
++    kind: RecordKind.ring,
++    key: UNPUBLISHED_RECORD_KEY,
++    amount: 0n,
++    ownerKey: owner.confidentialViewTag(),
++    mint: SOL_MINT,
++    blinding,
++  };
++  const payload = { data: Uint8Array.of(...dataHash, ...bytes) };
++  const ciphertext = sealOutputSlot(secret, { record, payload });
++  return {
++    domain,
++    state,
++    treeId,
++    reader,
++    secret,
++    record,
++    payload,
++    ciphertext,
++    utxo,
++    commitment,
++    dataHash,
++    nullifierPublicKey,
++  };
++}
+diff --git a/sdk-libs/ts/test/experimental/spawn-room-payload.test.ts b/sdk-libs/ts/test/experimental/spawn-room-payload.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f410f2d8fb59aebb5b26e832ce5de8870e69b642
+--- /dev/null
++++ b/sdk-libs/ts/test/experimental/spawn-room-payload.test.ts
+@@ -0,0 +1,62 @@
++import { describe, expect, it } from "vitest";
++import { Data, Utxo } from "@heliuslabs/spr/transaction";
++import type { Bytes32 } from "@heliuslabs/spr";
++import { sealOutputSlot } from "../../src/crypto/audit/ring-disclosure.js";
++import { ZERO_RECORD_KEY } from "../../src/protocol/codec/audit-stream.js";
++import {
++  createSpawnRoomApplicationData,
++  openSpawnRoomOutput,
++  verifySpawnRoomNote,
++} from "../../src/experimental/spawn-room/payload.js";
++import { spawnPayloadFixture } from "./spawn-room-fixture.js";
++
++describe("experimental Spawn encrypted recipient state", () => {
++  it("uses the real encrypted output slot and reconstructs the exact note and app commitments", () => {
++    const f = spawnPayloadFixture();
++    const application = createSpawnRoomApplicationData(f.state);
++    const opened = openSpawnRoomOutput(f.reader, f.secret, f.ciphertext, f.domain);
++    expect(opened?.state).toEqual(f.state);
++    expect(opened?.commitment).toEqual(f.commitment);
++    expect(opened?.note.utxo.data.utxoData()).toEqual(application.bytes);
++    expect(opened?.note.dataHash).toEqual(application.hash);
++    expect(f.ciphertext).not.toEqual(f.payload.data);
++  });
++
++  it("rejects substituted application bytes even when the upstream note opening still matches", () => {
++    const f = spawnPayloadFixture();
++    const data = f.payload.data.slice();
++    data[32 + 136] = data[32 + 136]! ^ 1;
++    const changed = sealOutputSlot(f.secret, { record: f.record, payload: { data } });
++    expect(openSpawnRoomOutput(f.reader, f.secret, changed, f.domain)).toBeUndefined();
++    expect(
++      openSpawnRoomOutput(f.reader, new Uint8Array(32).fill(3) as Bytes32, f.ciphertext, f.domain),
++    ).toBeUndefined();
++    expect(
++      openSpawnRoomOutput(f.reader, f.secret, f.ciphertext, { ...f.domain, applicationID: 20n }),
++    ).toBeUndefined();
++  });
++
++  it("refuses wrong note profile, owner and plaintext state substitutions", () => {
++    const f = spawnPayloadFixture();
++    const opened = openSpawnRoomOutput(f.reader, f.secret, f.ciphertext, f.domain)!;
++    const amount = new Utxo({ ...f.utxo, amount: 1n });
++    expect(() =>
++      verifySpawnRoomNote(
++        { ...opened.note, utxo: amount },
++        f.treeId,
++        f.domain,
++        amount.hash(f.nullifierPublicKey, f.treeId, f.dataHash),
++      ),
++    ).toThrow();
++    const bytes = createSpawnRoomApplicationData({ ...f.state, writer: 1n }).bytes;
++    const different = new Utxo({ ...f.utxo, data: new Data([{ kind: "utxoData", bytes }]) });
++    expect(() =>
++      verifySpawnRoomNote({ ...opened.note, utxo: different }, f.treeId, f.domain, f.commitment),
++    ).toThrow();
++    const publicKeyBody = sealOutputSlot(f.secret, {
++      record: { ...f.record, key: ZERO_RECORD_KEY },
++      payload: f.payload,
++    });
++    expect(openSpawnRoomOutput(f.reader, f.secret, publicKeyBody, f.domain)).toBeUndefined();
++  });
++});
+diff --git a/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts b/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..a9d33d421af6faf1e92e185e2d0c21283b2fa9a1
+--- /dev/null
++++ b/sdk-libs/ts/test/experimental/spawn-room-staging.test.ts
+@@ -0,0 +1,286 @@
++import { describe, expect, it } from "vitest";
++import { mkdir, writeFile } from "node:fs/promises";
++import { join } from "node:path";
++import {
++  blockhash,
++  createKeyPairSignerFromBytes,
++  generateKeyPairSigner,
++  getCompiledTransactionMessageDecoder,
++  getTransactionEncoder,
++  signTransactionWithSigners,
++  type Instruction,
++  type KeyPairSigner,
++} from "@solana/kit";
++import { TRANSACTION_SIZE_LIMIT } from "@heliuslabs/spr/interface";
++import {
++  bytesToBigInt,
++  compileUnsignedTransaction,
++  encodeBase58,
++  isZero,
++  poseidon,
++} from "@heliuslabs/spr/internal";
++import { ShieldedKeypair, SigningKey } from "@heliuslabs/spr/keypair";
++import { AssetRegistry, Data, ProofInputUtxo, SOL_MINT, Utxo } from "@heliuslabs/spr/transaction";
++import { ringIdField } from "../../src/crypto/derivation/ring-stream.js";
++import { signingKeySpendSigner } from "../../src/operations/payments/anonymous.js";
++import {
++  stageSpawnRoomAdvance,
++  stageSpawnRoomGenesis,
++} from "../../src/experimental/spawn-room/staging.js";
++import {
++  createSpawnRoomGenesis,
++  deriveSpawnRoomAdvance,
++  hashSpawnAcceptanceGrant,
++  hashSpawnRoomState,
++  spawnGrantRoot,
++  spawnRoomIdentity,
++  spawnScalarBytes,
++  type SpawnAcceptanceGrant,
++  type SpawnGrantPath,
++} from "../../src/experimental/spawn-room/codec.js";
++import { createSpawnRoomApplicationData } from "../../src/experimental/spawn-room/payload.js";
++import {
++  SpawnRoomLocalnetProver,
++  spawnRoomProofRequestBody,
++  spawnStateParams,
++  stringifySpawnProofRequest,
++} from "../../src/experimental/spawn-room/prover.js";
++import {
++  spawnRoomAdvanceInstruction,
++  spawnRoomGenesisAddress,
++  spawnRoomGenesisInstruction,
++} from "../../src/experimental/spawn-room/instructions.js";
++import { ringFixture, small, walletKeys } from "../helpers/ring-pipeline.js";
++import { buildRuleTable } from "../../src/protocol/membership/policy.js";
++
++export async function spawnStagingFixture() {
++  const fixture = await ringFixture({ mode: "anonymous", table: buildRuleTable({ rules: [] }) });
++  const signing = SigningKey.generate();
++  const keypair = ShieldedKeypair.fromKeypair(signing);
++  fixture.enroll(keypair.shieldedAddress());
++  const keys = walletKeys(keypair);
++  const payer = await generateKeyPairSigner();
++  const writer = await createKeyPairSignerFromBytes(
++    Uint8Array.of(...signing.secretBytes(), ...signing.publicKey().ed25519()),
++  );
++  const state = createSpawnRoomGenesis({
++    binding: {
++      network: new Uint8Array(32).fill(255),
++      applicationID: 19n,
++      ringProgramID: bytesToBigInt(ringIdField(fixture.ringProgramId)),
++      creationNonce: new Uint8Array(32).fill(4),
++    },
++    seedManifest: new Uint8Array(32).fill(5),
++    fixedMembers: new Uint8Array(32).fill(6),
++    writer: bytesToBigInt(keypair.signingPublicKey().ownerProofInputHash()),
++  });
++  const base = {
++    ringProgramId: fixture.ringProgramId,
++    keys,
++    listSalt: small(1),
++    payer: payer.address,
++    outputTreeId: 0,
++    assets: new AssetRegistry(),
++    state,
++  };
++  return { fixture, signing, keypair, base, payer, writer };
++}
++
++async function measuredTransaction(
++  name: string,
++  instruction: Instruction,
++  signers: readonly KeyPairSigner[],
++) {
++  const signed = await signTransactionWithSigners(
++    signers,
++    compileUnsignedTransaction({
++      feePayer: signers[0]!.address,
++      lifetime: { blockhash: blockhash(signers[0]!.address), lastValidBlockHeight: 100n },
++      computeUnitLimit: 1_400_000,
++      priorityFeeLamports: 1n,
++      instructions: [instruction],
++    }),
++  );
++  const message = getCompiledTransactionMessageDecoder().decode(signed.messageBytes);
++  const size = getTransactionEncoder().encode(signed).length;
++  expect(message.version).toBe(1);
++  expect(size).toBeLessThanOrEqual(TRANSACTION_SIZE_LIMIT);
++  expect(message.header.numSignerAccounts).toBe(signers.length);
++  expect(Object.values(signed.signatures).every((signature) => signature?.length === 64)).toBe(
++    true,
++  );
++  const directory = process.env.SPAWN_ROOM_FIXTURE_DIRECTORY;
++  if (directory !== undefined)
++    await writeFile(
++      join(directory, `${name}.transaction-size.json`),
++      JSON.stringify({
++        version: message.version,
++        serializedBytes: size,
++        instructionBytes: instruction.data?.length,
++        maximumBytes: TRANSACTION_SIZE_LIMIT,
++        signerCount: message.header.numSignerAccounts,
++        accounts: message.staticAccounts.length,
++        proofs: "fixed-size fixture proofs; actual SDK encrypted payload and audit stream",
++      }),
++      { mode: 0o600 },
++    );
++  return message;
++}
++
++async function retainPrivateFixture(name: string, body: Readonly<Record<string, unknown>>) {
++  const directory = process.env.SPAWN_ROOM_FIXTURE_DIRECTORY;
++  if (directory === undefined) return;
++  await mkdir(directory, { recursive: true, mode: 0o700 });
++  await writeFile(join(directory, `${name}.request.json`), stringifySpawnProofRequest(body), {
++    mode: 0o600,
++  });
++}
++
++describe("Spawn one-note staging through actual upstream pipeline", () => {
++  it("builds visible genesis with only dummy inputs and one exact data-bearing zero-value output", async () => {
++    const { fixture, keypair, base, payer, writer } = await spawnStagingFixture();
++    const proven = await stageSpawnRoomGenesis(base).prove(fixture.client);
++    const spp = fixture.sppCalls[0]!;
++    expect(spp.proofInputs.inputUtxos.every((input) => input.isDummy())).toBe(true);
++    expect(spp.proofInputs.outputs.map((output) => output.isDummy())).toEqual([false, true]);
++    expect(spp.proofInputs.outputs[0]!.dataHash).toEqual(hashSpawnRoomState(base.state));
++    expect(spp.proofInputs.outputs[0]!.amount).toBe(0n);
++    expect(proven.accounts.ownerSigners).toEqual([
++      encodeBase58(keypair.signingPublicKey().ed25519()),
++    ]);
++    expect(proven.data.publicOwners).toBe(true);
++    expect(proven.data.noSpend).toBe(true);
++    expect(proven.data.interfaceTransfers).toEqual([]);
++    const ring = fixture.ringRequests.find((request) => request.kind === "transfer")!;
++    if (ring.kind !== "transfer") throw new Error("expected transfer");
++    expect(ring.hidden).toBe(false);
++    expect(ring.signerCount).toBe(1);
++    expect(ring.inputs.map((input) => bytesToBigInt(input.domain))).toEqual(Array(24).fill(1n));
++    expect(ring.outputs.map((output) => bytesToBigInt(output.output.domain))).toEqual([3n, 1n]);
++    expect(ring.outputs[0]!.output.dataHash).toEqual(hashSpawnRoomState(base.state));
++    const body = spawnRoomProofRequestBody(ring, {
++      kind: "genesis",
++      domain: base.state.binding,
++      state: base.state,
++    });
++    expect(body.circuitType).toBe("spawn-room-genesis-v1");
++    await retainPrivateFixture("typescript-genesis", body);
++    const ordinary = await proven.instruction();
++    const wrapped = await spawnRoomGenesisInstruction(proven, base.state, base.payer);
++    expect(wrapped.data?.[0]).toBe(0x82);
++    expect(wrapped.data?.subarray(1, 33)).toEqual(spawnRoomIdentity(base.state));
++    expect(wrapped.data?.subarray(33)).toEqual(ordinary.data?.subarray(1));
++    expect(wrapped.accounts?.slice(5)).toEqual(ordinary.accounts);
++    await measuredTransaction("typescript-genesis", wrapped, [payer, writer]);
++  });
++
++  it("builds the hidden rail with the same zero-value owner and one state output", async () => {
++    const { fixture, keypair, signing, base, payer, writer } = await spawnStagingFixture();
++    const application = createSpawnRoomApplicationData(base.state);
++    const utxo = new Utxo({
++      owner: keypair.signingPublicKey(),
++      asset: SOL_MINT,
++      amount: 0n,
++      blinding: small(31),
++      ringProgramId: fixture.ringProgramId,
++      data: new Data([{ kind: "utxoData", bytes: application.bytes }]),
++    });
++    const input = ProofInputUtxo.fromKeypair(utxo, keypair, { dataHash: application.hash }, 0);
++    const grant: SpawnAcceptanceGrant = {
++      roomIdentity: bytesToBigInt(spawnRoomIdentity(base.state)),
++      actor: base.state.writer,
++      epoch: 1n,
++      predecessor: bytesToBigInt(input.hash()),
++      ordinal: 1n,
++      memory: {
++        lesson: new TextEncoder().encode("Sort inputs before selecting the median."),
++        scope: 0,
++        episode: new Uint8Array(32).fill(0xff),
++        originalResult: new Uint8Array(32).fill(0xee),
++        candidate: new Uint8Array(32).fill(0xdd),
++      },
++      selectedProcedure: 0,
++      negative: true,
++      magnitude: 10,
++      nonce: new Uint8Array(32).fill(0xcc),
++    };
++    let empty = spawnScalarBytes(0n);
++    const siblings = Array.from({ length: 13 }, () => {
++      const row = [empty, empty, empty] as const;
++      empty = poseidon([empty, empty, empty, empty]);
++      return row;
++    });
++    const grantPath: SpawnGrantPath = { index: 0, siblings };
++    const context = {
++      ...base.state.binding,
++      grantEpoch: 1n,
++      grantRoot: bytesToBigInt(
++        spawnGrantRoot(hashSpawnAcceptanceGrant(base.state.binding, grant), grantPath),
++      ),
++    };
++    const next = deriveSpawnRoomAdvance(context, base.state, bytesToBigInt(input.hash()), grant);
++    const proven = await stageSpawnRoomAdvance({
++      ...base,
++      state: next,
++      input,
++      signer: signingKeySpendSigner(signing),
++    }).prove(fixture.client);
++    const spp = fixture.sppCalls[0]!;
++    expect(spp.proofInputs.inputUtxos.map((entry) => entry.isDummy())).toEqual([false, true]);
++    expect(spp.proofInputs.outputs.map((entry) => entry.isDummy())).toEqual([false, true]);
++    expect(spp.owner).toBeDefined();
++    expect(proven.accounts.ownerSigners).toEqual([]);
++    const ring = fixture.ringRequests.find((request) => request.kind === "transfer")!;
++    if (ring.kind !== "transfer") throw new Error("expected transfer");
++    expect(ring.hidden).toBe(true);
++    expect(ring.signerCount).toBe(0);
++    expect(ring.inputs.slice(1).map((slot) => bytesToBigInt(slot.domain))).toEqual(
++      Array(23).fill(1n),
++    );
++    expect(ring.outputs.map((slot) => bytesToBigInt(slot.output.domain))).toEqual([3n, 1n]);
++    expect(ring.outputs[0]!.output.ownerPkHash).toEqual(ring.inputs[0]!.ownerPkHash);
++    expect(ring.outputs[0]!.output.dataHash).toEqual(hashSpawnRoomState(next));
++    expect(ring.publicAmounts.every(isZero)).toBe(true);
++    const body = spawnRoomProofRequestBody(ring, {
++      kind: "advance",
++      context,
++      old: base.state,
++      next,
++      grant,
++      grantPath,
++    });
++    expect(body.circuitType).toBe("spawn-room-advance-v1");
++    await retainPrivateFixture("typescript-advance", body);
++    const ordinary = await proven.instruction();
++    const wrapped = await spawnRoomAdvanceInstruction(proven, next);
++    expect(wrapped.data?.[0]).toBe(0x83);
++    expect(wrapped.data?.subarray(1)).toEqual(ordinary.data?.subarray(1));
++    expect(wrapped.accounts?.slice(1)).toEqual(ordinary.accounts);
++    const message = await measuredTransaction("typescript-advance", wrapped, [payer]);
++    expect(message.staticAccounts).not.toContain(writer.address);
++    expect(message.staticAccounts).not.toContain(
++      await spawnRoomGenesisAddress(fixture.ringProgramId, spawnRoomIdentity(base.state)),
++    );
++    expect(() =>
++      spawnRoomProofRequestBody(ring, {
++        kind: "genesis",
++        domain: base.state.binding,
++        state: base.state,
++      }),
++    ).toThrow(/owner_profile/);
++  });
++
++  it("keeps uint64 request numbers exact and refuses remote use of local test keys", async () => {
++    const { base } = await spawnStagingFixture();
++    const body = stringifySpawnProofRequest(
++      spawnStateParams({ ...base.state, revision: (1n << 64n) - 1n }),
++    );
++    expect(body).toContain('"revision":18446744073709551615,');
++    expect(() => stringifySpawnProofRequest({ ordinal: Number((1n << 64n) - 1n) })).toThrow(
++      /unsafe_number/,
++    );
++    expect(
++      () => new SpawnRoomLocalnetProver({ url: "https://example.com", localnetTestKeys: true }),
++    ).toThrow(/localnet_only/);
++  });
++});
+diff --git a/sdk-tests/spawn-room/localnet-journey.test.ts b/sdk-tests/spawn-room/localnet-journey.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..66e97b8235926a25710f30a7c2d7f3f624172da0
+--- /dev/null
++++ b/sdk-tests/spawn-room/localnet-journey.test.ts
+@@ -0,0 +1,1058 @@
++/** Real local-validator journey. Invoked only by tools/run-spawn-room-localnet.mjs. */
++import { mkdir, readFile, writeFile } from "node:fs/promises";
++import { join, resolve } from "node:path";
++import { pathToFileURL } from "node:url";
++import { expect, it } from "vitest";
++import { ed25519 } from "@noble/curves/ed25519.js";
++import { sha256 } from "@noble/hashes/sha2.js";
++import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
++import {
++  AccountRole,
++  address,
++  createKeyPairSignerFromBytes,
++  getBase58Encoder,
++  getBase64EncodedWireTransaction,
++  getCompiledTransactionMessageDecoder,
++  getSignatureFromTransaction,
++  getTransactionEncoder,
++  lamports,
++  sendTransactionWithoutConfirmingFactory,
++  signTransactionWithSigners,
++  type Instruction,
++  type KeyPairSigner,
++  type Address,
++  type Signature,
++} from "@solana/kit";
++import { LocalKeys, ShieldedKeypair, SigningKey, Wallet, type Bytes32 } from "@heliuslabs/spr";
++import {
++  addressBytes,
++  bytesToBigInt,
++  compileUnsignedTransaction,
++  equalBytes,
++  poseidon,
++  setRingActivationInstruction,
++} from "@heliuslabs/spr/internal";
++import { AssetRegistry, ProofInputUtxo, type WalletUtxo } from "@heliuslabs/spr/transaction";
++import { TRANSACTION_SIZE_LIMIT } from "@heliuslabs/spr/interface";
++import { createCustomRingClient } from "../../sdk-libs/ts/src/rpc/client.js";
++import {
++  RingRpc,
++  signCreateRecordsRegistryRequest,
++  signRegisterEnrollmentRingRequest,
++} from "../../sdk-libs/ts/src/rpc/ring-rpc.js";
++import { initializeRingInstruction } from "../../sdk-libs/ts/src/operations/management/admin.js";
++import {
++  enrollmentRequest,
++  enrollmentState,
++  proveEnrollment,
++} from "../../sdk-libs/ts/src/operations/management/enrollment.js";
++import { signEnrollment } from "../../sdk-libs/ts/src/operations/management/enrollment-submit.js";
++import { fetchRingPolicy } from "../../sdk-libs/ts/src/protocol/membership/config.js";
++import { buildRuleTable } from "../../sdk-libs/ts/src/protocol/membership/policy.js";
++import { ringAuthAddress } from "../../sdk-libs/ts/src/protocol/pda/index.js";
++import { ringIdField } from "../../sdk-libs/ts/src/crypto/derivation/ring-stream.js";
++import { signingKeySpendSigner } from "../../sdk-libs/ts/src/operations/payments/anonymous.js";
++import { AnonymousWallet } from "../../sdk-libs/ts/src/state/anonymous-wallet.js";
++import { ViewingHistory } from "../../sdk-libs/ts/src/state/viewing-history.js";
++import { LocalRingKeys, ringWalletKeys } from "../../sdk-libs/ts/src/state/ring-keys.js";
++import { syncRingWallet } from "../../sdk-libs/ts/src/state/ring-sync.js";
++import {
++  createSpawnRoomGenesis,
++  encodeSpawnRoomState,
++  spawnGrantRoot,
++  spawnRoomIdentity,
++  spawnScalarBytes,
++  type SpawnGrantPath,
++  type SpawnRoomState,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/codec.js";
++import {
++  stageSpawnRoomAdvance,
++  stageSpawnRoomGenesis,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/staging.js";
++import {
++  SpawnRoomLocalnetProver,
++  withSpawnRoomProof,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/prover.js";
++import {
++  fetchSpawnRoomConfig,
++  initializeSpawnRoomConfigInstruction,
++  spawnRoomConfigAddress,
++  spawnRoomAdvanceInstruction,
++  spawnRoomGenesisAddress,
++  spawnRoomGenesisInstruction,
++  updateSpawnRoomGrantRootInstruction,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/instructions.js";
++import {
++  verifySpawnRoomNote,
++  type OpenedSpawnRoom,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/payload.js";
++import {
++  SpawnRoomNativeAdapter,
++  spawnRoomNativeView,
++  type NativeEpisodeBinding,
++  type SpawnConfirmedObservation,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/native-adapter.js";
++
++interface JourneyConfig {
++  rpcUrl: string;
++  photonUrl: string;
++  ringIndexerUrl: string;
++  proverUrl: string;
++  ringRpcUrl: string;
++  ringOrigin: string;
++  ringProgramId: string;
++  enrollmentWriter: string;
++  defaultTreeAddress: string;
++  upgradeAuthorityKeypairPath: string;
++  feePayerKeypairPath: string;
++  publisherKeypairPath: string;
++  workDirectory: string;
++}
++interface Step {
++  name: string;
++  status: "passed" | "failed";
++  signature?: string;
++  [key: string]: unknown;
++}
++const configPath = process.env.SPAWN_JOURNEY_CONFIG;
++if (configPath === undefined)
++  throw new Error("SPAWN_JOURNEY_CONFIG is required; this test never selects public endpoints");
++const config = JSON.parse(await readFile(configPath, "utf8")) as JourneyConfig;
++for (const url of [
++  config.rpcUrl,
++  config.photonUrl,
++  config.ringIndexerUrl,
++  config.proverUrl,
++  config.ringRpcUrl,
++]) {
++  if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(url).hostname))
++    throw new Error("journey requires loopback services");
++}
++const nativeRoot = resolve(
++  process.env.SPAWN_REFERENCE_HOST_ROOT ?? "../backroom-rings/backrooms/reference-host",
++);
++const { ReferenceAuthority } = await import(pathToFileURL(join(nativeRoot, "authority.ts")).href);
++const { EncryptedSqliteRecords, loadDevelopmentKey } = await import(
++  pathToFileURL(join(nativeRoot, "records.ts")).href
++);
++const { FlueResidents } = await import(pathToFileURL(join(nativeRoot, "residents.ts")).href);
++const { residentIds } = await import(pathToFileURL(join(nativeRoot, "../flue/seeds.ts")).href);
++
++async function signerAt(path: string): Promise<KeyPairSigner> {
++  const raw: unknown = JSON.parse(await readFile(path, "utf8"));
++  if (
++    !Array.isArray(raw) ||
++    raw.length !== 64 ||
++    raw.some((value) => !Number.isInteger(value) || value < 0 || value > 255)
++  )
++    throw new Error("invalid local signer file");
++  return createKeyPairSignerFromBytes(Uint8Array.from(raw));
++}
++async function poll<T>(read: () => Promise<T | undefined>, description: string): Promise<T> {
++  const until = Date.now() + 240_000;
++  for (;;) {
++    const found = await read();
++    if (found !== undefined) return found;
++    if (Date.now() > until) throw new Error(`timed out waiting for ${description}`);
++    await new Promise((resolve) => setTimeout(resolve, 500));
++  }
++}
++function oneGrantPath(): SpawnGrantPath {
++  let empty = spawnScalarBytes(0n);
++  return {
++    index: 0,
++    siblings: Array.from({ length: 13 }, () => {
++      const row = [empty, empty, empty] as const;
++      empty = poseidon([empty, empty, empty, empty]);
++      return row;
++    }),
++  };
++}
++
++it("creates, advances, restarts and recovers, then reuses the native learned lesson on a real local validator", async () => {
++  await mkdir(config.workDirectory, { recursive: true, mode: 0o700 });
++  const steps: Step[] = [];
++  const evidencePath = join(config.workDirectory, "journey-evidence.json");
++  const evidence = async (status: "running" | "passed" | "failed", error?: string) => {
++    await writeFile(
++      evidencePath,
++      JSON.stringify(
++        {
++          schema: "spawn-room-localnet-journey-v1",
++          status,
++          ringProgramId: config.ringProgramId,
++          inference: "existing deterministic Flue fixture; no external provider",
++          steps,
++          ...(error === undefined ? {} : { error }),
++        },
++        null,
++        2,
++      ),
++      { mode: 0o600 },
++    );
++  };
++  await evidence("running");
++  let records: InstanceType<typeof EncryptedSqliteRecords> | undefined;
++  let residents: InstanceType<typeof FlueResidents> | undefined;
++  try {
++    const ringProgramId = address(config.ringProgramId);
++    const [upgrade, payer, publisher] = await Promise.all([
++      signerAt(config.upgradeAuthorityKeypairPath),
++      signerAt(config.feePayerKeypairPath),
++      signerAt(config.publisherKeypairPath),
++    ]);
++    const client = await createCustomRingClient({
++      solanaRpcUrl: config.rpcUrl,
++      indexerUrl: config.ringIndexerUrl,
++      proverUrl: config.proverUrl,
++      tree: address(config.defaultTreeAddress),
++      proofDataSource: "prover",
++      commitment: "confirmed",
++      indexerConfig: { poll: { numRetries: 120, delayMs: 250n, maxDelayMs: 2_000n } },
++    });
++    const appProver = new SpawnRoomLocalnetProver({
++      url: config.proverUrl,
++      localnetTestKeys: true,
++    });
++    const confirmed = async (signature: Signature): Promise<bigint> =>
++      poll(async () => {
++        const value = (
++          await client.solanaRpc
++            .getSignatureStatuses([signature], { searchTransactionHistory: true })
++            .send()
++        ).value[0];
++        if (value?.err !== null && value?.err !== undefined)
++          throw new Error(`transaction rejected: ${JSON.stringify(value.err)}`);
++        return value?.confirmationStatus === "confirmed" ||
++          value?.confirmationStatus === "finalized"
++          ? BigInt(value.slot)
++          : undefined;
++      }, `confirmation ${signature}`);
++    let transactionSequence = 0n;
++    const prepareTransaction = async (
++      instruction: Instruction,
++      signers: readonly KeyPairSigner[],
++      hidden?: { writer: Address; marker: Address },
++    ) => {
++      const transaction = compileUnsignedTransaction({
++        feePayer: signers[0]!.address,
++        lifetime: await client.getLatestBlockhash(),
++        computeUnitLimit: 1_400_000,
++        // A replay must reach the program, not return an existing signature.
++        // The fee is outside both proof statements and distinguishes retries
++        // even when the validator returns the same recent blockhash.
++        priorityFeeLamports: ++transactionSequence,
++        instructions: [instruction],
++      });
++      const signed = await signTransactionWithSigners(signers, transaction);
++      const compiled = getCompiledTransactionMessageDecoder().decode(signed.messageBytes);
++      const serializedBytes = getTransactionEncoder().encode(signed).length;
++      expect(compiled.version).toBe(1);
++      expect(serializedBytes).toBeLessThanOrEqual(TRANSACTION_SIZE_LIMIT);
++      expect(Object.values(signed.signatures).every((value) => value?.length === 64)).toBe(true);
++      if (hidden !== undefined) {
++        expect(compiled.header.numSignerAccounts).toBe(1);
++        expect(Object.keys(signed.signatures)).toEqual([payer.address]);
++        expect(compiled.staticAccounts).not.toContain(hidden.writer);
++        expect(compiled.staticAccounts).not.toContain(hidden.marker);
++      }
++      return { signed, serializedBytes, signerCount: compiled.header.numSignerAccounts };
++    };
++    const send = async (
++      instruction: Instruction,
++      signers: readonly KeyPairSigner[],
++      hidden?: { writer: Address; marker: Address },
++    ) => {
++      const { signed, serializedBytes, signerCount } = await prepareTransaction(
++        instruction,
++        signers,
++        hidden,
++      );
++      const signature = getSignatureFromTransaction(signed);
++      await sendTransactionWithoutConfirmingFactory({ rpc: client.solanaRpc })(signed, {
++        commitment: "confirmed",
++      });
++      return { signature, slot: await confirmed(signature), serializedBytes, signerCount };
++    };
++    const drop = async (owner: KeyPairSigner) =>
++      confirmed(
++        await client.solanaRpc.requestAirdrop(owner.address, lamports(5_000_000_000n)).send(),
++      );
++    const network = getBase58Encoder().encode(
++      await client.solanaRpc.getGenesisHash().send(),
++    ) as Bytes32;
++    const ringRpc = new RingRpc(config.ringRpcUrl, { allowInsecureHttp: true });
++    const health = await ringRpc.health();
++    const target = { cluster: network, service: health.servicePublicKey, ringProgramId };
++    const auditor = await ringRpc.createAuditorKey({
++      ringProgramId,
++      genesisHash: network,
++      authority: upgrade,
++      servicePublicKey: health.servicePublicKey,
++    });
++    const storage = await ringRpc.createRecordsRegistry(
++      await signCreateRecordsRegistryRequest(target, upgrade),
++    );
++    const initialized = await send(
++      await initializeRingInstruction({
++        ringProgramId,
++        payer,
++        authority: upgrade,
++        auditorPublicKey: auditor.auditorPublicKey,
++        kind: "anonymousPolicy",
++        roles: {
++          admin: upgrade.address,
++          policy: upgrade.address,
++          pauser: upgrade.address,
++          cosignAdmin: upgrade.address,
++          enrollmentWriter: address(config.enrollmentWriter),
++        },
++        policy: { records: storage.registry, table: buildRuleTable({ rules: [] }) },
++      }),
++      [payer, upgrade],
++    );
++    const governanceSeed = new TextEncoder().encode("zolana localnet snapshot authori");
++    const governance = await createKeyPairSignerFromBytes(
++      Uint8Array.of(...governanceSeed, ...ed25519.getPublicKey(governanceSeed)),
++    );
++    await drop(governance);
++    await send(
++      await setRingActivationInstruction({
++        authority: governance,
++        ringConfig: await ringAuthAddress(ringProgramId),
++        activated: true,
++        ringAuthorityTransactIsEnabled: false,
++      }),
++      [governance],
++    );
++    await ringRpc.registerEnrollmentRing(
++      await signRegisterEnrollmentRingRequest(target, upgrade, address(config.enrollmentWriter)),
++    );
++    await send(
++      await initializeSpawnRoomConfigInstruction({
++        program: ringProgramId,
++        payer: payer.address,
++        upgradeAuthority: upgrade.address,
++        publisher: publisher.address,
++        network,
++        applicationID: 19n,
++        grantRoot: 0n,
++      }),
++      [payer, upgrade, publisher],
++    );
++    const domain = {
++      network,
++      applicationID: 19n,
++      ringProgramID: bytesToBigInt(ringIdField(ringProgramId)),
++    };
++    steps.push({ name: "setup", status: "passed", signature: initialized.signature });
++    await evidence("running");
++
++    const nativeDirectory = join(config.workDirectory, "native-host");
++    const masterKey = await loadDevelopmentKey(join(nativeDirectory, "development.key"));
++    const recordsPath = join(nativeDirectory, "private-records.sqlite");
++    records = await EncryptedSqliteRecords.open(recordsPath, masterKey, "spawn-room-localnet-v1");
++    const creationNonce = crypto.getRandomValues(new Uint8Array(32));
++    const ids = await residentIds(bytesToHex(creationNonce));
++    residents = await FlueResidents.start({
++      directory: nativeDirectory,
++      records,
++      masterKey,
++      residentIds: ids,
++    });
++    const writerSeed = crypto.getRandomValues(new Uint8Array(32)) as Bytes32;
++    await records.create("spawn-room-v1/writer-seed", bytesToHex(writerSeed));
++    let signing = SigningKey.fromEd25519Bytes(writerSeed);
++    let writer = await createKeyPairSignerFromBytes(
++      Uint8Array.of(...writerSeed, ...ed25519.getPublicKey(writerSeed)),
++    );
++    let keypair = ShieldedKeypair.fromKeypair(signing);
++    let keys = ringWalletKeys(
++      LocalKeys.fromKeypair(keypair, client.proofService),
++      LocalRingKeys.fromKeypair(keypair),
++    );
++    expect(writer.address).not.toBe(payer.address);
++    const { tracking } = await fetchRingPolicy(client, ringProgramId);
++    const enrollOwner = async (
++      owner: KeyPairSigner,
++      holder: ShieldedKeypair,
++      ownerKeys: typeof keys,
++    ) => {
++      await drop(owner);
++      const salt = await ownerKeys.listSalt(ringProgramId);
++      const enrolled = await proveEnrollment({
++        holder,
++        owner: owner.address,
++        trackingRegistry: tracking,
++        listSalt: salt,
++        client,
++        prover: client,
++      });
++      const enrollment = await enrollmentRequest(
++        {
++          ringProgramId,
++          owner: owner.address,
++          seal: enrolled.seal,
++          viewingU: holder.shieldedAddress().viewingPublicKey.u(),
++          proof: enrolled.proof,
++        },
++        client,
++      );
++      await ringRpc.submitEnrollment(await signEnrollment(enrollment, owner));
++      await poll(
++        () => enrollmentState({ trackingRegistry: tracking, owner: owner.address }, client),
++        `writer enrollment ${owner.address}`,
++      );
++      return salt;
++    };
++    const listSalt = await enrollOwner(writer, keypair, keys);
++    const peerSeed = crypto.getRandomValues(new Uint8Array(32)) as Bytes32;
++    await records.create("spawn-room-v1/peer-seed", bytesToHex(peerSeed));
++    const peerSigning = SigningKey.fromEd25519Bytes(peerSeed);
++    const peerWriter = await createKeyPairSignerFromBytes(
++      Uint8Array.of(...peerSeed, ...ed25519.getPublicKey(peerSeed)),
++    );
++    const peerKeypair = ShieldedKeypair.fromKeypair(peerSigning);
++    const peerKeys = ringWalletKeys(
++      LocalKeys.fromKeypair(peerKeypair, client.proofService),
++      LocalRingKeys.fromKeypair(peerKeypair),
++    );
++    expect(peerWriter.address).not.toBe(writer.address);
++    expect(peerWriter.address).not.toBe(payer.address);
++    const peerListSalt = await enrollOwner(peerWriter, peerKeypair, peerKeys);
++    const initial = createSpawnRoomGenesis({
++      binding: { ...domain, creationNonce },
++      seedManifest: hexToBytes(residents.seedCommitment),
++      fixedMembers: hexToBytes(residents.membershipCommitment),
++      writer: bytesToBigInt(keypair.signingPublicKey().ownerProofInputHash()),
++    });
++    let wallet = AnonymousWallet.create(
++      new Wallet({ identity: keypair.shieldedAddress() }),
++      ViewingHistory.create(keypair.shieldedAddress().viewingPublicKey, 0n),
++    );
++    let adapter = new SpawnRoomNativeAdapter(
++      new ReferenceAuthority(records),
++      records,
++      domain,
++      residents,
++    );
++    const assets = new AssetRegistry();
++    const staging = (state: SpawnRoomState) => ({
++      ringProgramId,
++      keys,
++      listSalt,
++      payer: payer.address,
++      outputTreeId: client.treeId,
++      assets,
++      state,
++    });
++    const genesis = await stageSpawnRoomGenesis(staging(initial)).prove(
++      withSpawnRoomProof(client, appProver, { kind: "genesis", domain, state: initial }),
++    );
++    const genesisInstruction = await spawnRoomGenesisInstruction(genesis, initial, payer.address);
++    const creation = await send(genesisInstruction, [payer, writer]);
++    const marker = await spawnRoomGenesisAddress(ringProgramId, spawnRoomIdentity(initial));
++    const uniqueAddress = bytesToHex(addressBytes(marker, "marker"));
++    steps.push({
++      name: "create",
++      status: "passed",
++      signature: creation.signature,
++      slot: creation.slot.toString(),
++      visibleWriter: writer.address,
++      serializedBytes: creation.serializedBytes,
++      signerCount: creation.signerCount,
++    });
++    await evidence("running");
++
++    const recover = async (
++      expected: SpawnRoomState,
++      minimumSlot: bigint,
++      reader?: { wallet: AnonymousWallet; keys: typeof keys; keypair: ShieldedKeypair },
++    ): Promise<{ room: OpenedSpawnRoom; entry: WalletUtxo; contextSlot: bigint }> =>
++      poll(async () => {
++        const targetWallet = reader?.wallet ?? wallet;
++        const targetKeys = reader?.keys ?? keys;
++        const targetKeypair = reader?.keypair ?? keypair;
++        const targetSlot = BigInt(
++          await client.solanaRpc.getSlot({ commitment: "confirmed" }).send(),
++        );
++        if (targetSlot < minimumSlot) return undefined;
++        await syncRingWallet({
++          client,
++          wallet: targetWallet,
++          keys: targetKeys,
++          config: { requireSlot: targetSlot },
++        });
++        if (targetWallet.recoveryCoverage().status !== "Complete") return undefined;
++        for (const entry of targetWallet.notes()) {
++          if (
++            entry.spent ||
++            entry.utxo.ringProgramId !== ringProgramId ||
++            entry.dataHash === undefined
++          )
++            continue;
++          const room = verifySpawnRoomNote(
++            {
++              utxo: entry.utxo,
++              utxoHash: entry.outputContext.hash,
++              nullifierPublicKey: targetKeypair.shieldedAddress().nullifierPublicKey,
++              dataHash: entry.dataHash,
++              ...(entry.ringDataHash === undefined ? {} : { ringDataHash: entry.ringDataHash }),
++              registered: true,
++            },
++            entry.outputContext.treeId,
++            domain,
++            entry.outputContext.hash,
++          );
++          if (equalBytes(encodeSpawnRoomState(room.state), encodeSpawnRoomState(expected)))
++            return { room, entry, contextSlot: targetSlot };
++        }
++        return undefined;
++      }, `private revision ${expected.revision}`);
++    let current = await recover(initial, creation.slot);
++    // The additional enrolled owner has a real unspent state note under this
++    // exact profile, so the first hidden spend has two eligible local candidates.
++    // Both rooms bind the real persisted resident set; only the first is run.
++    const peerInitial = createSpawnRoomGenesis({
++      binding: { ...domain, creationNonce: crypto.getRandomValues(new Uint8Array(32)) },
++      seedManifest: initial.seedManifest,
++      fixedMembers: initial.fixedMembers,
++      writer: bytesToBigInt(peerKeypair.signingPublicKey().ownerProofInputHash()),
++    });
++    const peerGenesis = await stageSpawnRoomGenesis({
++      ...staging(peerInitial),
++      keys: peerKeys,
++      listSalt: peerListSalt,
++    }).prove(
++      withSpawnRoomProof(client, appProver, { kind: "genesis", domain, state: peerInitial }),
++    );
++    const peerCreation = await send(
++      await spawnRoomGenesisInstruction(peerGenesis, peerInitial, payer.address),
++      [payer, peerWriter],
++    );
++    const peerWallet = AnonymousWallet.create(
++      new Wallet({ identity: peerKeypair.shieldedAddress() }),
++      ViewingHistory.create(peerKeypair.shieldedAddress().viewingPublicKey, 0n),
++    );
++    const peerNote = await recover(peerInitial, peerCreation.slot, {
++      wallet: peerWallet,
++      keys: peerKeys,
++      keypair: peerKeypair,
++    });
++    expect(peerNote.room.state.writer).not.toBe(current.room.state.writer);
++    expect(peerNote.entry.spent).toBe(false);
++    current = await recover(initial, peerCreation.slot);
++    expect(current.entry.spent).toBe(false);
++    steps.push({
++      name: "eligible-second-room",
++      status: "passed",
++      signature: peerCreation.signature,
++      slot: peerCreation.slot.toString(),
++      eligibleWriters: 2,
++      unspentRoomNotes: 2,
++      privacyScope: "two local candidates; no claim of production anonymity",
++    });
++    await evidence("running");
++    const stateSnapshot = async (
++      instruction: Instruction,
++      expected: SpawnRoomState,
++      minimumSlot: bigint,
++    ) => {
++      const recovered = await recover(expected, minimumSlot);
++      const accountAddresses = [
++        ...new Set([
++          await spawnRoomConfigAddress(ringProgramId),
++          marker,
++          address(config.defaultTreeAddress),
++          tracking,
++          ...(instruction.accounts ?? [])
++            .filter(
++              (account) =>
++                account.role === AccountRole.WRITABLE ||
++                account.role === AccountRole.WRITABLE_SIGNER,
++            )
++            .map((account) => account.address),
++        ]),
++      ].filter((account) => account !== payer.address);
++      const accounts = await client.getMultipleAccounts(accountAddresses);
++      return {
++        commitment: bytesToHex(recovered.room.commitment),
++        state: bytesToHex(encodeSpawnRoomState(recovered.room.state)),
++        walletNotes: wallet
++          .notes()
++          .filter((note) => note.utxo.ringProgramId === ringProgramId)
++          .map((note) => ({ commitment: bytesToHex(note.outputContext.hash), spent: note.spent }))
++          .sort((a, b) => a.commitment.localeCompare(b.commitment)),
++        accounts: accountAddresses.map((account, index) => ({
++          address: account,
++          exists: accounts[index] !== undefined,
++          owner: accounts[index]?.owner,
++          lamports: accounts[index]?.lamports.toString(),
++          dataHash:
++            accounts[index] === undefined ? undefined : bytesToHex(sha256(accounts[index]!.data)),
++        })),
++      };
++    };
++    const refuse = async (input: {
++      name: string;
++      instruction: Instruction;
++      signers: readonly KeyPairSigner[];
++      expected: SpawnRoomState;
++      minimumSlot: bigint;
++      error: string | { Custom: number };
++      previousSignature?: string;
++    }) => {
++      const before = await stateSnapshot(input.instruction, input.expected, input.minimumSlot);
++      const { signed } = await prepareTransaction(input.instruction, input.signers);
++      const signature = getSignatureFromTransaction(signed);
++      if (input.previousSignature !== undefined)
++        expect(signature).not.toBe(input.previousSignature);
++      // Require a failed transaction in the validator's ledger. A transport,
++      // timeout, size, signature or preflight exception fails this test.
++      await sendTransactionWithoutConfirmingFactory({ rpc: client.solanaRpc })(signed, {
++        commitment: "confirmed",
++        skipPreflight: true,
++      });
++      const rejected = await poll(async () => {
++        const value = (
++          await client.solanaRpc
++            .getSignatureStatuses([signature], { searchTransactionHistory: true })
++            .send()
++        ).value[0];
++        if (value?.confirmationStatus !== "confirmed" && value?.confirmationStatus !== "finalized")
++          return undefined;
++        expect(value.err).not.toBeNull();
++        return { err: value.err, slot: BigInt(value.slot) };
++      }, `specific refusal ${input.name}`);
++      const error = JSON.parse(
++        JSON.stringify(rejected.err, (_key, value: unknown) =>
++          typeof value === "bigint" ? Number(value) : value,
++        ),
++      ) as unknown;
++      expect(error).toEqual({ InstructionError: [0, input.error] });
++      const failed = await poll(
++        async () =>
++          (await client.solanaRpc
++            .getTransaction(signature, {
++              commitment: "confirmed",
++              encoding: "json",
++              maxSupportedTransactionVersion: 1,
++            })
++            .send()) ?? undefined,
++        `refusal logs ${input.name}`,
++      );
++      const failureLogs = failed.meta?.logMessages ?? [];
++      expect(failureLogs).toContain(`Program ${ringProgramId} invoke [1]`);
++      expect(failureLogs.some((line) => line.startsWith(`Program ${ringProgramId} failed:`))).toBe(
++        true,
++      );
++      const after = await stateSnapshot(input.instruction, input.expected, rejected.slot);
++      expect(after).toEqual(before);
++      steps.push({
++        name: input.name,
++        status: "passed",
++        signature,
++        slot: rejected.slot.toString(),
++        instructionError: input.error,
++        acceptedRevision: input.expected.revision.toString(),
++        acceptedCommitment: after.commitment,
++        unchangedAccounts: after.accounts,
++        unchangedWalletNotes: after.walletNotes,
++      });
++      await evidence("running");
++      return { signature, slot: rejected.slot };
++    };
++    await refuse({
++      name: "reject-duplicate-genesis",
++      instruction: genesisInstruction,
++      signers: [payer, writer],
++      expected: initial,
++      minimumSlot: peerCreation.slot,
++      error: "AccountAlreadyInitialized",
++      previousSignature: creation.signature,
++    });
++    const observe = (
++      signature: string,
++      slot: bigint,
++      contextSlot: bigint,
++    ): SpawnConfirmedObservation => ({ recoveryStatus: "Complete", signature, slot, contextSlot });
++    const genesisView = spawnRoomNativeView({
++      room: current.room,
++      uniqueAddress,
++      operationId: "genesis",
++      observed: observe(creation.signature, creation.slot, current.contextSlot),
++    });
++    const binding: NativeEpisodeBinding = {
++      roomId: genesisView.checkpoint.roomId,
++      episodeId: "localnet-episode-1",
++      episodeCommitment: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
++      predecessor: genesisView.checkpoint,
++      ordinal: "1",
++      minimumConfirmedSlot: creation.slot.toString(),
++      residentIds: ids,
++    };
++    await adapter.authority.resolveEpisode(binding);
++    const original = await adapter.authority.captureOriginalResult(
++      binding,
++      await residents.run(binding, genesisView),
++    );
++    expect(JSON.parse(original.investigator)).toMatchObject({ selectedProcedure: 0, value: 9 });
++    const before = await fetchSpawnRoomConfig(client, ringProgramId);
++    const pending = await adapter.prepare({
++      binding,
++      room: current.room,
++      grantEpoch: before.grantEpoch + 1n,
++    });
++    const grantPath = oneGrantPath();
++    const root = bytesToBigInt(spawnGrantRoot(pending.grantLeaf as Bytes32, grantPath));
++    // The configured publisher signs only after the existing native authority
++    // retained this exact original and runtime-bound grant. Single-room fixture.
++    await send(
++      await updateSpawnRoomGrantRootInstruction({
++        program: ringProgramId,
++        publisher: publisher.address,
++        expectedEpoch: before.grantEpoch,
++        newRoot: root,
++      }),
++      [payer, publisher],
++    );
++    const context = await fetchSpawnRoomConfig(client, ringProgramId);
++    expect(context.grantEpoch).toBe(pending.grant.epoch);
++    expect(context.grantRoot).toBe(root);
++    const input = ProofInputUtxo.fromKeypair(
++      current.entry.utxo,
++      keypair,
++      { dataHash: current.entry.dataHash! },
++      current.entry.outputContext.treeId,
++    );
++    const advanced = await stageSpawnRoomAdvance({
++      ...staging(pending.nextState),
++      input,
++      signer: signingKeySpendSigner(signing),
++    }).prove(
++      withSpawnRoomProof(client, appProver, {
++        kind: "advance",
++        context,
++        old: pending.oldState,
++        next: pending.nextState,
++        grant: pending.grant,
++        grantPath,
++      }),
++    );
++    const advanceInstruction = await spawnRoomAdvanceInstruction(advanced, pending.nextState);
++    expect(advanceInstruction.accounts?.some((account) => account.address === writer.address)).toBe(
++      false,
++    );
++    expect(advanceInstruction.accounts?.some((account) => account.address === marker)).toBe(false);
++    const ordinaryAdvance = await advanced.instruction();
++    for (const [name, tag] of [
++      ["transfer", 55],
++      ["authority-transfer", 56],
++      ["merge", 57],
++      ["set-delegate", 64],
++    ] as const)
++      await refuse({
++        name: `reject-generic-${name}`,
++        instruction: {
++          ...ordinaryAdvance,
++          data: Uint8Array.of(tag, ...ordinaryAdvance.data!.subarray(1)),
++        },
++        signers: [payer],
++        expected: initial,
++        minimumSlot: peerCreation.slot,
++        error: "InvalidInstructionData",
++      });
++    const advancement = await send(advanceInstruction, [payer], { writer: writer.address, marker });
++    current = await recover(pending.nextState, advancement.slot);
++    const firstObserved = observe(advancement.signature, advancement.slot, current.contextSlot);
++    const checkpoint = await adapter.retainConfirmed(
++      pending.authorization.operationId,
++      current.room,
++      firstObserved,
++    );
++    const acceptedView = spawnRoomNativeView({
++      room: current.room,
++      uniqueAddress,
++      operationId: pending.authorization.operationId,
++      observed: firstObserved,
++    });
++    expect(acceptedView.policy.scores).toEqual([40, 50]);
++    steps.push({
++      name: "advance",
++      status: "passed",
++      signature: advancement.signature,
++      slot: advancement.slot.toString(),
++      scores: [40, 50],
++      selectedProcedure: 0,
++      originalValue: 9,
++      originalDigest: original.originalResultCommitment,
++      serializedBytes: advancement.serializedBytes,
++      signerCount: advancement.signerCount,
++      explicitWriterAbsent: true,
++      stableMarkerAbsent: true,
++      eligibleUnspentRoomNotesBefore: 2,
++    });
++    await evidence("running");
++    await refuse({
++      name: "reject-replay",
++      instruction: advanceInstruction,
++      signers: [payer],
++      expected: pending.nextState,
++      minimumSlot: advancement.slot,
++      error: { Custom: 7043 }, // SPP NullifierAlreadyQueued, not a stale app epoch.
++      previousSignature: advancement.signature,
++    });
++    await records.create("spawn-room-v1/wallet", wallet.toJson());
++    await residents.stop();
++    residents = undefined;
++    records.close();
++    records = undefined;
++    records = await EncryptedSqliteRecords.open(
++      recordsPath,
++      await loadDevelopmentKey(join(nativeDirectory, "development.key")),
++      "spawn-room-localnet-v1",
++    );
++    residents = await FlueResidents.start({
++      directory: nativeDirectory,
++      records,
++      masterKey,
++      residentIds: ids,
++    });
++    const retainedSeed = hexToBytes(
++      (await records.read("spawn-room-v1/writer-seed")).value,
++    ) as Bytes32;
++    signing = SigningKey.fromEd25519Bytes(retainedSeed);
++    keypair = ShieldedKeypair.fromKeypair(signing);
++    writer = await createKeyPairSignerFromBytes(
++      Uint8Array.of(...retainedSeed, ...ed25519.getPublicKey(retainedSeed)),
++    );
++    keys = ringWalletKeys(
++      LocalKeys.fromKeypair(keypair, client.proofService),
++      LocalRingKeys.fromKeypair(keypair),
++    );
++    wallet = AnonymousWallet.fromJson((await records.read("spawn-room-v1/wallet")).value);
++    adapter = new SpawnRoomNativeAdapter(
++      new ReferenceAuthority(records),
++      records,
++      domain,
++      residents,
++    );
++    current = await recover(pending.nextState, advancement.slot);
++    const retained = await adapter.read(pending.authorization.operationId);
++    expect(retained?.original).toEqual(original);
++    expect(retained?.authorization.acceptanceNonce).toBe(pending.authorization.acceptanceNonce);
++    expect(await residents.run(binding, genesisView)).toEqual(original);
++    expect(residents.inferenceCalls).toBe(0);
++    steps.push({
++      name: "recovery",
++      status: "passed",
++      revision: current.room.state.revision.toString(),
++      coverage: wallet.recoveryCoverage().status,
++      originalDigest: retained!.authorization.originalResultCommitment,
++      resumedInferenceCalls: 0,
++    });
++    await evidence("running");
++
++    const secondBinding: NativeEpisodeBinding = {
++      ...binding,
++      episodeId: "localnet-episode-2",
++      episodeCommitment: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
++      predecessor: checkpoint,
++      ordinal: "2",
++      minimumConfirmedSlot: advancement.slot.toString(),
++    };
++    await adapter.authority.resolveEpisode(secondBinding);
++    const secondOriginal = await adapter.authority.captureOriginalResult(
++      secondBinding,
++      await residents.run(secondBinding, acceptedView),
++    );
++    expect(JSON.parse(secondOriginal.investigator)).toMatchObject({
++      selectedProcedure: 1,
++      value: 5,
++      lessonUsed: original.proposal.lesson,
++    });
++    const secondBefore = await fetchSpawnRoomConfig(client, ringProgramId);
++    const secondPending = await adapter.prepare({
++      binding: secondBinding,
++      room: current.room,
++      grantEpoch: secondBefore.grantEpoch + 1n,
++    });
++    const secondRoot = bytesToBigInt(spawnGrantRoot(secondPending.grantLeaf as Bytes32, grantPath));
++    await send(
++      await updateSpawnRoomGrantRootInstruction({
++        program: ringProgramId,
++        publisher: publisher.address,
++        expectedEpoch: secondBefore.grantEpoch,
++        newRoot: secondRoot,
++      }),
++      [payer, publisher],
++    );
++    const secondContext = await fetchSpawnRoomConfig(client, ringProgramId);
++    const secondInput = ProofInputUtxo.fromKeypair(
++      current.entry.utxo,
++      keypair,
++      { dataHash: current.entry.dataHash! },
++      current.entry.outputContext.treeId,
++    );
++    const reused = await stageSpawnRoomAdvance({
++      ...staging(secondPending.nextState),
++      input: secondInput,
++      signer: signingKeySpendSigner(signing),
++    }).prove(
++      withSpawnRoomProof(client, appProver, {
++        kind: "advance",
++        context: secondContext,
++        old: secondPending.oldState,
++        next: secondPending.nextState,
++        grant: secondPending.grant,
++        grantPath,
++      }),
++    );
++    const reuseInstruction = await spawnRoomAdvanceInstruction(reused, secondPending.nextState);
++    expect(reuseInstruction.accounts?.some((account) => account.address === writer.address)).toBe(
++      false,
++    );
++    const reuse = await send(reuseInstruction, [payer], { writer: writer.address, marker });
++    current = await recover(secondPending.nextState, reuse.slot);
++    const secondCheckpoint = await adapter.retainConfirmed(
++      secondPending.authorization.operationId,
++      current.room,
++      observe(reuse.signature, reuse.slot, current.contextSlot),
++    );
++    expect(current.room.state.policy.scores).toEqual([40, 60]);
++    steps.push({
++      name: "reuse",
++      status: "passed",
++      signature: reuse.signature,
++      slot: reuse.slot.toString(),
++      selectedProcedure: 1,
++      learnedValue: 5,
++      lessonUsed: (JSON.parse(secondOriginal.investigator) as { lessonUsed: string }).lessonUsed,
++      proposedLesson: secondOriginal.proposal.lesson,
++      scores: [40, 60],
++      serializedBytes: reuse.serializedBytes,
++      signerCount: reuse.signerCount,
++      explicitWriterAbsent: true,
++      stableMarkerAbsent: true,
++    });
++    await evidence("running");
++
++    const secondView = spawnRoomNativeView({
++      room: current.room,
++      uniqueAddress,
++      operationId: secondPending.authorization.operationId,
++      observed: observe(reuse.signature, reuse.slot, current.contextSlot),
++    });
++    const thirdBinding: NativeEpisodeBinding = {
++      ...binding,
++      episodeId: "localnet-episode-3-revoked",
++      episodeCommitment: bytesToHex(crypto.getRandomValues(new Uint8Array(32))),
++      predecessor: secondCheckpoint,
++      ordinal: "3",
++      minimumConfirmedSlot: reuse.slot.toString(),
++    };
++    await adapter.authority.resolveEpisode(thirdBinding);
++    const thirdOriginal = await adapter.authority.captureOriginalResult(
++      thirdBinding,
++      await residents.run(thirdBinding, secondView),
++    );
++    const thirdBefore = await fetchSpawnRoomConfig(client, ringProgramId);
++    const thirdPending = await adapter.prepare({
++      binding: thirdBinding,
++      room: current.room,
++      grantEpoch: thirdBefore.grantEpoch + 1n,
++    });
++    const thirdRoot = bytesToBigInt(spawnGrantRoot(thirdPending.grantLeaf as Bytes32, grantPath));
++    await send(
++      await updateSpawnRoomGrantRootInstruction({
++        program: ringProgramId,
++        publisher: publisher.address,
++        expectedEpoch: thirdBefore.grantEpoch,
++        newRoot: thirdRoot,
++      }),
++      [payer, publisher],
++    );
++    const thirdContext = await fetchSpawnRoomConfig(client, ringProgramId);
++    const third = await stageSpawnRoomAdvance({
++      ...staging(thirdPending.nextState),
++      input: ProofInputUtxo.fromKeypair(
++        current.entry.utxo,
++        keypair,
++        { dataHash: current.entry.dataHash! },
++        current.entry.outputContext.treeId,
++      ),
++      signer: signingKeySpendSigner(signing),
++    }).prove(
++      withSpawnRoomProof(client, appProver, {
++        kind: "advance",
++        context: thirdContext,
++        old: thirdPending.oldState,
++        next: thirdPending.nextState,
++        grant: thirdPending.grant,
++        grantPath,
++      }),
++    );
++    const thirdInstruction = await spawnRoomAdvanceInstruction(third, thirdPending.nextState);
++    const validThird = await prepareTransaction(thirdInstruction, [payer], {
++      writer: writer.address,
++      marker,
++    });
++    const simulation = await client.solanaRpc
++      .simulateTransaction(getBase64EncodedWireTransaction(validThird.signed), {
++        encoding: "base64",
++        commitment: "confirmed",
++        sigVerify: true,
++      })
++      .send();
++    expect(simulation.value.err).toBeNull();
++    expect(simulation.value.logs).toContain(`Program ${ringProgramId} success`);
++    const revoked = await send(
++      await updateSpawnRoomGrantRootInstruction({
++        program: ringProgramId,
++        publisher: publisher.address,
++        expectedEpoch: thirdContext.grantEpoch,
++        newRoot: 0n,
++      }),
++      [payer, publisher],
++    );
++    const revokedContext = await fetchSpawnRoomConfig(client, ringProgramId);
++    expect(revokedContext.grantEpoch).toBe(thirdContext.grantEpoch + 1n);
++    expect(revokedContext.grantRoot).toBe(0n);
++    await refuse({
++      name: "reject-revoked-grant",
++      instruction: thirdInstruction,
++      signers: [payer],
++      expected: secondPending.nextState,
++      minimumSlot: revoked.slot,
++      error: { Custom: 8101 }, // Combined application proof fails against the current root/epoch.
++    });
++    const refusedOriginal = await adapter.read(thirdPending.authorization.operationId);
++    expect(refusedOriginal?.original).toEqual(thirdOriginal);
++    expect(refusedOriginal?.authorization.acceptanceNonce).toBe(
++      thirdPending.authorization.acceptanceNonce,
++    );
++    expect(await records.read(`receipt/${thirdPending.authorization.operationId}`)).toBeUndefined();
++    current = await recover(secondPending.nextState, revoked.slot);
++    expect(current.room.state.revision).toBe(2n);
++    expect(current.room.state.policy.scores).toEqual([40, 60]);
++    steps.push({
++      name: "revocation-retention",
++      status: "passed",
++      validBeforeRevocation: true,
++      admittedEpoch: thirdContext.grantEpoch.toString(),
++      revokedEpoch: revokedContext.grantEpoch.toString(),
++      originalDigest: thirdOriginal.originalResultCommitment,
++      originalAndNonceRetained: true,
++      acceptedRevision: current.room.state.revision.toString(),
++      pendingRevision: thirdPending.nextState.revision.toString(),
++      acceptedScores: current.room.state.policy.scores,
++    });
++    await evidence("passed");
++  } catch (error) {
++    await evidence("failed", error instanceof Error ? error.message : String(error));
++    throw error;
++  } finally {
++    await residents?.stop();
++    records?.close();
++  }
++}, 1_800_000);
+diff --git a/sdk-tests/spawn-room/native-restart.test.ts b/sdk-tests/spawn-room/native-restart.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8d80f2078c67ee7350888188e162e4fac2e0424f
+--- /dev/null
++++ b/sdk-tests/spawn-room/native-restart.test.ts
+@@ -0,0 +1,332 @@
++import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import { join, resolve } from "node:path";
++import { pathToFileURL } from "node:url";
++import { describe, expect, it } from "vitest";
++import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
++import { Data, Utxo } from "@heliuslabs/spr/transaction";
++import {
++  createSpawnRoomApplicationData,
++  openSpawnRoomOutput,
++  verifySpawnRoomNote,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/payload.js";
++import { spawnRoomIdentity } from "../../sdk-libs/ts/src/experimental/spawn-room/codec.js";
++import {
++  SpawnRoomNativeAdapter,
++  spawnRoomNativeView,
++  type NativeEpisodeAuthority,
++  type NativeEpisodeBinding,
++  type NativeOriginalResult,
++  type NativePrivateRecordStore,
++} from "../../sdk-libs/ts/src/experimental/spawn-room/native-adapter.js";
++import type { SpawnRoomState } from "../../sdk-libs/ts/src/experimental/spawn-room/codec.js";
++import { spawnPayloadFixture } from "../../sdk-libs/ts/test/experimental/spawn-room-fixture.js";
++
++// Explicit integration test: uses the actual pinned native implementation,
++// never a replacement authority. Run with --config sdk-tests/spawn-room/vitest.config.ts.
++const nativeRoot = resolve(
++  process.env.SPAWN_REFERENCE_HOST_ROOT ?? "../backroom-rings/backrooms/reference-host",
++);
++const authorityModule = await import(pathToFileURL(join(nativeRoot, "authority.ts")).href);
++const recordsModule = await import(pathToFileURL(join(nativeRoot, "records.ts")).href);
++const Authority = authorityModule.ReferenceAuthority as new (
++  records: NativePrivateRecordStore,
++) => NativeEpisodeAuthority;
++const Records = recordsModule.EncryptedSqliteRecords as {
++  open(
++    path: string,
++    key: Uint8Array,
++    namespace: string,
++  ): Promise<NativePrivateRecordStore & { close(): void }>;
++};
++
++describe("Spawn adapter over actual native encrypted records", () => {
++  it("retains original/CID, nonce, full grant and bounded lesson after close/reopen; then reserves the next episode", async () => {
++    const directory = await mkdtemp(join(tmpdir(), "spawn-native-restart-"));
++    const path = join(directory, "records.sqlite");
++    const key = new Uint8Array(32).fill(91);
++    let records = await Records.open(path, key, "spawn-room-v1-local-test");
++    try {
++      const f = spawnPayloadFixture();
++      const room = openSpawnRoomOutput(f.reader, f.secret, f.ciphertext, f.domain)!;
++      const roomId = bytesToHex(spawnRoomIdentity(f.state));
++      const binding: NativeEpisodeBinding = {
++        roomId,
++        episodeId: "episode-one",
++        episodeCommitment: "ff".repeat(32),
++        predecessor: {
++          roomId,
++          uniqueAddress: "33".repeat(32),
++          stateCommitment: bytesToHex(f.commitment),
++          revision: "0",
++        },
++        ordinal: "1",
++        minimumConfirmedSlot: "1",
++        residentIds: ["investigator", "critic"],
++      };
++      const original = {
++        episodeId: binding.episodeId,
++        originalResultCommitment: "ee".repeat(32),
++        candidateCommitment: "dd".repeat(32),
++        investigator: "Original investigation retained verbatim.",
++        critic: "Original critic retained verbatim.",
++        proposal: {
++          lesson: "Use a bounded retry.",
++          selectedProcedure: 0 as const,
++          feedback: { negative: false, magnitude: 7 },
++        },
++        resultCid: "ipfs://bafy-test-original-result",
++      };
++      const residents = {
++        seedCommitment: bytesToHex(f.state.seedManifest),
++        membershipCommitment: bytesToHex(f.state.fixedMembers),
++        residentIds: binding.residentIds,
++      };
++      let authority = new Authority(records);
++      await authority.resolveEpisode(binding);
++      await authority.captureOriginalResult(binding, original);
++      let adapter = new SpawnRoomNativeAdapter(authority, records, f.domain, residents);
++      const accepted = await adapter.prepare({ binding, room, grantEpoch: 1n });
++      expect(accepted.nextState.policy.scores).toEqual([57, 50]);
++      const nonce = accepted.authorization.acceptanceNonce;
++      expect(bytesToHex(accepted.grant.nonce)).toBe(nonce);
++      records.close();
++      const database = await readFile(path);
++      expect(database.includes(Buffer.from(original.investigator))).toBe(false);
++      expect(database.includes(Buffer.from(original.resultCid))).toBe(false);
++      records = await Records.open(path, key, "spawn-room-v1-local-test");
++      authority = new Authority(records);
++      adapter = new SpawnRoomNativeAdapter(authority, records, f.domain, residents);
++      const reloaded = await adapter.read(accepted.authorization.operationId);
++      expect(reloaded).toEqual(accepted);
++      expect((reloaded!.original as NativeOriginalResult & { resultCid: string }).resultCid).toBe(
++        original.resultCid,
++      );
++      expect(
++        (await adapter.prepare({ binding, room, grantEpoch: 1n })).authorization.acceptanceNonce,
++      ).toBe(nonce);
++      await expect(adapter.prepare({ binding, room, grantEpoch: 2n })).rejects.toThrow(
++        /requires_readmission/,
++      );
++      await expect(
++        new SpawnRoomNativeAdapter(authority, records, f.domain, {
++          ...residents,
++          membershipCommitment: "11".repeat(32),
++        }).read(accepted.authorization.operationId),
++      ).rejects.toThrow(/resident_manifest/);
++      await expect(
++        adapter.prepare({
++          binding: { ...binding, residentIds: [binding.residentIds[1], binding.residentIds[0]] },
++          room,
++          grantEpoch: 1n,
++        }),
++      ).rejects.toThrow(/resident_order/);
++      await expect(
++        authority.captureOriginalResult(binding, {
++          ...original,
++          originalResultCommitment: "ab".repeat(32),
++        }),
++      ).rejects.toThrow(/original_result_conflict/);
++      // A locally reconstructed note tests the adapter only; chain confirmation
++      // and frozen scanner coverage are supplied by the separate localnet journey.
++      const application = createSpawnRoomApplicationData(accepted.nextState);
++      const nextUtxo = new Utxo({
++        ...f.utxo,
++        data: new Data([{ kind: "utxoData", bytes: application.bytes }]),
++      });
++      const commitment = nextUtxo.hash(f.nullifierPublicKey, f.treeId, application.hash);
++      const next = verifySpawnRoomNote(
++        { ...room.note, utxo: nextUtxo, utxoHash: commitment, dataHash: application.hash },
++        f.treeId,
++        f.domain,
++        commitment,
++      );
++      const checkpoint = await adapter.retainConfirmed(accepted.authorization.operationId, next, {
++        recoveryStatus: "Complete",
++        slot: 3n,
++        contextSlot: 4n,
++        signature: "local-adapter-fixture",
++      });
++      const receipt = await records.read<{
++        room: { protocolVersion: string; artifactVersion: string };
++      }>(`receipt/${accepted.authorization.operationId}`);
++      expect(receipt?.value.room.protocolVersion).toBe("backrooms.v0");
++      expect(receipt?.value.room.artifactVersion).toBe("spawn-room.v1");
++      records.close();
++      records = await Records.open(path, key, "spawn-room-v1-local-test");
++      authority = new Authority(records);
++      const second = {
++        ...binding,
++        episodeId: "episode-two",
++        ordinal: "2",
++        predecessor: checkpoint,
++      };
++      expect(await authority.resolveEpisode(second)).toEqual(second);
++      expect((await authority.getOriginalResult(binding.episodeId))?.proposal.lesson).toBe(
++        "Use a bounded retry.",
++      );
++    } finally {
++      records.close();
++      await rm(directory, { recursive: true, force: true });
++    }
++  });
++
++  it("runs the real seeded Flue residents, commits their original, restarts, and selects the learned procedure", async () => {
++    const { FlueResidents } = await import(pathToFileURL(join(nativeRoot, "residents.ts")).href);
++    const { residentIds } = await import(pathToFileURL(join(nativeRoot, "../flue/seeds.ts")).href);
++    const directory = await mkdtemp(join(tmpdir(), "spawn-flue-restart-"));
++    const key = new Uint8Array(32).fill(73);
++    const path = join(directory, "records.sqlite");
++    let records = await Records.open(path, key, "spawn-room-flue-test");
++    const ids = await residentIds("44".repeat(32));
++    let runtime = await FlueResidents.start({
++      directory,
++      records,
++      masterKey: key,
++      residentIds: ids,
++    });
++    try {
++      const f = spawnPayloadFixture();
++      const originalOpening = openSpawnRoomOutput(f.reader, f.secret, f.ciphertext, f.domain)!;
++      const state = {
++        ...f.state,
++        seedManifest: hexToBytes(runtime.seedCommitment),
++        fixedMembers: hexToBytes(runtime.membershipCommitment),
++      };
++      const openState = (state: SpawnRoomState) => {
++        const application = createSpawnRoomApplicationData(state);
++        const utxo = new Utxo({
++          ...f.utxo,
++          data: new Data([{ kind: "utxoData", bytes: application.bytes }]),
++        });
++        const commitment = utxo.hash(f.nullifierPublicKey, f.treeId, application.hash);
++        return verifySpawnRoomNote(
++          { ...originalOpening.note, utxo, utxoHash: commitment, dataHash: application.hash },
++          f.treeId,
++          f.domain,
++          commitment,
++        );
++      };
++      const genesis = openState(state);
++      const observed = {
++        recoveryStatus: "Complete" as const,
++        slot: 1n,
++        contextSlot: 1n,
++        signature: "native-fixture-genesis",
++      };
++      const view = spawnRoomNativeView({
++        room: genesis,
++        uniqueAddress: "55".repeat(32),
++        operationId: "genesis",
++        observed,
++      });
++      const binding: NativeEpisodeBinding = {
++        roomId: view.checkpoint.roomId,
++        episodeId: "flue-one",
++        episodeCommitment: "a1".repeat(32),
++        predecessor: view.checkpoint,
++        ordinal: "1",
++        minimumConfirmedSlot: "1",
++        residentIds: ids,
++      };
++      let authority = new Authority(records);
++      await authority.resolveEpisode(binding);
++      const first = await authority.captureOriginalResult(
++        binding,
++        await runtime.run(binding, view),
++      );
++      expect(JSON.parse(first.investigator)).toMatchObject({
++        selectedProcedure: 0,
++        value: 9,
++        lessonUsed: "",
++      });
++      expect(runtime.inferenceCalls).toBe(4);
++      let adapter = new SpawnRoomNativeAdapter(authority, records, f.domain, runtime);
++      const pending = await adapter.prepare({ binding, room: genesis, grantEpoch: 1n });
++      expect(pending.nextState.policy.scores).toEqual([40, 50]);
++      const next = openState(pending.nextState);
++      const nextObserved = {
++        ...observed,
++        slot: 3n,
++        contextSlot: 4n,
++        signature: "native-fixture-advance",
++      };
++      const checkpoint = await adapter.retainConfirmed(
++        pending.authorization.operationId,
++        next,
++        nextObserved,
++      );
++      const nextView = spawnRoomNativeView({
++        room: next,
++        uniqueAddress: view.checkpoint.uniqueAddress,
++        operationId: pending.authorization.operationId,
++        observed: nextObserved,
++      });
++      await runtime.stop();
++      records.close();
++      records = await Records.open(path, key, "spawn-room-flue-test");
++      runtime = await FlueResidents.start({ directory, records, masterKey: key, residentIds: ids });
++      authority = new Authority(records);
++      adapter = new SpawnRoomNativeAdapter(authority, records, f.domain, runtime);
++      expect((await adapter.read(pending.authorization.operationId))!.original).toEqual(first);
++      expect(await runtime.run(binding, view)).toEqual(first);
++      expect(runtime.inferenceCalls).toBe(0);
++      const secondBinding = {
++        ...binding,
++        episodeId: "flue-two",
++        episodeCommitment: "a2".repeat(32),
++        predecessor: checkpoint,
++        ordinal: "2",
++        minimumConfirmedSlot: "3",
++      };
++      await authority.resolveEpisode(secondBinding);
++      const second = await authority.captureOriginalResult(
++        secondBinding,
++        await runtime.run(secondBinding, nextView),
++      );
++      expect(JSON.parse(second.investigator)).toMatchObject({
++        selectedProcedure: 1,
++        value: 5,
++        lessonUsed: first.proposal.lesson,
++      });
++      expect(
++        (await adapter.prepare({ binding: secondBinding, room: next, grantEpoch: 2n })).nextState
++          .policy.scores,
++      ).toEqual([40, 60]);
++      await expect(
++        runtime.run(
++          { ...secondBinding, episodeId: "bad-members" },
++          { ...nextView, fixedMembersCommitment: "ff".repeat(32) },
++        ),
++      ).rejects.toThrow(/resident_room_binding_mismatch/);
++      if (process.env.SPAWN_NATIVE_EVIDENCE !== undefined)
++        await writeFile(
++          process.env.SPAWN_NATIVE_EVIDENCE,
++          JSON.stringify(
++            {
++              schema: "spawn-room-native-fixture-v1",
++              status: "passed",
++              implementation: "actual FlueResidents + ReferenceAuthority + EncryptedSqliteRecords",
++              provider: "existing deterministicInferenceFixture; no external provider",
++              chainSettlement: false,
++              first: JSON.parse(first.investigator),
++              firstOriginalDigest: first.originalResultCommitment,
++              acceptedScores: pending.nextState.policy.scores,
++              retainedNonceMatches: true,
++              second: JSON.parse(second.investigator),
++              nextScores: [40, 60],
++              seedCommitment: runtime.seedCommitment,
++              membershipCommitment: runtime.membershipCommitment,
++            },
++            null,
++            2,
++          ),
++          { mode: 0o600 },
++        );
++    } finally {
++      await runtime.stop();
++      records.close();
++      await rm(directory, { recursive: true, force: true });
++    }
++  }, 60_000);
++});
+diff --git a/sdk-tests/spawn-room/tsconfig.json b/sdk-tests/spawn-room/tsconfig.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..a5a3786220764a5790e8f34b621e7a593e369da8
+--- /dev/null
++++ b/sdk-tests/spawn-room/tsconfig.json
+@@ -0,0 +1,5 @@
++{
++  "extends": "../../sdk-libs/ts/tsconfig.json",
++  "compilerOptions": { "noEmit": true },
++  "include": ["*.ts"]
++}
+diff --git a/sdk-tests/spawn-room/vitest.config.ts b/sdk-tests/spawn-room/vitest.config.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..cb58aa6fc5f007955391bbeaaf4bc2eed2a5cdc1
+--- /dev/null
++++ b/sdk-tests/spawn-room/vitest.config.ts
+@@ -0,0 +1,14 @@
++import { fileURLToPath } from "node:url";
++import { defineConfig } from "vitest/config";
++import sdk from "../../sdk-libs/ts/vitest.config.js";
++
++export default defineConfig({
++  ...sdk,
++  test: {
++    environment: "node",
++    include: ["sdk-tests/spawn-room/**/*.test.ts"],
++    setupFiles: [fileURLToPath(new URL("../../sdk-libs/ts/test/setup.ts", import.meta.url))],
++    maxWorkers: 1,
++    testTimeout: 30_000,
++  },
 +});
 diff --git a/test-vectors/proof/spawn-room-advance-v1.json b/test-vectors/proof/spawn-room-advance-v1.json
 new file mode 100644
@@ -4011,3 +7961,629 @@ index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c9
 +  zolana/tools/build-programs.sh --manifest-path programs/custom-ring/Cargo.toml -- \
 +  --locked --features bpf-entrypoint,spawn-room-v1-localnet-keys
 +sha256sum target/deploy/custom_ring_program.so
+diff --git a/tools/run-spawn-room-localnet.mjs b/tools/run-spawn-room-localnet.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..9485e44b9e81fab7e5b3963a904e17c1e1c43ade
+--- /dev/null
++++ b/tools/run-spawn-room-localnet.mjs
+@@ -0,0 +1,429 @@
++#!/usr/bin/env node
++// All services and the journey are descendants of this process. In particular,
++// this also works in executors whose separate commands cannot share loopback.
++import { spawn, execFileSync } from 'node:child_process';
++import { createHash } from 'node:crypto';
++import { createReadStream, openSync, closeSync } from 'node:fs';
++import { access, chmod, mkdir, mkdtemp, readFile, readdir, realpath, stat, symlink, writeFile } from 'node:fs/promises';
++import { constants } from 'node:fs';
++import { createServer } from 'node:net';
++import { dirname, isAbsolute, join, resolve } from 'node:path';
++import { fileURLToPath, pathToFileURL } from 'node:url';
++import { setTimeout as delay } from 'node:timers/promises';
++
++const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
++const NATIVE_PIN = '02bca33729051798834ecbb4d94e968cdc0ef9b8';
++const ZOLANA_PIN = '0fe4f952182b39464d472c52c40b3febe6cbd9ec';
++const BACKROOMS_PIN = '08822c65254cd73c5f2dccbdf182ce1df2c7510a';
++const PROGRAM_ID = '2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y';
++const DEFAULT_PORTS = { rpc: 42899, photon: 42784, ringIndexer: 42786, ringRpc: 42785, prover: 45001, metrics: 51998 };
++const now = () => new Date().toISOString();
++const requireThat = (condition, message) => { if (!condition) throw new Error(message); };
++const json = async (path) => JSON.parse(await readFile(path, 'utf8'));
++const writeJson = (path, value) => writeFile(path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
++const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' }).trim();
++
++async function hashFile(path) {
++  const hash = createHash('sha256');
++  for await (const part of createReadStream(path)) hash.update(part);
++  return { path, size: (await stat(path)).size, sha256: hash.digest('hex') };
++}
++
++async function sourceManifest(root) {
++  const files = execFileSync('git', ['-C', root, 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '.'], { encoding: 'utf8' })
++    .split('\0').filter(Boolean).filter((path) => !/(^|\/)(\.env[^/]*|[^/]*keypair\.json|[^/]*\.request\.json)$/.test(path));
++  const manifest = {};
++  for (const name of [...new Set(files)].sort()) {
++    try {
++      const path = join(root, name);
++      if (!(await stat(path)).isFile()) continue; // Gitlinks are pinned separately.
++      const { size, sha256 } = await hashFile(path);
++      manifest[name] = { size, sha256 };
++    } catch (error) {
++      if (error.code !== 'ENOENT') throw error;
++      manifest[name] = { deleted: true };
++    }
++  }
++  return { root, revision: git(root, 'rev-parse', 'HEAD'), sha256: createHash('sha256').update(JSON.stringify(manifest)).digest('hex'), files: manifest };
++}
++
++export function normalizedPorts(input = {}) {
++  requireThat(input && typeof input === 'object' && !Array.isArray(input), 'ports must be an object');
++  for (const name of Object.keys(input)) requireThat(name in DEFAULT_PORTS, `Unknown port: ${name}`);
++  const ports = { ...DEFAULT_PORTS, ...input };
++  const all = [...Object.values(ports), ports.rpc + 1, ports.rpc + 2];
++  requireThat(all.every((port) => Number.isInteger(port) && port >= 1024 && port <= 65535), 'Use unprivileged TCP ports in range');
++  requireThat(new Set(all).size === all.length, 'Localnet ports, including RPC auxiliary ports, must be distinct');
++  return ports;
++}
++
++export async function requireAvailablePorts(ports) {
++  // Keep every successful bind until the whole check finishes. Never kill a
++  // listener to make a requested port available.
++  const listeners = [];
++  try {
++    for (const port of ports) {
++      const server = createServer();
++      await new Promise((accept, reject) => {
++        server.once('error', reject);
++        server.listen({ host: '127.0.0.1', port, exclusive: true }, accept);
++      });
++      listeners.push(server);
++    }
++  } finally {
++    await Promise.all(listeners.map((server) => new Promise((done) => server.close(done))));
++  }
++}
++
++export function validateJourneyResult(vitest, evidence) {
++  requireThat(vitest.success === true && vitest.numPassedTests > 0 && vitest.numFailedTests === 0 &&
++    vitest.numPendingTests === 0 && vitest.numTodoTests === 0, 'Vitest must execute and pass the journey without skipped tests');
++  const assertions = vitest.testResults?.flatMap((suite) => suite.assertionResults ?? []) ?? [];
++  requireThat(assertions.length > 0 && assertions.every((test) => test.status === 'passed'), 'No complete passing journey assertions');
++  requireThat(evidence.schema === 'spawn-room-localnet-journey-v1' && evidence.status === 'passed', 'Journey did not produce a passing evidence receipt');
++  requireThat(Array.isArray(evidence.steps) && evidence.steps.length > 0 && evidence.steps.every((step) => step.status === 'passed'), 'Journey contains missing or unsuccessful steps');
++  for (const name of ['create', 'advance', 'recovery', 'reuse']) {
++    requireThat(evidence.steps.some((step) => step.name === name && step.status === 'passed'), `Journey did not verify ${name}`);
++  }
++}
++
++function childEnvironment() {
++  // Inherit the selected toolchain, not provider credentials or service config.
++  const allowed = ['PATH', 'HOME', 'LANG', 'LC_ALL', 'LD_LIBRARY_PATH', 'DYLD_LIBRARY_PATH',
++    'RUSTUP_HOME', 'CARGO_HOME', 'LIBCLANG_PATH', 'PROTOC', 'PROTOC_INCLUDE', 'PKG_CONFIG_PATH',
++    'GOPATH', 'GOCACHE', 'SSL_CERT_FILE', 'SSL_CERT_DIR'];
++  const env = Object.fromEntries(allowed.filter((key) => process.env[key] !== undefined).map((key) => [key, process.env[key]]));
++  return { ...env, GOENV: 'off', GOWORK: 'off', GOMAXPROCS: '1', GOMEMLIMIT: '3GiB', CARGO_BUILD_JOBS: '1',
++    CARGO_PROFILE_DEV_DEBUG: '0', CARGO_PROFILE_TEST_DEBUG: '0', JUST_NO_DOTENV: 'true',
++    AWS_EC2_METADATA_DISABLED: 'true', NO_PROXY: '127.0.0.1,localhost,::1', no_proxy: '127.0.0.1,localhost,::1',
++    ZOLANA_RING_SURFPOOL_FIXTURE: '1', RING_RPC_DEPLOYMENT: 'localnet' };
++}
++
++async function executable(value, fallback) {
++  const requested = value ?? fallback;
++  requireThat(typeof requested === 'string' && requested.length > 0, 'Missing executable path');
++  const candidates = requested.includes('/') ? [resolve(requested)] : (process.env.PATH ?? '').split(':').map((dir) => join(dir, requested));
++  for (const candidate of candidates) {
++    try { await access(candidate, constants.X_OK); return await realpath(candidate); } catch { /* next PATH entry */ }
++  }
++  throw new Error(`Executable unavailable: ${requested}. Build the pinned prerequisites first.`);
++}
++
++async function prepareKeys(config, nativeRepo, destination) {
++  const nativeDirectory = resolve(config.nativeKeysDirectory ?? join(nativeRepo, 'zolana/prover/server/proving-keys'));
++  const appDirectory = resolve(config.applicationKeysDirectory ?? join(APP_ROOT, 'target/spawn-room-keys'));
++  const locks = {
++    ...(await json(join(nativeRepo, 'prover/ring/proving-keys.lock'))).keys,
++    ...(await json(join(nativeRepo, 'zolana/prover/server/prover/provingkeys/proving-keys.lock'))).keys,
++  };
++  const sources = new Map();
++  for (const name of (await readdir(nativeDirectory)).filter((name) => name.endsWith('.key')).sort()) {
++    requireThat(locks[name], `Unrecognized native proving key: ${name}`);
++    sources.set(name, { source: join(nativeDirectory, name), expected: locks[name] });
++  }
++  for (const operation of ['advance', 'genesis']) {
++    const stem = `spawn-room-${operation}-v1`;
++    const proof = await json(join(APP_ROOT, 'test-vectors/proof', `${stem}.json`));
++    const name = `spawn_room_${operation}_v1.key`;
++    requireThat(/^[a-f0-9]{64}$/.test(proof.proof?.provingKeySha256 ?? ''), `Missing source key fingerprint for ${stem}`);
++    sources.set(name, { source: join(appDirectory, `${stem}.key`), expected: { sha256: proof.proof.provingKeySha256 } });
++  }
++  for (const name of ['custom_ring_apply_enrollments_1.key', 'custom_ring_apply_records_1.key',
++    'transfer_ring_2_2.key', 'transfer_eddsa_ring_1_2.key', 'transfer_eddsa_ring_2_2.key']) {
++    requireThat(sources.has(name), `Missing pinned prerequisite ${name}; fetch only the required keys before running`);
++  }
++  await mkdir(destination, { mode: 0o700 });
++  const keys = {};
++  for (const [name, { source, expected }] of sources) {
++    const artifact = await hashFile(await realpath(source));
++    requireThat(artifact.sha256 === expected.sha256 && (expected.size === undefined || artifact.size === expected.size), `Proving key integrity mismatch: ${name}`);
++    await symlink(artifact.path, join(destination, name));
++    keys[name] = artifact;
++  }
++  return keys;
++}
++
++export async function runLocalnet(config) {
++  requireThat(config?.disposableLocalnet === true, 'Set disposableLocalnet: true in the run config for this fresh local validator');
++  requireThat(process.platform !== 'win32', 'The pinned localnet tools require a Unix runtime');
++  process.umask(0o077);
++  const nativeRepo = await realpath(resolve(config.nativeRepo));
++  requireThat(git(nativeRepo, 'rev-parse', 'HEAD') === NATIVE_PIN, 'Native checkout does not match the reviewed source pin');
++  requireThat(git(join(nativeRepo, 'zolana'), 'rev-parse', 'HEAD') === ZOLANA_PIN, 'Native Zolana submodule pin mismatch');
++  requireThat(!git(nativeRepo, 'status', '--porcelain=v1', '--untracked-files=all', '--ignore-submodules=none'), 'Native checkout must remain clean');
++  requireThat(git(join(APP_ROOT, 'zolana'), 'rev-parse', 'HEAD') === ZOLANA_PIN, 'Application SDK Zolana submodule pin mismatch');
++  requireThat(!git(join(APP_ROOT, 'zolana'), 'status', '--porcelain=v1', '--untracked-files=all', '--ignore-submodules=none'), 'Application SDK Zolana submodule must remain clean');
++  const ports = normalizedPorts(config.ports);
++  const urls = Object.fromEntries(Object.entries(ports).map(([name, port]) => [name, `http://127.0.0.1:${port}`]));
++  const ringProgramId = config.programId ?? PROGRAM_ID;
++  requireThat(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(ringProgramId), 'Invalid app program ID');
++  const parent = resolve(config.workParent ?? join(APP_ROOT, 'target/spawn-room-runs'));
++  await mkdir(parent, { recursive: true, mode: 0o700 });
++  const workDirectory = await mkdtemp(join(parent, 'journey-'));
++  const logDirectory = join(workDirectory, 'logs');
++  const scope = join(workDirectory, 'scope');
++  const home = join(workDirectory, 'config');
++  for (const path of [logDirectory, scope, home]) await mkdir(path, { mode: 0o700 });
++  const receiptPath = join(workDirectory, 'run-receipt.json');
++  const receipt = { schema: 'spawn-room-localnet-run-v1', status: 'running', startedAt: now(), workDirectory,
++    sameParentServices: true, setup: 'experimental localnet only', nativeRevision: NATIVE_PIN, zolanaRevision: ZOLANA_PIN, appZolanaRevision: ZOLANA_PIN,
++    runtime: { node: process.version, platform: process.platform, arch: process.arch },
++    appRevision: git(APP_ROOT, 'rev-parse', 'HEAD'), appDiffSha256: createHash('sha256').update(git(APP_ROOT, 'diff', '--binary', 'HEAD')).digest('hex'),
++    ports, ringProgramId, commands: [], services: [], cleanup: [] };
++  const save = () => writeJson(receiptPath, receipt);
++  await save();
++  console.log(`Localnet run: ${workDirectory}`);
++  const env = { ...childEnvironment(), ZOLANA_CONFIG_DIR: home, ZOLANA_PROCESS_SCOPE_DIR: scope };
++  receipt.resources = Object.fromEntries(['GOMAXPROCS', 'GOMEMLIMIT', 'CARGO_BUILD_JOBS', 'CARGO_PROFILE_DEV_DEBUG', 'CARGO_PROFILE_TEST_DEBUG'].map((name) => [name, env[name]]));
++  const services = [];
++  const activeCommands = new Set();
++  let stopping = false;
++  let stoppedSignal;
++  let validatorStarted = false;
++  let binaries;
++  let referenceHostRoot;
++  const signalHandler = (signal) => {
++    stoppedSignal = signal;
++    for (const child of activeCommands) {
++      try { process.kill(-child.pid, 'SIGTERM'); } catch { /* already exited */ }
++      setTimeout(() => {
++        if (child.exitCode === null && child.signalCode === null) {
++          try { process.kill(-child.pid, 'SIGKILL'); } catch { /* already exited */ }
++        }
++      }, 5000).unref();
++    }
++  };
++  const onInt = () => signalHandler('SIGINT');
++  const onTerm = () => signalHandler('SIGTERM');
++  process.on('SIGINT', onInt); process.on('SIGTERM', onTerm);
++
++  async function command(name, binary, args, { capture = false, recordArgs = true, timeoutMs = 300_000, allowFailure = false, cwd = APP_ROOT } = {}) {
++    if (stoppedSignal && !stopping) throw new Error(`Interrupted by ${stoppedSignal}`);
++    const logPath = join(logDirectory, `${String(receipt.commands.length).padStart(2, '0')}-${name}.log`);
++    const row = { name, binary, ...(recordArgs ? { args } : {}), cwd, logPath, startedAt: now(), status: 'running' };
++    receipt.commands.push(row); await save();
++    const fd = openSync(logPath, 'wx', 0o600);
++    const child = spawn(binary, args, { cwd, env, detached: true, stdio: ['ignore', fd, fd] });
++    closeSync(fd);
++    activeCommands.add(child);
++    let timedOut = false;
++    const timer = setTimeout(() => { timedOut = true; try { process.kill(-child.pid, 'SIGKILL'); } catch { /* already exited */ } }, timeoutMs);
++    let outcome;
++    try {
++      outcome = await new Promise((accept, reject) => {
++        child.once('error', reject);
++        child.once('exit', (code, signal) => accept({ code, signal }));
++      });
++    } finally { clearTimeout(timer); activeCommands.delete(child); }
++    Object.assign(row, { finishedAt: now(), exitCode: outcome.code, signal: outcome.signal, timedOut,
++      status: outcome.code === 0 && !timedOut ? 'passed' : 'failed', logSha256: (await hashFile(logPath)).sha256 });
++    await save();
++    if (!allowFailure) requireThat(row.status === 'passed', `${name} failed; see ${logPath}`);
++    return capture ? readFile(logPath, 'utf8') : row;
++  }
++
++  async function service(name, binary, args) {
++    const logPath = join(logDirectory, `${name}.log`);
++    const fd = openSync(logPath, 'wx', 0o600);
++    const child = spawn(binary, args, { cwd: workDirectory, env, detached: true, stdio: ['ignore', fd, fd] });
++    closeSync(fd);
++    const row = { name, binary, args, pid: child.pid, logPath, startedAt: now(), status: 'running' };
++    child.once('error', (error) => { row.status = 'failed'; row.error = error.message; });
++    child.once('exit', (exitCode, signal) => { Object.assign(row, { exitCode, signal, exitedAt: now(), status: stopping ? 'stopped' : 'exited' }); });
++    services.push({ child, row }); receipt.services.push(row); await save();
++    return row;
++  }
++
++  async function ready(label, check, timeoutMs = 180_000) {
++    const started = Date.now();
++    while (Date.now() - started < timeoutMs) {
++      if (stoppedSignal) throw new Error(`Interrupted by ${stoppedSignal}`);
++      const failed = services.find(({ row }) => row.status !== 'running');
++      requireThat(!failed, `Owned service exited before ${label}: ${failed?.row.name}; inspect its log`);
++      try { if (await check()) return; } catch { /* readiness can lag startup */ }
++      await delay(250);
++    }
++    throw new Error(`Timed out waiting for ${label}`);
++  }
++  const rpc = async (url, method, params = []) => {
++    const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' },
++      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: AbortSignal.timeout(5000) });
++    requireThat(response.ok, `${method}: HTTP ${response.status}`);
++    const body = await response.json(); requireThat(!body.error, `${method} returned an RPC error`); return body.result;
++  };
++  const httpOk = async (url) => (await fetch(url, { signal: AbortSignal.timeout(5000) })).ok;
++
++  try {
++    await requireAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]);
++    const requested = config.binaries ?? {};
++    binaries = {};
++    for (const [name, fallback] of Object.entries({
++      zolana: join(nativeRepo, 'zolana/target/debug/zolana'), xtask: join(nativeRepo, 'zolana/target/debug/xtask'),
++      photon: join(nativeRepo, 'target/debug/photon'), ringIndexer: join(nativeRepo, 'target/debug/ring-indexer'),
++      ringRpc: join(nativeRepo, 'target/debug/ring-rpc'), prover: join(APP_ROOT, 'target/spawn-room-prover'),
++      surfpool: 'surfpool', solana: 'solana', solanaKeygen: 'solana-keygen', npm: 'npm',
++    })) binaries[name] = await executable(requested[name], fallback);
++    const programSo = await realpath(resolve(config.programSo ?? join(APP_ROOT, 'target/deploy/custom_ring_program.so')));
++    const sppSo = await realpath(join(nativeRepo, 'zolana/target/deploy/shielded_pool_program.so'));
++    const registrySo = await realpath(join(nativeRepo, 'zolana/target/deploy/spr_user_registry.so'));
++    const storageSo = await realpath(join(nativeRepo, 'target/deploy/storage_program.so'));
++    referenceHostRoot = await realpath(resolve(config.referenceHostRoot ?? join(APP_ROOT, '../backroom-rings/backrooms/reference-host')));
++    requireThat(git(referenceHostRoot, 'rev-parse', 'HEAD') === BACKROOMS_PIN, 'Reference host checkout does not match the reviewed Backrooms pin');
++    requireThat(!git(referenceHostRoot, 'status', '--porcelain=v1', '--untracked-files=all', '--ignore-submodules=none'), 'Reference host checkout must remain clean');
++    receipt.backroomsRevision = BACKROOMS_PIN;
++    await access(join(APP_ROOT, 'node_modules/vitest/vitest.mjs'));
++    await access(join(referenceHostRoot, 'authority.ts'));
++    await access(join(referenceHostRoot, '../node_modules'));
++    receipt.sources = { before: { application: await sourceManifest(APP_ROOT), referenceHost: await sourceManifest(dirname(referenceHostRoot)) } };
++    receipt.referenceHostDependencies = {};
++    for (const name of ['package.json', 'package-lock.json']) {
++      receipt.referenceHostDependencies[name] = await hashFile(join(referenceHostRoot, '..', name));
++    }
++    receipt.serviceBindings = { default: '127.0.0.1', photon: '0.0.0.0 (fixed by pinned upstream source; use an isolated runtime)' };
++    receipt.artifacts = {};
++    for (const [name, path] of Object.entries({ appProgram: programSo, sppProgram: sppSo, userRegistryProgram: registrySo,
++      storageProgram: storageSo, ...binaries })) receipt.artifacts[name] = await hashFile(path);
++    receipt.keys = await prepareKeys(config, nativeRepo, join(workDirectory, 'proving-keys'));
++    Object.assign(env, { SURFPOOL_BIN: binaries.surfpool, ZOLANA_PHOTON_BIN: binaries.photon,
++      RING_RPC_BIN: binaries.ringRpc, SPAWN_REFERENCE_HOST_ROOT: referenceHostRoot });
++    await save();
++
++    const idsOutput = await command('program-ids', binaries.xtask, ['program-ids'], { capture: true, cwd: join(nativeRepo, 'zolana') });
++    const ids = {};
++    for (const line of idsOutput.trim().split('\n')) {
++      const match = /^([A-Z_]+)=([1-9A-HJ-NP-Za-km-z]{32,44})$/.exec(line);
++      if (match) ids[match[1]] = match[2];
++    }
++    for (const name of ['SHIELDED_POOL_PROGRAM_ID', 'USER_REGISTRY_PROGRAM_ID', 'DEFAULT_TREE_ADDRESS']) requireThat(ids[name], `xtask did not provide ${name}`);
++    const accounts = join(workDirectory, 'accounts');
++    await command('protocol-snapshot', binaries.xtask, ['generate-account-snapshots', '--deploy-dir', dirname(sppSo), '--accounts-dir', accounts], { cwd: join(nativeRepo, 'zolana') });
++    const actors = {};
++    for (const name of ['upgradeAuthority', 'feePayer', 'publisher']) {
++      const path = join(workDirectory, `${name}-keypair.json`);
++      await command(`keypair-${name}`, binaries.solanaKeygen, ['new', '--no-bip39-passphrase', '--silent', '--outfile', path]);
++      await chmod(path, 0o600);
++      const address = (await command(`pubkey-${name}`, binaries.solanaKeygen, ['pubkey', path], { capture: true })).trim();
++      requireThat(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address), 'Keygen did not return a public address');
++      actors[name] = { path, address };
++    }
++    receipt.actors = Object.fromEntries(Object.entries(actors).map(([role, actor]) => [role, actor.address]));
++    validatorStarted = true;
++    await command('validator-start', binaries.zolana, ['dev', 'start', '--local', '--skip-prover',
++      '--rpc-port', String(ports.rpc), '--photon-port', String(ports.photon), '--photon-start-slot', '0',
++      '--gossip-host', '127.0.0.1', '--account-dir', accounts,
++      '--sbf-program', ids.SHIELDED_POOL_PROGRAM_ID, sppSo, '--sbf-program', ids.USER_REGISTRY_PROGRAM_ID, registrySo,
++      '--sbf-program', 'rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL', storageSo,
++      '--upgradeable-program', ringProgramId, programSo, actors.upgradeAuthority.address], { timeoutMs: 300_000, cwd: workDirectory });
++    await ready('validator', async () => await rpc(urls.rpc, 'getHealth') === 'ok');
++    await ready('Photon indexing', async () => Number.isSafeInteger(await rpc(urls.photon, 'getIndexerSlot')));
++    await service('ring-indexer', binaries.ringIndexer, ['--db-url', `sqlite://${join(workDirectory, 'ring-indexer.sqlite')}?mode=rwc`,
++      '--rpc-url', urls.rpc, '--photon-url', urls.photon, '--bind', '127.0.0.1', '--port', String(ports.ringIndexer), '--start-slot', '0']);
++    await ready('ring indexer', () => httpOk(`${urls.ringIndexer}/ready`));
++    await service('prover', binaries.prover, ['start', '--prover-address', `127.0.0.1:${ports.prover}`,
++      '--metrics-address', `127.0.0.1:${ports.metrics}`, '--keys-dir', join(workDirectory, 'proving-keys'),
++      '--indexer-url', urls.ringIndexer, '--indexer-concurrency', '1', '--transfer-concurrency', '1', '--batch-max', '1',
++      '--server-only', '--auto-download=false']);
++    await ready('app prover', () => httpOk(`${urls.prover}/health`));
++    const kms = await service('localnet-kms', process.execPath, [join(APP_ROOT, 'tools/localnet-kms.mjs'), '0']);
++    let kmsEndpoint;
++    await ready('local KMS', async () => {
++      kmsEndpoint = (await readFile(kms.logPath, 'utf8')).trim();
++      return /^127\.0\.0\.1:\d+$/.test(kmsEndpoint);
++    }, 30_000);
++    env.RING_RPC_LOCALNET_KMS = kmsEndpoint;
++    const custodyHelper = join(APP_ROOT, 'tools/localnet-custody.sh');
++    const writer = JSON.parse(await command('enrollment-writer', custodyHelper, ['signer'], { capture: true }));
++    const genesis = await rpc(urls.rpc, 'getGenesisHash');
++    const custody = JSON.parse(await command('rpc-custody', custodyHelper, ['rpc', genesis, 'derived', JSON.stringify(writer), 'relay'], { capture: true, recordArgs: false }));
++    const custodyPath = join(workDirectory, 'rpc-custody.json');
++    await writeJson(custodyPath, custody);
++    for (const [role, address] of [...Object.entries(actors).map(([role, actor]) => [role, actor.address]),
++      ...['storage_authority', 'fee_payer', 'enrollment_applier'].map((role) => [role, custody[role]?.address])]) {
++      requireThat(typeof address === 'string', `No local public address for ${role}`);
++      await command(`fund-${role}`, binaries.solana, ['airdrop', '100', address, '--url', urls.rpc, '--keypair', actors.feePayer.path]);
++    }
++    const ringOrigin = 'http://localhost:3000';
++    await service('ring-rpc', binaries.ringRpc, ['serve', '--bind', '127.0.0.1', '--port', String(ports.ringRpc),
++      '--indexer-url', urls.ringIndexer, '--rpc-url', urls.rpc, '--custody', custodyPath, '--localnet-kms', kmsEndpoint,
++      '--allow-origin', ringOrigin, '--webauthn-rp-id', 'localhost',
++      '--store-url', `sqlite://${join(workDirectory, 'ring-rpc.sqlite')}?mode=rwc`, '--prover-url', urls.prover,
++      '--reader-grants', 'database', '--enrollment-apply-ring', ringProgramId, '--enrollment-budget-lamports', '1000000000']);
++    await ready('RingRPC', () => httpOk(`${urls.ringRpc}/health`));
++    const journeyConfig = { rpcUrl: urls.rpc, photonUrl: urls.photon, ringIndexerUrl: urls.ringIndexer,
++      proverUrl: urls.prover, ringRpcUrl: urls.ringRpc, ringOrigin, enrollmentWriter: writer.address,
++      ringProgramId, defaultTreeAddress: ids.DEFAULT_TREE_ADDRESS, upgradeAuthorityKeypairPath: actors.upgradeAuthority.path,
++      feePayerKeypairPath: actors.feePayer.path, publisherKeypairPath: actors.publisher.path, workDirectory };
++    env.SPAWN_JOURNEY_CONFIG = join(workDirectory, 'journey-config.json');
++    await writeJson(env.SPAWN_JOURNEY_CONFIG, journeyConfig);
++    const vitestPath = join(workDirectory, 'vitest-results.json');
++    await command('journey', binaries.npm, ['exec', '--no', '--', 'vitest', 'run', '--config', 'sdk-tests/spawn-room/vitest.config.ts',
++      'sdk-tests/spawn-room/localnet-journey.test.ts', '--maxWorkers=1', '--reporter=json', `--outputFile=${vitestPath}`], { timeoutMs: 3_600_000 });
++    const evidencePath = join(workDirectory, 'journey-evidence.json');
++    const evidence = await json(evidencePath);
++    validateJourneyResult(await json(vitestPath), evidence);
++    receipt.journey = { evidencePath, evidenceSha256: (await hashFile(evidencePath)).sha256, steps: evidence.steps,
++      vitestPath, vitestSha256: (await hashFile(vitestPath)).sha256 };
++    receipt.status = 'passed';
++  } catch (error) {
++    receipt.status = 'failed'; receipt.error = error instanceof Error ? error.message : String(error);
++  } finally {
++    stopping = true;
++    for (const { child, row } of services.toReversed()) {
++      if (child.exitCode === null && child.signalCode === null && child.pid) {
++        try { process.kill(-child.pid, 'SIGTERM'); } catch (error) { if (error.code !== 'ESRCH') receipt.cleanup.push({ name: row.name, error: error.message }); }
++        await Promise.race([new Promise((done) => child.once('exit', done)), delay(5000)]);
++        if (child.exitCode === null && child.signalCode === null) {
++          try { process.kill(-child.pid, 'SIGKILL'); } catch { /* already exited */ }
++          await Promise.race([new Promise((done) => child.once('exit', done)), delay(5000)]);
++        }
++      }
++      receipt.cleanup.push({ name: row.name, stopped: child.exitCode !== null || child.signalCode !== null });
++    }
++    if (validatorStarted && binaries) {
++      try {
++        const stop = await command('validator-stop', binaries.zolana, ['dev', 'start', '--local', '--stop', '--skip-prover',
++          '--rpc-port', String(ports.rpc), '--photon-port', String(ports.photon)], { allowFailure: true, timeoutMs: 60_000, cwd: workDirectory });
++        receipt.cleanup.push({ name: 'scoped-validator-and-photon', stopped: stop.exitCode === 0 });
++      } catch (error) { receipt.cleanup.push({ name: 'scoped-validator-and-photon', stopped: false, error: error.message }); }
++    }
++    try { await requireAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]); }
++    catch { receipt.cleanup.push({ name: 'owned-port-release', stopped: false }); }
++    if (receipt.cleanup.some((item) => item.stopped === false || item.error)) {
++      receipt.status = 'failed'; receipt.error ??= 'Owned service cleanup did not finish';
++    }
++    receipt.finishedAt = now();
++    for (const { row } of services) { try { row.logSha256 = (await hashFile(row.logPath)).sha256; } catch { /* spawn may have failed */ } }
++    if (receipt.sources && referenceHostRoot) {
++      try {
++        receipt.sources.after = { application: await sourceManifest(APP_ROOT), referenceHost: await sourceManifest(dirname(referenceHostRoot)) };
++        receipt.sources.unchanged = ['application', 'referenceHost'].every((name) => receipt.sources.before[name].sha256 === receipt.sources.after[name].sha256);
++        receipt.sources.appZolanaUnchanged = git(join(APP_ROOT, 'zolana'), 'rev-parse', 'HEAD') === ZOLANA_PIN &&
++          !git(join(APP_ROOT, 'zolana'), 'status', '--porcelain=v1', '--untracked-files=all', '--ignore-submodules=none');
++        receipt.sources.referenceHostUnchanged = git(referenceHostRoot, 'rev-parse', 'HEAD') === BACKROOMS_PIN &&
++          !git(referenceHostRoot, 'status', '--porcelain=v1', '--untracked-files=all', '--ignore-submodules=none');
++        receipt.sources.unchanged &&= receipt.sources.appZolanaUnchanged && receipt.sources.referenceHostUnchanged;
++        if (!receipt.sources.unchanged) { receipt.status = 'failed'; receipt.error ??= 'Application or reference-host source changed during this run'; }
++      } catch (error) { receipt.status = 'failed'; receipt.error ??= `Source receipt failed: ${error.message}`; }
++    }
++    await save();
++    process.off('SIGINT', onInt); process.off('SIGTERM', onTerm);
++  }
++  console.log(`Localnet ${receipt.status}: ${receiptPath}`);
++  if (receipt.status !== 'passed') throw new Error(receipt.error ?? 'Localnet journey failed');
++  return receipt;
++}
++
++if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
++  const args = process.argv.slice(2);
++  if (args.length === 1 && ['--help', '-h'].includes(args[0])) {
++    console.log('Usage: node tools/run-spawn-room-localnet.mjs --config CONFIG.json\n' +
++      'Required config: {"disposableLocalnet":true,"nativeRepo":"/absolute/clean/custom-rings"}.\n' +
++      'Optional: applicationKeysDirectory, nativeKeysDirectory, programId, programSo, referenceHostRoot, workParent, ports, binaries.\n' +
++      'Build prerequisites and prepare the application keys first. See tools/spawn-room-localnet.md.');
++  } else {
++    try {
++      requireThat(args.length === 2 && args[0] === '--config' && isAbsolute(args[1]), 'Expected --config /absolute/path.json; use --help');
++      await runLocalnet(await json(args[1]));
++    } catch (error) { console.error(error.message); process.exitCode = 1; }
++  }
++}
+diff --git a/tools/run-spawn-room-localnet.test.mjs b/tools/run-spawn-room-localnet.test.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..147dd5645657abe2a978cdc8911947f8769a63c8
+--- /dev/null
++++ b/tools/run-spawn-room-localnet.test.mjs
+@@ -0,0 +1,42 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { createServer, connect } from 'node:net';
++import { normalizedPorts, requireAvailablePorts, validateJourneyResult } from './run-spawn-room-localnet.mjs';
++
++const report = () => ({ success: true, numPassedTests: 1, numFailedTests: 0, numPendingTests: 0, numTodoTests: 0,
++  testResults: [{ assertionResults: [{ status: 'passed' }] }] });
++const evidence = () => ({ schema: 'spawn-room-localnet-journey-v1', status: 'passed',
++  steps: ['create', 'advance', 'recovery', 'reuse'].map((name) => ({ name, status: 'passed' })) });
++
++test('no tests, skipped tests and incomplete chain journeys cannot become a passed run', () => {
++  assert.doesNotThrow(() => validateJourneyResult(report(), evidence()));
++  assert.throws(() => validateJourneyResult({ ...report(), numPassedTests: 0 }, evidence()));
++  assert.throws(() => validateJourneyResult({ ...report(), numPendingTests: 1 }, evidence()));
++  assert.throws(() => validateJourneyResult({ ...report(), testResults: [] }, evidence()));
++  assert.throws(() => validateJourneyResult(report(), { ...evidence(), steps: evidence().steps.slice(0, 3) }));
++  assert.throws(() => validateJourneyResult(report(), { ...evidence(), status: 'failed' }));
++  assert.throws(() => validateJourneyResult(report(), { ...evidence(), steps: [...evidence().steps, { name: 'negative-cases', status: 'failed' }] }));
++});
++
++test('port preflight refuses an occupied socket and leaves its owner running', async () => {
++  const server = createServer((socket) => socket.end('owned-by-test'));
++  await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
++  try {
++    const port = server.address().port;
++    await assert.rejects(requireAvailablePorts([port]), { code: 'EADDRINUSE' });
++    const result = await new Promise((accept, reject) => {
++      const socket = connect(port, '127.0.0.1');
++      let data = '';
++      socket.on('data', (chunk) => { data += chunk; });
++      socket.on('end', () => accept(data));
++      socket.on('error', reject);
++    });
++    assert.equal(result, 'owned-by-test');
++  } finally { await new Promise((done) => server.close(done)); }
++});
++
++test('RPC auxiliary ports are part of the collision and range checks', () => {
++  assert.throws(() => normalizedPorts({ photon: 42900 }), /distinct/);
++  assert.throws(() => normalizedPorts({ rpc: 65535 }), /range/);
++  assert.throws(() => normalizedPorts({ rpc: '42899' }), /range/);
++});
+diff --git a/tools/spawn-room-localnet.md b/tools/spawn-room-localnet.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..f27491fbbce0b44b7ac2961d7edea6ee36c4d269
+--- /dev/null
++++ b/tools/spawn-room-localnet.md
+@@ -0,0 +1,137 @@
++# Run the experimental room journey locally
++
++`run-spawn-room-localnet.mjs` runs a fresh local validator, Photon, ring indexer,
++the application prover, and RingRPC with the pinned in-memory local KMS. It then
++runs the TypeScript create → advance → recover → reuse journey and stops the
++processes it owns. Services and tests share one parent process, which also works
++in executors that isolate the loopback network between separate commands.
++
++This profile uses the two explicitly generated local proving keys. The runner
++does not create proving keys, download dependencies, or call a hosted Solana
++RPC. It does not change the upstream baseline source or deploy remotely.
++
++## Prerequisites
++
++Use the Go version in `prover/go.mod`, the Rust toolchain in
++`rust-toolchain.toml`, and SBF platform tools v1.54. Install the native compiler
++dependencies required by the pinned upstream checkout. On smaller machines,
++build with `CARGO_BUILD_JOBS=1`, `CARGO_PROFILE_DEV_DEBUG=0`, and
++`CARGO_PROFILE_TEST_DEBUG=0`.
++
++Keep a separate clean native checkout at custom-rings commit
++`02bca33729051798834ecbb4d94e968cdc0ef9b8`, with its Zolana submodule at
++`0fe4f952182b39464d472c52c40b3febe6cbd9ec`. In that checkout, build the native
++prerequisites and fetch the custom-ring catalog:
++
++```sh
++JUST_NO_DOTENV=true just build-programs build-localnet-tools fetch-custom-ring-keys
++```
++
++The native cache needs `transfer_ring_2_2.key` for genesis (included by the
++custom-ring fetch command), plus `transfer_eddsa_ring_1_2.key` and
++`transfer_eddsa_ring_2_2.key` for the hidden-owner rail. Obtain those exact artifacts using the pinned
++Zolana key lock and downloader; do not download the full SPP catalog. The runner
++checks the SHA256 and size of every cached native key against the two pinned
++lockfiles before serving any keys.
++
++In this application checkout, install the pinned npm dependencies, prepare the
++application keys/program/prover with `tools/prepare-spawn-room-localnet.sh`, and
++install the pinned npm dependencies in the sibling `backroom-rings/backrooms`
++directory. That clean checkout must be at Backrooms commit
++`08822c65254cd73c5f2dccbdf182ce1df2c7510a`. The journey imports its real
++`reference-host` and Flue source; the runner verifies the revision and clean
++status before and after the run.
++
++The application preparation command is expensive on its first run. It creates
++the two separate experimental keys, runs their full proof tests, exports the
++matching verification keys and public proof vectors, and builds the explicit
++localnet application profile. Preserve its ignored `target/spawn-room-keys`
++directory between runs. Never substitute these keys or the app SBF artifact for
++the upstream baseline catalog or program.
++
++## One command for services and journey
++
++Create a JSON config outside tracked source, using absolute paths:
++
++```json
++{
++  "disposableLocalnet": true,
++  "nativeRepo": "/path/to/clean/custom-rings",
++  "referenceHostRoot": "/path/to/backroom-rings/backrooms/reference-host",
++  "binaries": {
++    "surfpool": "/path/to/surfpool",
++    "solana": "/path/to/solana",
++    "solanaKeygen": "/path/to/solana-keygen"
++  }
++}
++```
++
++Then run:
++
++```sh
++node tools/run-spawn-room-localnet.mjs --config /absolute/path/to/localnet-run.json
++```
++
++The default app program ID is
++`2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y`. The default artifact is
++`target/deploy/custom_ring_program.so`, and the default prover is
++`target/spawn-room-prover`. Native binaries are taken from the clean checkout's
++`target/debug` or `zolana/target/debug`. Every executable can be supplied under
++`binaries`: `zolana`, `xtask`, `photon`, `ringIndexer`, `ringRpc`, `prover`,
++`surfpool`, `solana`, `solanaKeygen`, and `npm`.
++
++Other optional config fields are `programId`, `programSo`,
++`applicationKeysDirectory`, `nativeKeysDirectory`, `workParent`, and `ports`.
++The default application key directory is `target/spawn-room-keys`; native keys
++default to the clean checkout's `zolana/prover/server/proving-keys`. No large
++keys are copied: the fresh served-key directory contains symlinks to validated
++immutable artifacts.
++
++| Service | Default port |
++| --- | ---: |
++| Validator RPC | 42899 |
++| Validator websocket / auxiliary | 42900 / 42901 |
++| Photon | 42784 |
++| Ring indexer | 42786 |
++| RingRPC | 42785 |
++| Application prover | 45001 |
++| Prover metrics | 51998 |
++
++All client URLs and configurable service binds use loopback. The pinned Photon
++binary hardcodes its API listener to `0.0.0.0` and has no bind option; run this
++profile inside an isolated runtime without publishing that port. The receipt
++records this inherited limitation. The local KMS takes a free loopback port.
++An occupied port is a failure; the runner never kills another service to
++take its port. It generates fresh upgrade-authority, fee-payer, and publisher
++keypairs, and funds them only through its own validator's airdrop endpoint.
++The journey creates its records registry, ring configuration, enrollment,
++application state, and native encrypted records using the supplied local
++configuration.
++
++## Evidence and failure handling
++
++Each run creates a new private `target/spawn-room-runs/journey-*` directory and
++prints its path immediately. The directory contains:
++
++- `run-receipt.json`: started/completed commands, artifact and key hashes,
++  tracked and untracked source manifests, reference-host identity, resource
++  settings, service ownership, cleanup status, and the final result.
++- `journey-evidence.json`: the actual journey's named checks and transaction
++  signatures, written by the TypeScript test.
++- `vitest-results.json`: the test runner's machine-readable result.
++- Private service logs, fresh local keypairs, local databases, and account
++  snapshots. Do not commit the whole directory.
++
++A run passes only when Vitest executes at least one passing test with no skips,
++the journey reports passed `create`, `advance`, `recovery`, and `reuse` steps,
++owned services stop successfully, and implementation sources remain unchanged
++during the run. A running receipt after an interrupted
++executor is incomplete evidence, not a pass. An unsuccessful run retains its
++logs for diagnosis and a fresh command creates a new isolated run directory.
++These application receipts are separate from the upstream CR01 baseline.
++
++The lightweight runner checks can be repeated without starting services:
++
++```sh
++node --test tools/run-spawn-room-localnet.test.mjs
++```

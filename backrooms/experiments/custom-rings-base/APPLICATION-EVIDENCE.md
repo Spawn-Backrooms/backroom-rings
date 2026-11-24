@@ -2,7 +2,7 @@
 
 This checkpoint contains the implemented combined circuit and dedicated program,
 actual generated proofs, strict prover endpoints, cross-language proof checks,
-and a successful SBF build. It supersedes the initial uncompiled two-file
+a successful SBF build, and the reviewed SDK/native integration and localnet runner. It supersedes the initial uncompiled two-file
 candidate. **The full live validator journey is still pending.** The earlier
 composition oracle remains a historical synthetic model, not proof evidence.
 
@@ -19,12 +19,14 @@ SHA-256 digests. The private requests and large proving keys are not committed.
 | Full combined hidden advance | Actual Groth16 proof generated and verified; 618,360 constraints. Mutating either public input was refused. |
 | Full visible genesis | Actual Groth16 proof generated and verified; 594,484 constraints. Mutating either public input was refused. |
 | Strict request boundary | Full honest Go witness → JSON → strict server assignment preserved every private/public witness byte and solved the complete relation. Missing, duplicate, unknown, malformed and noncanonical fields are refused by focused schema tests. |
-| Actual SDK request construction | Both real TypeScript staging-pipeline requests passed strict decoding, assignment and the entire Go circuit relation (advance 6.67 seconds, genesis 5.34 seconds). This is a circuit solve, not validator settlement. |
+| Actual SDK request construction | Both real TypeScript staging-pipeline requests passed strict decoding, assignment and the entire Go circuit relation (final fixture run: advance 8.71 seconds, genesis 9.00 seconds; exact request hashes retained). This is a circuit solve, not validator settlement. |
 | Local HTTP prover | Both application endpoints produced actual proofs verified against their exact keys; wrong-family endpoint requests were refused. |
 | Rust proof interoperability | Rust verified both actual Go proof vectors with their two public inputs, compiled keys and BSB22 commitment/proof-of-knowledge handling. |
 | Rust regressions | 40 interface tests, 3 program entrypoint tests and 2 actual proof-vector tests passed. Generic and unkeyed application configurations built successfully. |
 | Application SBF | Dedicated program built successfully; binary 526,024 bytes, SHA-256 `81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d`. |
-| Pristine upstream source baseline | `just check-all` passed against the exact Custom Rings/Zolana pins. Program SBF and prover builds passed; remaining native services and validator tests are a separate gate. |
+| Pristine upstream source baseline | `just check-all` passed against the exact Custom Rings/Zolana pins. Program SBF, prover, Zolana CLI and Photon builds passed; remaining services and validator tests are a separate gate. |
+| SDK/native integration | 10 focused SDK tests and 2 real native restart tests passed; SDK/integration type checks and focused lint passed. Independent runner checks passed 3/3. |
+| Signed SDK transaction fixtures | Visible genesis: 2,740 bytes and 2 signers. Hidden advance: 2,639 bytes and 1 payer signer; writer/marker absent from decoded accounts. Both fit the pinned 4,096-byte ceiling. These use fixed-size fixture proofs; live execution is separate. |
 | Overlay integrity | Patch applied to a temporary Git index at the exact base, and every resulting file matched the manifest. The portable helper also passed its clean-checkout preflight against the untouched baseline. |
 
 Each application circuit has two ordinary public inputs and one private BSB22
@@ -59,20 +61,34 @@ established actionable Critical, Important or Minor defect. Read
 [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md) for the reviewed properties and
 limits. This is not a formal proof of soundness or a production security audit.
 
-## Integration still being qualified
+## Reviewed SDK/native integration and pending live execution
 
-The experimental SDK/native adapter has passed local codec, encryption,
+The complete 52-file patch now includes the experimental SDK, native adapter,
+focused tests and same-parent localnet runner. Local codec, recipient encryption,
 request/frame, encrypted-record restart and deterministic seeded Flue reuse
-checks. Those integration files are still being finalized and independently
-reviewed and are not part of this core-only checkpoint. The live runner must
-settle a real genesis and hidden advance, recover the note that actually landed,
-restart the native host and wallet, use the retained lesson to change the next
-procedure, and settle the next authorized advance. On-chain refusal and atomic
-rollback evidence remain required as well.
+checks passed. The actual host retains the original result and acceptance nonce
+across restart without rerunning a completed episode. It then uses the accepted
+lesson to switch from procedure 0 (value 9, scores `[40,50]` after feedback) to
+procedure 1 (value 5, scores `[40,60]` after the next acceptance).
+
+[SDK-NATIVE-REVIEW.md](SDK-NATIVE-REVIEW.md) records the independent review. Three
+Minor findings were fixed: source provenance for new files/submodules/native
+host, native retry receipt protocol compatibility, and the reported lesson
+actually used. No outstanding Critical or Important defect was established.
+
+The live runner must still settle and recover real notes for two independently
+enrolled writers, then execute the primary create/hidden-advance/restart/reuse
+journey. It requires a single payer signer with no explicit writer/room-marker
+account in the entire hidden transaction. It also requires ledger-confirmed
+duplicate genesis, generic bypass, replay and revoked-grant failures, unchanged
+accepted note/account snapshots, and retained originals/grants. The revocation
+test must first successfully simulate its coherent proof before removing its
+live admission. These are implemented test requirements, not claimed validator
+results. Source files are frozen during execution for before/after manifests.
 
 The complete upstream Go suite is running with an explicit 60-minute package
 timeout and constrained parallelism after a resource-limited run hit Go's default
-600-second timeout. No complete-suite pass is claimed yet. The two specifically
+600-second timeout. The policy package has now passed in 1,310 seconds under that explicit timeout; no complete-suite pass is claimed yet. The two specifically
 named upstream anonymous validator cases also remain pending; build success or
 an empty/skipped test selection cannot satisfy them.
 

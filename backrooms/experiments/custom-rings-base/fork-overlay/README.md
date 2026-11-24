@@ -25,7 +25,7 @@ Use a clean recursive checkout on an isolated review branch with these exact pin
 | Backrooms native runtime used by integration | `08822c65254cd73c5f2dccbdf182ce1df2c7510a` |
 
 `application-core.patch` includes the dedicated program dispatcher changes and
-additive Go/Rust sources. Its manifest records the patch SHA-256 and every
+additive Go/Rust sources, the experimental SDK/native adapter, and its localnet journey. Its manifest records the patch SHA-256 and every
 resulting file's SHA-256. Apply it once to the clean base; do not copy the
 obsolete initial two-file candidate first.
 
@@ -81,11 +81,28 @@ setup**. They require the explicit `spawn-room-v1-localnet-keys` feature and mus
 never authorize a production deployment. Ordinary upstream and v0 keys are
 unchanged. The profile without its explicit key feature fails closed.
 
+## Run the complete local journey
+
+The patch includes `tools/spawn-room-localnet.md` with prerequisites and a
+concrete configuration. After preparation, run all services and the test in the
+same parent process:
+
+```sh
+node tools/run-spawn-room-localnet.mjs --config /absolute/path/to/localnet-run.json
+```
+
+The runner starts a fresh local validator and services, verifies key/source
+provenance, uses the real pinned Backrooms native host, records executed tests
+and chain observations, then stops only the processes it owns. Read the guide
+before running. Private service logs, local keys and encrypted databases remain
+under ignored `target/`; publish only a reviewed evidence extract.
+
 ## Review and remaining integration
 
 [APPLICATION-REVIEW.md](../APPLICATION-REVIEW.md) records the independent core
-source review and its scope. The SDK/native runtime and full validator journey
-require their own final evidence. A native root publisher admits exact grants;
+source review. [SDK-NATIVE-REVIEW.md](../SDK-NATIVE-REVIEW.md) records the completed
+SDK/native/harness source review and corrected findings. Actual full-validator
+execution remains a separate gate. A native root publisher admits exact grants;
 the circuit does not prove the truth of an original external result. Owner
 authorization binds encrypted transaction data, but a malicious authorized
 writer can still withhold or corrupt its own recovery payload.
