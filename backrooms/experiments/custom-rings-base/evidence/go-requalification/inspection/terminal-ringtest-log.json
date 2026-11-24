@@ -1,0 +1,186 @@
+{
+  "schema": "cr01-upstream-terminal-log-content-inspection-v1",
+  "recordedAt": "2026-11-24T13:22:37.188257+00:00",
+  "scope": "Factual content/provenance inspection of one terminal upstream CR01 Go ringtest execution packet. This inspector only read source and completed execution files; it did not run tests/proofs, control the root session, change source, or publish.",
+  "notASecurityReview": true,
+  "excluded": [
+    "Application overlay and logs",
+    "Previously blocked latest application source/observer review",
+    "Other packages and any whole-suite completion claim",
+    "Production qualification"
+  ],
+  "previousInspectionsUnchanged": {
+    "terminal-logs-14-packages.json": {
+      "path": "context/go-recovery/inspection/terminal-logs-14-packages.json",
+      "bytes": 44281,
+      "sha256": "a0c894031e9f831b90316c15ee5711c1bad6de281e68928daab5a84e096257d4"
+    },
+    "terminal-policy-log.json": {
+      "path": "context/go-recovery/inspection/terminal-policy-log.json",
+      "bytes": 10311,
+      "sha256": "56a518cbf02cd3c434c7a65d17e0033ec3e400449bfd409ea30e787d43901bc7"
+    },
+    "terminal-ring-log.json": {
+      "path": "context/go-recovery/inspection/terminal-ring-log.json",
+      "bytes": 11198,
+      "sha256": "e9ae2b2e6246056778d5ac3309e9b3778cd3ebf47545cb841a3baba9f194b919"
+    }
+  },
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec"
+  },
+  "method": [
+    "Recomputed complete log, stderr and receipt hashes and sizes only after a terminal receipt.",
+    "Independently counted every JSONL outcome and compared with the receipt.",
+    "Read pinned top-level test/compile/fixture callsites and verified their exact Git blob identities.",
+    "Reported any non-status output as unclassified instead of assuming its provenance."
+  ],
+  "interpretation": {
+    "go_status_and_result": "Only test lifecycle/name/duration and package-result lines are classified as Go status output.",
+    "pinnedTestFixtureCallsites": "prove_test.go calls the fixed ringaudit.NewSection, ringpolicy.Confidential and ringtransfer.Hidden fixtures. Its requireProves helper compiles, performs fresh setup/prove/verify, then checks that verification rejects a changed public input. This describes the unchanged upstream test path, not a separate review or production qualification.",
+    "defaultSkipCorrespondence": {
+      "actualSkippedTests": [],
+      "topLevelTestFileExplicitSkipCalls": 0,
+      "unmatchedActualSkips": []
+    }
+  },
+  "counts": {
+    "terminalPackagesInspected": 1,
+    "outputLinesByCategory": {
+      "go_status_and_result": 6
+    },
+    "actualSkippedTests": 0,
+    "unclassifiedOutputLines": 0,
+    "stderrBytes": 0
+  },
+  "sources": {
+    "prover/ringtest/prove_test.go": {
+      "path": "custom-rings-base/prover/ringtest/prove_test.go",
+      "bytes": 2082,
+      "sha256": "45f3eceaf556fe175513065518c94f31ee5a1718c1e7ae7198ba07bbde451f8f",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "92d079f5f56d1e169a9e7a9d95bb86c71533c739",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringkey/ringkey.go": {
+      "path": "custom-rings-base/prover/ringtest/ringkey/ringkey.go",
+      "bytes": 1624,
+      "sha256": "3642b7ca382ab98d504d65ee3d5aa21caab875eeac8e6aa131acaf3c0b4097c1",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "7d8f4ff8df86102102067a91dab7386bd470ea9e",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringaudit/section.go": {
+      "path": "custom-rings-base/prover/ringtest/ringaudit/section.go",
+      "bytes": 13244,
+      "sha256": "913f6595688c267f5aee3b8505792342125a1a4b2c7e99b7223bab5836f84f08",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "1ddc551d9741867892d82b6aadc964dfc4ad26f6",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringpolicy/world.go": {
+      "path": "custom-rings-base/prover/ringtest/ringpolicy/world.go",
+      "bytes": 5935,
+      "sha256": "21e7f34a233693eb99d9794ccc76da4f5d8a8845e1372a622cf1d2860c3f56f4",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "e909c16fc2f5b0e436ebbc4e7374fa25d18327bd",
+      "matchesPinnedBlob": true
+    },
+    "prover/ringtest/ringtransfer/anonymous.go": {
+      "path": "custom-rings-base/prover/ringtest/ringtransfer/anonymous.go",
+      "bytes": 2786,
+      "sha256": "a1c54864fa300378ae07e7ce6f36163436872c3df2bb3f1cd7889522165cf7b1",
+      "commit": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "gitBlob": "394bb8773ecfb96a8a9ffcf7aaf249416e6e9fc2",
+      "matchesPinnedBlob": true
+    }
+  },
+  "logsBySha256": {
+    "a51216ed08e7f708e19ae4f92a82f67626eb163266e959aff3d96cf4475808e0": {
+      "package": "github.com/helius-labs/zolana-custom-rings/prover/ringtest",
+      "receiptStatus": "passed",
+      "exitCode": 0,
+      "durationSeconds": 422.435,
+      "receipt": {
+        "path": "context/go-recovery/packages/ringtest-20261124T131450Z.json",
+        "bytes": 5283,
+        "sha256": "b40bc013cdb06a99aed65f5a5e778147e57bbe5ac4733ddee461cb2e50c2c997"
+      },
+      "log": {
+        "path": "context/go-recovery/packages/ringtest-20261124T131450Z.jsonl",
+        "bytes": 2426,
+        "sha256": "a51216ed08e7f708e19ae4f92a82f67626eb163266e959aff3d96cf4475808e0"
+      },
+      "stderr": {
+        "path": "context/go-recovery/packages/ringtest-20261124T131450Z.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "classification": "empty"
+      },
+      "eventCount": 12,
+      "testEvents": {
+        "pass": 2,
+        "fail": 0,
+        "skip": 0
+      },
+      "topLevelPassCount": 2,
+      "topLevelPassed": [
+        "TestAnonymousTransferProves",
+        "TestAuditAndPolicySectionsProve"
+      ],
+      "terminalActions": [
+        "pass"
+      ],
+      "unterminatedTests": [],
+      "individualTestOutcomes": [
+        {
+          "test": "TestAuditAndPolicySectionsProve",
+          "action": "pass",
+          "elapsedSeconds": 139.06
+        },
+        {
+          "test": "TestAnonymousTransferProves",
+          "action": "pass",
+          "elapsedSeconds": 280.49
+        }
+      ],
+      "actualSkippedTests": [],
+      "outputLineCategories": {
+        "go_status_and_result": 6
+      },
+      "unclassifiedOutput": [],
+      "independentCountsMatchReceipt": {
+        "eventCount": true,
+        "testEvents": true,
+        "topLevelPassCount": true,
+        "terminalActions": true
+      },
+      "sourceBefore": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      },
+      "sourceAfter": {
+        "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true,
+        "lockfiles": {
+          "prover/go.mod": "0fe6ad28b3f333119598bea27659b1544763d0c0d3440b78c2345f44df82a750",
+          "prover/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "zolana/prover/server/go.mod": "729aa755ff815c114c79bc2c55f389cd64f9064232450221b3a264cb1e1b7db4",
+          "zolana/prover/server/go.sum": "21ae56a58501b7e458db52a7aa37f8e4519361cdd5581f2fca942bc130a57527",
+          "prover/ring/proving-keys.lock": "71a44740abcfc866e04b5045f1835f401527f77f3861f7fa01046502a3c636bc"
+        }
+      }
+    }
+  },
+  "unclassifiedOutput": []
+}
