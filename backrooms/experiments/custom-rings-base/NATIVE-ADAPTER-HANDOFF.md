@@ -10,6 +10,13 @@ released npm API or activated native product mode. Canonical native host/UI
 activation remains with its authorized maintainer and requires its own source
 and UI evidence. No private native source is copied into this repository.
 
+The public application journey now has a real-validator pass. Its 25 steps
+include two hidden updates, fresh-process confirmation recovery, a deliberate
+post-receipt interruption and retry, retained-lesson reuse, and 15 expected
+ledger refusals. The [live evidence](evidence/spawn-room-live-pass.json) records
+that run. Final independent review and the remaining upstream baseline gates
+are still open; this run does not activate the private native host or UI.
+
 | Boundary | Exact selection |
 | --- | --- |
 | Chain artifact/state format | `spawn-room.v1` |
@@ -36,6 +43,7 @@ The resulting Custom Rings checkout includes these modules under
 | --- | --- |
 | `codec.ts` | Canonical state/grant encoding and hash order; strict domains, widths, bounds and transition derivation. |
 | `payload.ts` | Canonical application data for the existing recipient encryption path, and recovery checks against the published note commitment. |
+| `recovery.ts` | Ring-aware indexed-note lookup with an exact slot/signature/commitment match and complete coverage. |
 | `staging.ts` | One zero-value application note with the correct visible-genesis or hidden-advance rail and dummy padding. |
 | `prover.ts` | Strict application request construction, exact u64 JSON serialization, separate key pins and combined proof selection. |
 | `instructions.ts` | Config/root management, visible genesis and hidden advance with the agreed tags/account prefixes. |
@@ -213,8 +221,10 @@ SPAWN_REFERENCE_HOST_ROOT=/absolute/path/to/backroom-rings/backrooms/reference-h
 
 The launcher-negative test checks real process creation, distinct retry attempts
 and refusal of a missing job. It does not execute successful on-chain recovery.
-Use [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md) for observed qualification;
-this handoff asserts no live pass by itself.
+The separate full validator journey passed successful recovery, a controlled
+post-receipt failure, a fresh retry and completed-job re-entry. Use
+[APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md) for the observed run and its
+remaining qualification gates.
 
 Each full run retains `run-receipt.json`, `journey-evidence.json` and
 `vitest-results.json`, plus one `native-process-<phase>-*/` directory per worker
@@ -255,8 +265,8 @@ second owner without a live eligible note is insufficient for that fixture.
 
 ## Evidence the native maintainer should return
 
-After final independent review and live qualification, use the exact approved
-public overlay and qualified key/program digests.
+After the remaining independent review and baseline gates pass, use the exact
+approved public overlay and qualified key/program digests.
 Return content-safe references to the actual native source revision, explicit
 profile selection/readiness behavior, create/work/review/remember/restart/reuse
 trace, actual proof/chain signatures and recovered revision, and UI checks for
@@ -269,7 +279,8 @@ checks, actual native runtime tests and the live-validator journey. Read
 [APPLICATION-REVIEW.md](APPLICATION-REVIEW.md),
 [SDK-NATIVE-REVIEW.md](SDK-NATIVE-REVIEW.md), and
 [NATIVE-WORKER-REVIEW.md](NATIVE-WORKER-REVIEW.md) for the historical independent
-scope and limits. The latest indexed-note helper and live corpus still require
-independent review and completed validator evidence. Production setup,
+scope and limits. The latest indexed-note helper and named live corpus passed
+the recorded validator journey but still require final independent review.
+Production setup,
 independent production cryptographic audit, custody and the stronger
 Q06/D08/D09/O06 gates remain separate.

@@ -1,11 +1,13 @@
 # Anonymous Backroom application: implementation evidence
 
-**The application is implemented, but the full local-validator preview is not
-qualified yet.** Real combined proofs, the dedicated SBF program, strict prover
-endpoints, SDK/native integration and the complete journey runner exist. The
-second actual validator attempt created and recovered two eligible room notes
-and confirmed a duplicate-genesis refusal; it then failed in the first native
-worker. No completed hidden-update/restart/reuse journey is claimed.
+**The full application journey passed on the real local validator.** The third
+attempt completed all 25 recorded steps, including two eligible room notes,
+hidden updates, fresh-process recovery, interrupted-confirmation retry, retained
+lesson reuse and 15 ledger-confirmed refusals. The command exited zero with one
+executed Vitest test, no failures or pending tests, unchanged source and complete
+cleanup. Final independent review, the remaining upstream Go packages and native
+product activation are still separate gates. This is a recorded localnet pass,
+not final preview release approval.
 
 This checkpoint contains **59 source files** in the portable overlay. Its patch
 SHA-256 is
@@ -32,7 +34,8 @@ checkpoints, not proof or validator evidence.
 | Application SBF | Dedicated program built successfully: 526,024 bytes, SHA-256 `81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d`. |
 | Latest SDK/native checks | 18 focused SDK tests and 3 off-chain native/worker-launcher tests passed, with zero failed/pending tests. SDK and integration type checks and focused lint passed. These checks do not establish on-chain recovery. |
 | Localnet runner | A fresh focused run passed all 5 runner tests, with zero failed/cancelled/skipped tests. The runner, monitor and test files also match the earlier independent worker/resource review's frozen file digests. |
-| Signed SDK transaction fixtures | Visible genesis: 2,740 bytes and 2 signers. Hidden advance: 2,639 bytes and 1 payer signer, with no explicit writer or room-marker account in the decoded message. Both fit the pinned 4,096-byte ceiling. These measurements use fixed-size fixture proofs; actual visible genesis also matched its size/signers. |
+| Actual signed transactions | The passing live run matched the earlier fixture sizes. Visible genesis was 2,740 bytes with 2 signers. Both hidden updates were 2,639 bytes with 1 payer signer and no explicit writer or stable room-marker account in the decoded message. All fit the pinned 4,096-byte ceiling. |
+| Full application validator journey | `journey-KXteXY` passed all 25 steps and its one unskipped Vitest test. Both hidden updates settled; fresh native processes recovered the first accepted update, retried an interrupted confirmation and reused the retained lesson for the second update. All 15 named refusal transactions failed as expected without changing accepted state. |
 | Pristine upstream checks/builds | `just check-all`, all eight native build stages and `just test-hermetic` passed at the exact clean source pins. The three hermetic nextest groups reported 149/1,497/40 passes and 0/33/4 canonical default skips. Both exact upstream anonymous-validator cases also passed with full command exit 0. Complete upstream Go coverage remains incomplete. |
 | Overlay integrity | The patch applied to a temporary Git index at the exact base and every resulting file matched the manifest. The portable helper passed its clean-checkout preflight against the untouched baseline. |
 
@@ -63,9 +66,10 @@ later command that exited zero.
 | --- | --- | --- |
 | `journey-y16s2B` | Setup and visible genesis confirmed at slot 365; genesis was 2,740 bytes with two signers. | **Failed** while recovering primary revision 0, before the peer room was created. Fresh viewing history had omitted application-ring registration. |
 | `journey-Xcz1rl` | Primary genesis confirmed at slot 343; the second eligible room confirmed at slot 427; both room notes were recovered. Duplicate genesis failed on the ledger at slot 429 with the expected error and unchanged accepted account/note snapshots. | **Failed** in the first native worker's indexed-transaction binding check. The pinned by-signature Photon query did not return ring metadata. |
+| `journey-KXteXY` | Primary genesis confirmed at slot 321 and the second eligible room at slot 385. The first hidden update settled at slot 615. Fresh native processes recovered its exact accepted state and retained records. The later task used the retained lesson and settled the second hidden update at slot 711. All 15 named refusal transactions passed their expected-failure checks; revoked admission at slot 798 retained accepted revision 2. | **Passed**, 25/25 steps, one executed Vitest test, zero failures/pending tests and supervisor exit 0. |
 
-Both attempts recorded unchanged source and completed cleanup of all five
-owned service groups. Their measured durations, including sampled cleanup,
+The two earlier failed attempts recorded unchanged source and completed cleanup
+of all five owned service groups. Their measured durations, including sampled cleanup,
 were 395.518 and 193.003 seconds. Sampled concurrent owned-process RSS peaks
 were 2,291,320 and 2,860,316 KiB respectively. These are measurements of failed
 attempts using periodic `/proc` sampling; they are not whole-journey performance
@@ -77,45 +81,67 @@ and then recovered the exact state after registration and wallet reopen; that
 correction received an independent source review. The later worker correction
 uses a ring-aware, slot-bounded indexed-note query and checks complete coverage,
 transaction identity, ring and commitment. Its eight focused tests are included
-in the 18 passing SDK tests. **The latest helper and expanded live corpus have
-not completed independent review or a passing full validator run.**
+in the 18 passing SDK tests. The third complete validator run passed with both
+corrections. **The latest helper and expanded live corpus still lack a completed
+independent review.**
 
-## Implemented journey still requiring execution
+## Observed create, recovery and reuse
 
-The runner requires one complete create/hidden-update/restart/reuse sequence
-with two independently enrolled writers and two actually settled eligible
-notes. Hidden transactions must contain only the payer signature and no explicit
-writer or stable room-marker account. The first native episode runs in a fresh
-OS process, persists the original and exact grant, closes its records and exits.
+The passing run used two independently enrolled writers and two actually
+settled eligible notes. Both hidden transactions contained only the payer
+signature and no explicit writer or stable room-marker account. The first
+native episode ran in worker PID 468, persisted its original and exact grant,
+closed its encrypted records and native runtime, and exited successfully before
+the recovery workers started.
 
-Before broadcasting the first update, the coordinator persists its complete
-signed submission, immutable recovery job and pre-submission wallet. A different
-native process must independently reconcile the exact ledger bytes and slot,
-recover the accepted successor and retain the same original, grant and nonce
-without inference. The journey deliberately throws after durable confirmation,
-then retries the same job in another fresh process and checks the complete
-receipt and its stored version remain unchanged. Completed-job re-entry must
-return the identical operation and acceptance with zero additional inference.
-The coordinator continues running; this controlled exception with cleanup does
-not establish abrupt OS-kill or power-loss durability.
+Before broadcasting the first update, the coordinator retained its complete
+signed submission, immutable recovery job and pre-submission wallet. Recovery
+worker PID 528 reconciled the exact ledger bytes and slot and persisted the
+confirmation receipt. It then exited 1 after the deliberate post-receipt
+exception. A fresh retry in PID 575 recovered revision 1 with complete index
+coverage, retained the same original, grant and nonce, and left the durable
+receipt and its stored version unchanged. Confirmation recovery invoked no
+inference. Another fresh process, PID 622, re-entered the completed job with
+zero repeated inference calls and identical original, grant, nonce and receipt.
+All five observed native worker attempts stopped their runtime and closed their
+records. The coordinator remained running; the controlled exception does not
+establish abrupt OS-kill or power-loss durability.
 
-Actual seeded Flue off-chain execution already demonstrates the bounded lesson
-transition: procedure 0 yields value 9 and accepted scores `[40,50]`; the retained
-lesson makes the later episode choose procedure 1, yielding value 5 and proposed
-next scores `[40,60]`. The full live journey must still settle and recover both
-accepted updates using that native flow.
+The actual seeded Flue execution settled its bounded lesson transition on the
+validator. Procedure 0 produced value 9 and accepted scores `[40,50]`. The
+retained lesson, "Sort inputs before selecting the median.", made the later
+episode choose procedure 1, which produced value 5 and accepted scores `[40,60]`.
+The later native task and second settlement used that retained lesson.
 
-In addition to duplicate genesis, the implemented validator corpus includes
-generic transfer/authority/merge/delegate bypass attempts, replay and a revoked
-third grant. The third proof must first simulate successfully while admitted.
-The latest added cases cover a wrong application-config account, wrong ring
-policy account, unapproved settlement program, wrong operation key, reordered
-audit frame, peer-room input, substituted bound output and substituted ciphertext.
-Each case requires its exact ledger failure and unchanged accepted state; an
-off-chain solver refusal does not satisfy that requirement. Except for the
-duplicate-genesis result above, these cases have no completed live pass in this
-checkpoint. This named set does not establish every variant in the broader
-CR02/CR04 acceptance bullets.
+The run confirmed all 15 named refusal transactions on the ledger. These cover
+duplicate genesis, four generic transfer/authority/merge/delegate bypasses,
+replay, a revoked third grant, a wrong application-config account, a wrong ring
+policy account, an unapproved settlement program, a wrong operation key,
+reordered audit data, a peer-room input, a substituted bound output and substituted
+ciphertext. Each recorded the expected instruction error and unchanged accepted
+account, wallet-note and peer-room snapshots. The third proof first simulated
+successfully while admitted; after revocation, its refusal retained accepted
+revision 2 and the original and nonce for pending revision 3. This executed
+named set does not establish every variant in the broader CR02/CR04 acceptance
+bullets or replace independent conformance review.
+
+The [public live evidence](evidence/spawn-room-live-pass.json) retains synthetic
+transaction identities, exact slots and errors, unchanged-state snapshots,
+separate worker exits and source/key/program identities. Its
+[reading guide](evidence/spawn-room-live-pass.md) describes the measured scopes.
+The authoritative private run receipt has SHA-256
+`2733c25234cbc478d1ef186274dbb3fa5a83d7dea7507d6a5a46ec8764dfb7cd`.
+The extract does not publish signing material, private witness requests,
+encrypted jobs or databases.
+
+The harness measured itself, its owned services and observed descendants for 331.313
+seconds, including cleanup. It took 1,322 samples at a 250 ms interval and
+observed 35 process records. The sampled concurrent RSS peak was 4,145,344 KiB.
+The separate outer supervisor command took 334.208 seconds and is outside that
+memory scope. No `lastSamplingError` field was present in the recorded resource
+data. Sampling may miss short-lived peaks, and shared pages can be counted more
+than once. These are measurements of this local run, not an exact instantaneous
+process-tree peak or production performance qualification.
 
 Use [QUICKSTART.md](QUICKSTART.md) for source preparation and invocation, and
 [NATIVE-ADAPTER-HANDOFF.md](NATIVE-ADAPTER-HANDOFF.md) for the native persistence,
@@ -141,7 +167,7 @@ profile. This checkpoint carries no final independent sign-off or merge approval
 
 CR01 also remains incomplete. Fifteen of 18 upstream Go packages now have retained terminal coverage: nine
 test packages passed and six explicitly reported no test files. Transfer, ring
-and ringtest remain incomplete. The latest transfer-package attempt ended with
+and ringtest remain incomplete. An earlier transfer-package process ended with
 `signal: killed` after 130 passing test events; its package command exited 1,
 and the cause of the kill is not established. The original default-timeout and
 interrupted extended whole-suite attempts remain recorded. Neither partial

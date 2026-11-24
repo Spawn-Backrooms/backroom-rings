@@ -104,9 +104,11 @@ under ignored `target/`; publish only a reviewed evidence extract.
 [NATIVE-WORKER-REVIEW.md](../NATIVE-WORKER-REVIEW.md) preserve independent reviews
 of earlier source checkpoints and their corrected findings. They do not approve
 the later indexed-note helper or expanded live corpus. Final independent review
-is blocked, and no Daybreak scan has launched. Actual full-validator execution
-also remains incomplete; the two retained attempts failed after partial chain
-progress. See the current evidence document for exact completed and pending gates. A native root publisher admits exact grants;
+is blocked, and no Daybreak scan has launched. The third actual application
+validator attempt passed all 25 steps, including hidden updates, fresh-process
+recovery/retry/reuse and 15 ledger refusals. The two earlier failed attempts
+remain in the history. See the current evidence document for exact completed
+and pending gates. A native root publisher admits exact grants;
 the circuit does not prove the truth of an original external result. Owner
 authorization binds encrypted transaction data, but a malicious authorized
 writer can still withhold or corrupt its own recovery payload.

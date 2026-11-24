@@ -5,8 +5,10 @@ from the retained worker/resource review without changing its findings or frozen
 source identities. It predates the ring-aware indexed-note helper and expanded
 live refusal corpus. Its source-review result and five passing runner tests do
 not approve those later changes or establish a completed live journey. A fresh
-runner test run also passed 5/5 at the same runner/monitor/test file digests. The
-latest independent review is blocked; consult
+runner test run passed 5/5 at the same runner/monitor/test file digests, and the
+complete 25-step application validator journey subsequently passed. The latest
+independent review remains blocked; execution does not extend this historical
+review. Consult
 [APPLICATION-EVIDENCE.md](APPLICATION-EVIDENCE.md) for the current qualification.
 
 Review date: 2026-11-24. Scope: the fresh-process and interrupted-commit additions in `custom-rings-app/sdk-tests/spawn-room/native-worker.ts`, `native-worker.test.ts`, `native-worker-runner.test.ts`, and `localnet-journey.test.ts`; plus `tools/localnet-resource-monitor.mjs` and its runner integration. Earlier circuit/program and SDK/native reviews remain in `independent-application-review.md` and `independent-sdk-native-review.md`.

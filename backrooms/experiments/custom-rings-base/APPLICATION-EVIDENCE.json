@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "implemented combined application, SDK/native adapter and runner; partial real-validator progress; complete hidden-update/restart/reuse and final review remain unqualified",
+  "scope": "implemented combined application, SDK/native adapter and runner; complete 25-step real-validator create/hidden-update/restart/retry/reuse journey passed; final independent review, remaining upstream baseline gates and native product activation remain pending",
   "sourcePins": {
     "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
     "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
@@ -146,14 +146,16 @@
     "historical independent core, SDK/native, worker/resource reviews with their recorded corrections; not a review of later helper/corpus",
     "clean pristine upstream just check-all, all eight native build stages, and just test-hermetic",
     "15/18 upstream whole packages covered at unchanged source: nine test-package passes and six explicit no-test-files results",
-    "two actual eligible room notes recovered in second failed validator attempt",
-    "actual ledger-confirmed duplicate-genesis refusal with unchanged accepted state in second failed attempt",
-    "both exact upstream anonymous-validator cases passed with full command exit0 and unchanged source pins"
+    "both exact upstream anonymous-validator cases passed with full command exit0 and unchanged source pins",
+    "full real-validator journey passed all 25 steps and its one executed Vitest test, with zero failures/pending tests",
+    "two eligible room notes, both actual hidden updates and retained-lesson reuse settled on the local validator",
+    "fresh-process interrupted-confirmation recovery, controlled post-receipt failure/retry and completed-job re-entry preserved exact records without repeated inference",
+    "15 named ledger-confirmed refusal transactions retained accepted account, wallet-note and peer-room state",
+    "five owned service groups stopped and application, Zolana and reference-host source remained unchanged"
   ],
   "pending": [
-    "complete upstream Go package coverage; latest transfer attempt failed after signal: killed",
-    "complete live application hidden-update/fresh-worker recovery/retry/reuse journey",
-    "live results for the implemented additional refusal corpus; full CR02/CR04 bullet remains broader than the named corpus",
+    "complete upstream Go package coverage; transfer, ring and ringtest retry is in progress, with the earlier killed transfer attempt retained",
+    "complete CR02/CR04 acceptance reconciliation; the executed named live corpus does not establish every broader variant",
     "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
     "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
     "authorized native-maintainer developer-preview activation; no production activation"
@@ -416,20 +418,269 @@
       "runReceiptSha256": "1c61ed04d6ca9a0e45dd959824e3e9621d0e3ec6199141b843bd6a783842a4ac",
       "journeyEvidenceSha256": "e5772cae52c8e106e32f4d0eba159a36636b51d11b9412b699b304e9eedec9b4",
       "privateRunDirectoryPublished": false
+    },
+    {
+      "attempt": "journey-KXteXY",
+      "status": "passed",
+      "startedAt": "2026-11-24T03:04:05.555Z",
+      "finishedAt": "2026-11-24T03:09:34.649Z",
+      "commandExitCode": 0,
+      "stepCount": 25,
+      "passedSteps": 25,
+      "vitest": {
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed",
+          "signature": "4MtKFis1eFbFt5KztbL2wxUgSCowcgJ9sJ7zyh67TN1HM85RZNWbSJwKYZnF2hZnhBsTW3LjDvwDzwyCa5A9fTHw"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "321",
+          "signature": "4kbtPeFKnrk8fCVrdzobH7r93jWsUYsoYSQz64rkTipqAFTKUXjcV9VJ2qiwwhcvbpbaz9fJqFZAwgvi4FvYxTy6",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        },
+        {
+          "name": "eligible-second-room",
+          "status": "passed",
+          "slot": "385",
+          "signature": "5vueWwJExSAxLaw8BeUSQRMwJ4qDd9Jtivob65P9m7cqFyxo1Q1b2GLgFnvtX6rHn1osfrXNbGDZLprLt9aF9zDC",
+          "eligibleWriters": 2,
+          "unspentRoomNotes": 2
+        },
+        {
+          "name": "reject-duplicate-genesis",
+          "status": "passed",
+          "slot": "388",
+          "signature": "5Qvz1mC4pYuakmCR6E6jQ76ESCxSubocaf3Zy2ZTUnhi2vTRznS2vZTCJmAeHq2PJTpezo1Coa9bLSeYfPv6MkgU",
+          "instructionError": "AccountAlreadyInitialized",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "native-process-first",
+          "status": "passed"
+        },
+        {
+          "name": "adversarial-valid-control",
+          "status": "passed"
+        },
+        {
+          "name": "reject-wrong-application-config",
+          "status": "passed",
+          "slot": "586",
+          "signature": "66yWyUvNxWAdh7mfP7CSVrqGs8p7VsvRppDkYXjRh8vyFHSomU1t6FRqTjTA7Z8uBgfsqCYak9J9NFQWRLLWrB7q",
+          "instructionError": "InvalidAccountData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-wrong-ring-policy",
+          "status": "passed",
+          "slot": "588",
+          "signature": "5N48rHLX1xv5xPuNVMAfZLDgDaynZ1gswm2Mw3bmehaHWHF6NkF3wboupsACVxJbGScN5uGKRAET43ehVYXzkmY5",
+          "instructionError": {
+            "Custom": 8300
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-unapproved-settlement-program",
+          "status": "passed",
+          "slot": "592",
+          "signature": "39nDrXQJqKj4ycr573NgnmUo1DrsvPbEPBn4Ya5SBdmNkCUUo6Ym4x8mQBci984CyWbJhGq6d7kWCECgzx82mocR",
+          "instructionError": {
+            "Custom": 8103
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-wrong-operation-key",
+          "status": "passed",
+          "slot": "594",
+          "signature": "5SSzzRPQ4akF4a5m225QpXh9r4N85SDghyBNVgwJA2bZxZ2KCengKqs4a513fB3buFMAFSKVBVF3Ddec71HCBnBx",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-reordered-audit-frame",
+          "status": "passed",
+          "slot": "597",
+          "signature": "5qLqz5e1TYPYVa3arZUTxuTGDzevnLtsnuEsbWNJjyJETRTz7wQ1jZie3n8zZCioqXX9BYxWVW9NjNhqQEzpAkKk",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-peer-room-input",
+          "status": "passed",
+          "slot": "599",
+          "signature": "27ebJ4fE5pGbMeDDwvvnx15tuxVdaQrFbqMj7BuNBpj1GfLEQuBaoPKfErHLqXHCeoMq4yYvLT2Wt5hUnfY18wup",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-bound-output-substitution",
+          "status": "passed",
+          "slot": "602",
+          "signature": "QfVuQpTZUQa6TeDD3TekWH11rCtzkKF8aRYFZCq4R1EF4FUdso3Vya3vBuUBRywD8zwfpyB2iwvwaNNGm5jaUGC",
+          "instructionError": {
+            "Custom": 7008
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-ciphertext-substitution",
+          "status": "passed",
+          "slot": "604",
+          "signature": "i8EJZoTT5hSAkDKVjsAaDVS8qp5WNP7jcvFprLE8HfFLUvDhpgAbt1oAoLvpK3hS1iVeeW1xnt9EiqUJkucCYED",
+          "instructionError": {
+            "Custom": 7008
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-transfer",
+          "status": "passed",
+          "slot": "607",
+          "signature": "4JnfmCwgxiakQbQnNbQX4DDfa2HSrbc9PcYzJWq5qenJasDWHi4d61nsTySTsByRHeDypxhKMEVFQ4rwDy8sgksJ",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-authority-transfer",
+          "status": "passed",
+          "slot": "609",
+          "signature": "3sogFTmQuCTJzmDJmGK8qa8V6VYJGLFQkXqLQD1bNQRZ21ApNoCP4Ywg7aCWP2knDeAtotVMzkBYWytSkpg9T65v",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-merge",
+          "status": "passed",
+          "slot": "612",
+          "signature": "3fv2gPoGs7aTEBy3yHAo5EUceXwM2gs4isuCC62arqt6QBJVV9sVS561xFi5gknyAPM7qYFN2CKddYaMvXb1Tamc",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-set-delegate",
+          "status": "passed",
+          "slot": "613",
+          "signature": "5gRjSUwSJWY9HMFC1umQdS1no4oLNHaEso3g6VDBuUABDYcworwdHWGddE8ZVCGnKNYGZzBeir9H1rsqLjQU29S6",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "advance",
+          "status": "passed",
+          "slot": "615",
+          "signature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+          "serializedBytes": 2639,
+          "signerCount": 1,
+          "explicitWriterAbsent": true,
+          "stableMarkerAbsent": true,
+          "selectedProcedure": 0,
+          "scores": [
+            40,
+            50
+          ],
+          "originalValue": 9
+        },
+        {
+          "name": "reject-replay",
+          "status": "passed",
+          "slot": "617",
+          "signature": "2sEWmFL684UFtmXQqWBqNTLYpYadsVnVj9WgCRPAN2pyvzoMp69YoEXt3vTR29BRZQpiQeDLNcUqPLe8bVtHLqeN",
+          "instructionError": {
+            "Custom": 7043
+          },
+          "acceptedRevision": "1"
+        },
+        {
+          "name": "recovery",
+          "status": "passed",
+          "revision": "1",
+          "resumedInferenceCalls": 0
+        },
+        {
+          "name": "native-worker-idempotent-reentry",
+          "status": "passed",
+          "repeatedInferenceCalls": 0
+        },
+        {
+          "name": "reuse",
+          "status": "passed",
+          "slot": "711",
+          "signature": "2BBFRnfmECWgrmJgWXQPB2atwwRCnkBG5ua6fgrKPXXA9Etr9PcxwjzJWQbtGEJe7ASvxBTY2gCrkUB2mLRGoywB",
+          "serializedBytes": 2639,
+          "signerCount": 1,
+          "explicitWriterAbsent": true,
+          "stableMarkerAbsent": true,
+          "selectedProcedure": 1,
+          "scores": [
+            40,
+            60
+          ],
+          "learnedValue": 5
+        },
+        {
+          "name": "reject-revoked-grant",
+          "status": "passed",
+          "slot": "798",
+          "signature": "5K3SocoYuNaajQ9SQ6ynpNtVCStofV5izpWibMGj99WtTYKBQ79uSiyYkQ1VPG7QHxz2yoYrbLP3w797jPutuzWe",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "2"
+        },
+        {
+          "name": "revocation-retention",
+          "status": "passed",
+          "acceptedRevision": "2"
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "overlayBeforeVerified": true,
+      "overlayAfterVerified": true,
+      "patchSha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "overlayManifestSha256": "f0fded9848ee7e30ec9d64e963efcd8e2176e9e9a13f25e27b115bbba676e614",
+      "measuredDurationMs": 331313,
+      "supervisorDurationSeconds": 334.208,
+      "supervisorResourceScope": "The application receipt measures its Node harness and owned descendants; this lightweight outer Python supervisor is excluded.",
+      "sampleIntervalMs": 250,
+      "resourceSamples": 1322,
+      "observedProcessRecords": 35,
+      "sampledPeakConcurrentRssKiB": 4145344,
+      "lastSamplingErrorFieldPresent": false,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementMethod": "Linux /proc VmRSS and process-lifetime VmHWM, sampled while each owned process exists",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "2733c25234cbc478d1ef186274dbb3fa5a83d7dea7507d6a5a46ec8764dfb7cd",
+      "journeyEvidenceSha256": "a16bd829d0478d6def9e390f390d1bbeb940ea85fcb276f627754c9c441aea2b",
+      "vitestResultsSha256": "d46ec97127516d5ac3e4e804ea137796e840b6e30247097891d3c141df5ff234",
+      "publicEvidence": "evidence/spawn-room-live-pass.json",
+      "privateRunDirectoryPublished": false,
+      "independentReviewApproval": false
     }
-  ],
-  "implementedUnexecutedLiveRefusals": [
-    "generic transfer/authority/merge/delegate bypasses",
-    "replay",
-    "revoked third grant after successful coherent simulation",
-    "wrong application-config account",
-    "wrong ring-policy account",
-    "unapproved settlement program",
-    "wrong operation key",
-    "reordered audit frame",
-    "peer-room input",
-    "bound output substitution",
-    "ciphertext substitution"
   ],
   "independentReview": {
     "status": "incomplete",
@@ -589,15 +840,6 @@
       "requiredPackages": 18,
       "retainedTerminalPassedPackages": 9,
       "wholeSuitePass": false,
-      "latestTransferAttempt": {
-        "status": "failed",
-        "exitCode": 1,
-        "causeObserved": "signal: killed",
-        "underlyingKillCause": "not established",
-        "passedTestEventsBeforeFailure": 130,
-        "durationSeconds": 1126.731,
-        "logSha256": "dbfff8b10548193a1e8164f3cd1df3bb1133f0f04237df0e2b88567495a25bd6"
-      },
       "earlierAttempts": [
         "default 600-second package timeout",
         "interrupted extended whole-suite command without terminal success receipt"
@@ -627,6 +869,29 @@
           "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
           "clean": true
         }
+      },
+      "priorFailedTransferAttempt": {
+        "status": "failed",
+        "exitCode": 1,
+        "causeObserved": "signal: killed",
+        "underlyingKillCause": "not established",
+        "passedTestEventsBeforeFailure": 130,
+        "durationSeconds": 1126.731,
+        "logSha256": "dbfff8b10548193a1e8164f3cd1df3bb1133f0f04237df0e2b88567495a25bd6"
+      },
+      "currentRetry": {
+        "status": "running",
+        "packages": [
+          "circuits/transfer",
+          "ring",
+          "ringtest"
+        ],
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOGC": "25",
+        "timeoutPerPackage": "60m",
+        "testFilter": null,
+        "retainedCompletePackageCount": 15
       }
     },
     "anonymousValidator": {
@@ -681,5 +946,222 @@
       "scope": "Controlled child output, not proof or validator execution"
     }
   },
-  "focusedCheckEvidenceDirectory": "evidence/focused-checks/"
+  "focusedCheckEvidenceDirectory": "evidence/focused-checks/",
+  "liveApplicationJourney": {
+    "status": "passed",
+    "attempt": "journey-KXteXY",
+    "evidence": "evidence/spawn-room-live-pass.json",
+    "readingGuide": "evidence/spawn-room-live-pass.md",
+    "stepsPassed": 25,
+    "ledgerRefusalsPassed": 15,
+    "coordinatorRemainedRunning": true,
+    "controlledReceiptInterruption": {
+      "workerPid": 528,
+      "exitCode": 1,
+      "reason": "spawn_worker_after_receipt_interruption",
+      "receiptRetainedExactly": true
+    },
+    "resumedInferenceCalls": 0,
+    "repeatedInferenceCalls": 0,
+    "originalGrantNonceAndReceiptUnchanged": true,
+    "validBeforeRevocation": true,
+    "acceptedRevisionAfterRevocation": "2",
+    "pendingRevisionAfterRevocation": "3",
+    "finalIndependentSignOff": false
+  },
+  "executedLiveRefusals": [
+    {
+      "name": "reject-duplicate-genesis",
+      "status": "passed",
+      "signature": "5Qvz1mC4pYuakmCR6E6jQ76ESCxSubocaf3Zy2ZTUnhi2vTRznS2vZTCJmAeHq2PJTpezo1Coa9bLSeYfPv6MkgU",
+      "slot": "388",
+      "instructionError": "AccountAlreadyInitialized",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-wrong-application-config",
+      "status": "passed",
+      "signature": "66yWyUvNxWAdh7mfP7CSVrqGs8p7VsvRppDkYXjRh8vyFHSomU1t6FRqTjTA7Z8uBgfsqCYak9J9NFQWRLLWrB7q",
+      "slot": "586",
+      "instructionError": "InvalidAccountData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "canonical application config account admission"
+    },
+    {
+      "name": "reject-wrong-ring-policy",
+      "status": "passed",
+      "signature": "5N48rHLX1xv5xPuNVMAfZLDgDaynZ1gswm2Mw3bmehaHWHF6NkF3wboupsACVxJbGScN5uGKRAET43ehVYXzkmY5",
+      "slot": "588",
+      "instructionError": {
+        "Custom": 8300
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "ring policy owner/discriminator admission"
+    },
+    {
+      "name": "reject-unapproved-settlement-program",
+      "status": "passed",
+      "signature": "39nDrXQJqKj4ycr573NgnmUo1DrsvPbEPBn4Ya5SBdmNkCUUo6Ym4x8mQBci984CyWbJhGq6d7kWCECgzx82mocR",
+      "slot": "592",
+      "instructionError": {
+        "Custom": 8103
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "pinned SPP executable after combined application verification"
+    },
+    {
+      "name": "reject-wrong-operation-key",
+      "status": "passed",
+      "signature": "5SSzzRPQ4akF4a5m225QpXh9r4N85SDghyBNVgwJA2bZxZ2KCengKqs4a513fB3buFMAFSKVBVF3Ddec71HCBnBx",
+      "slot": "594",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "real valid genesis proof refused by the pinned advance verifier"
+    },
+    {
+      "name": "reject-reordered-audit-frame",
+      "status": "passed",
+      "signature": "5qLqz5e1TYPYVa3arZUTxuTGDzevnLtsnuEsbWNJjyJETRTz7wQ1jZie3n8zZCioqXX9BYxWVW9NjNhqQEzpAkKk",
+      "slot": "597",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "ordered encrypted audit-envelope blocks; lengths and count byte preserved"
+    },
+    {
+      "name": "reject-peer-room-input",
+      "status": "passed",
+      "signature": "27ebJ4fE5pGbMeDDwvvnx15tuxVdaQrFbqMj7BuNBpj1GfLEQuBaoPKfErHLqXHCeoMq4yYvLT2Wt5hUnfY18wup",
+      "slot": "599",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "actual unspent peer room nullifier substituted under the first writer's proof"
+    },
+    {
+      "name": "reject-bound-output-substitution",
+      "status": "passed",
+      "signature": "QfVuQpTZUQa6TeDD3TekWH11rCtzkKF8aRYFZCq4R1EF4FUdso3Vya3vBuUBRywD8zwfpyB2iwvwaNNGm5jaUGC",
+      "slot": "602",
+      "instructionError": {
+        "Custom": 7008
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": true,
+      "scope": "actual peer note commitment substituted after both proofs were authorized"
+    },
+    {
+      "name": "reject-ciphertext-substitution",
+      "status": "passed",
+      "signature": "i8EJZoTT5hSAkDKVjsAaDVS8qp5WNP7jcvFprLE8HfFLUvDhpgAbt1oAoLvpK3hS1iVeeW1xnt9EiqUJkucCYED",
+      "slot": "604",
+      "instructionError": {
+        "Custom": 7008
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": true,
+      "scope": "recipient payload byte changed with all lengths, note hash and proofs preserved"
+    },
+    {
+      "name": "reject-generic-transfer",
+      "status": "passed",
+      "signature": "4JnfmCwgxiakQbQnNbQX4DDfa2HSrbc9PcYzJWq5qenJasDWHi4d61nsTySTsByRHeDypxhKMEVFQ4rwDy8sgksJ",
+      "slot": "607",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-authority-transfer",
+      "status": "passed",
+      "signature": "3sogFTmQuCTJzmDJmGK8qa8V6VYJGLFQkXqLQD1bNQRZ21ApNoCP4Ywg7aCWP2knDeAtotVMzkBYWytSkpg9T65v",
+      "slot": "609",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-merge",
+      "status": "passed",
+      "signature": "3fv2gPoGs7aTEBy3yHAo5EUceXwM2gs4isuCC62arqt6QBJVV9sVS561xFi5gknyAPM7qYFN2CKddYaMvXb1Tamc",
+      "slot": "612",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-set-delegate",
+      "status": "passed",
+      "signature": "5gRjSUwSJWY9HMFC1umQdS1no4oLNHaEso3g6VDBuUABDYcworwdHWGddE8ZVCGnKNYGZzBeir9H1rsqLjQU29S6",
+      "slot": "613",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-replay",
+      "status": "passed",
+      "signature": "2sEWmFL684UFtmXQqWBqNTLYpYadsVnVj9WgCRPAN2pyvzoMp69YoEXt3vTR29BRZQpiQeDLNcUqPLe8bVtHLqeN",
+      "slot": "617",
+      "instructionError": {
+        "Custom": 7043
+      },
+      "acceptedRevision": "1",
+      "acceptedCommitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b"
+    },
+    {
+      "name": "reject-revoked-grant",
+      "status": "passed",
+      "signature": "5K3SocoYuNaajQ9SQ6ynpNtVCStofV5izpWibMGj99WtTYKBQ79uSiyYkQ1VPG7QHxz2yoYrbLP3w797jPutuzWe",
+      "slot": "798",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "2",
+      "acceptedCommitment": "15aab2f67ac4718c8c4bc60926759db55315d759ce9969e370c5dbc675aea58f"
+    }
+  ],
+  "liveTransactionObservations": {
+    "create": {
+      "signature": "4kbtPeFKnrk8fCVrdzobH7r93jWsUYsoYSQz64rkTipqAFTKUXjcV9VJ2qiwwhcvbpbaz9fJqFZAwgvi4FvYxTy6",
+      "slot": "321",
+      "serializedBytes": 2740,
+      "signerCount": 2
+    },
+    "advance": {
+      "signature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+      "slot": "615",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true
+    },
+    "reuse": {
+      "signature": "2BBFRnfmECWgrmJgWXQPB2atwwRCnkBG5ua6fgrKPXXA9Etr9PcxwjzJWQbtGEJe7ASvxBTY2gCrkUB2mLRGoywB",
+      "slot": "711",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true
+    }
+  }
 }
