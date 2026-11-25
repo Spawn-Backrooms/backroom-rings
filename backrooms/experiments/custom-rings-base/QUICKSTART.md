@@ -146,8 +146,11 @@ node tools/run-spawn-room-localnet.mjs --config /absolute/path/to/localnet-run.j
 
 This single command starts its validator, Photon, ring indexer, separate
 application prover, local KMS and RingRPC; executes the actual journey; and
-stops its owned services. Read the patched `tools/spawn-room-localnet.md` for
-ports, binary overrides, dependencies, evidence paths and failure handling.
+stops its owned services. The runner uses `custom-rings-app/target/debug/ring-rpc`
+by default. Build it in step 3 to include the application auditor decoder.
+The clean checkout supplies Zolana, Photon and the ring indexer. For ports,
+binary overrides, dependencies, evidence paths and failure handling, see the
+patched `tools/spawn-room-localnet.md`.
 All client URLs use loopback. Pinned Photon binds to `0.0.0.0`, so keep this
 runtime isolated without publishing its listener.
 
@@ -168,8 +171,10 @@ proof must simulate successfully before its admission is revoked.
 A fresh private run directory contains `run-receipt.json`,
 `journey-evidence.json`, `vitest-results.json`, separate native process traces
 and exit records, measured runtime/resource data, and diagnostic logs. A pass
-requires executed unskipped tests, all required journey steps, source stability
-and completed service cleanup. A stale running receipt is incomplete.
+requires executed, unskipped tests, all 26 named journey steps passing exactly
+once, source stability and completed service cleanup. The application auditor
+step records owner-record and application-data-hash verification separately.
+Report both results as recorded. A stale running receipt is incomplete.
 
 Do not publish the entire directory: it also contains local signing material,
 databases and private logs. Publish a reviewed synthetic evidence extract with
