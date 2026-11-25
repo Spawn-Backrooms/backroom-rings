@@ -53,7 +53,9 @@ The public fork retains upstream history and Apache-2.0 attribution.
 At these pins, Go is `1.27.3`, Rust is `1.98.1`, Node is at least `24`, and the
 application SBF build uses platform tools `v1.54`. Follow the pinned upstream
 toolchain instructions for Agave/SBF, Surfpool, `just`, `cargo-nextest`, and
-native compiler dependencies. Both JavaScript projects have committed lockfiles.
+native compiler dependencies, plus `lsof` and the external `kill` command for
+scoped shutdown. On Debian, install `lsof` and `procps`. Both JavaScript projects
+have committed lockfiles.
 The actual qualification environment and downloaded artifact identities are
 recorded with the evidence; a newer toolchain needs its own verification.
 
@@ -98,6 +100,7 @@ cd "$SPAWN_PREVIEW_DIR/custom-rings-app"
 GOMAXPROCS=1 GOMEMLIMIT=3GiB CARGO_BUILD_JOBS=1 \
   CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 \
   tools/prepare-spawn-room-localnet.sh
+JUST_NO_DOTENV=true just build-ring-rpc
 npm run build:ts
 ```
 

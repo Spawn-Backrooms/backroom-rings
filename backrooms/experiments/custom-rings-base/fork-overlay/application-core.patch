@@ -3775,6 +3775,90 @@ index 0000000000000000000000000000000000000000..6226dd92c215b393c9cfea457f71b2b9
 +		})
 +	}
 +}
+diff --git a/sdk-libs/client/src/codec/origin/mod.rs b/sdk-libs/client/src/codec/origin/mod.rs
+--- a/sdk-libs/client/src/codec/origin/mod.rs
++++ b/sdk-libs/client/src/codec/origin/mod.rs
+@@ -16,8 +16,9 @@
+ 
+ use crate::AuditError;
+ use custom_ring_interface::{
+-    tag as ring_tag, transact_flag, AuditStreamLayout, CheckedAuthorization, CustomRingError,
+-    CustomRingMergeIxDataRef, InstructionTag, ParsedTransact, RingMode, RingRail, RingTransactData,
++    key_catalog::RingCircuit, spawn_room_profile::ADVANCE_ROOM, tag as ring_tag, transact_flag,
++    AuditStreamLayout, CheckedAuthorization, CustomRingError, CustomRingMergeIxDataRef,
++    InstructionTag, ParsedTransact, RingMode, RingRail, RingTransactData,
+ };
+ 
+ /// What a confirmed transaction says about its ring, its signers and the value it settled out.
+@@ -287,12 +288,22 @@
+         return None;
+     }
+     let caller = direct_caller(groups, source)?;
+-    (caller.program_id == ring
+-        && matches!(
+-            caller.data.first(),
+-            Some(&(ring_tag::TRANSFER | ring_tag::AUTHORITY_TRANSFER))
+-        ))
+-    .then(|| caller.data.clone())
++    if caller.program_id != ring {
++        return None;
++    }
++    match (caller.data.first()?, source.data.first()?) {
++        (&(ring_tag::TRANSFER | ring_tag::AUTHORITY_TRANSFER), _) => Some(caller.data.clone()),
++        (&ADVANCE_ROOM, &tag::RING_TRANSACT) => {
++            let parsed = parse_frame(RingMode::Anonymous, &caller.data).ok()?;
++            let transfer = parsed.data();
++            let (forwarded, _) =
++                TransactIxDataRef::parse_with_external_data_prefix(&source.data[1..]).ok()?;
++            (transfer.circuit() == forwarded.circuit
++                && transfer.owner_signers(&source.accounts, 0).ok()?.is_empty())
++            .then(|| caller.data.clone())
++        }
++        _ => None,
++    }
+ }
+ 
+ fn audit_frame_of(frame: &[u8], mode: RingMode) -> Result<AuditStreamLayout, AuditError> {
+@@ -302,6 +313,39 @@
+ fn parse_frame(mode: RingMode, frame: &[u8]) -> Result<ParsedTransact<'_>, AuditError> {
+     let invalid = |error: CustomRingError| AuditError::InvalidTransactData(error.to_string());
+     let (&tag, data) = frame.split_first().ok_or(AuditError::MissingRingTransact)?;
++    if tag == ADVANCE_ROOM {
++        if mode != RingMode::Anonymous {
++            return Err(invalid(CustomRingError::InvalidInstructionData));
++        }
++        let parsed = RingTransactData::parse(data, RingRail::Anonymous).map_err(invalid)?;
++        let transfer = parsed.data();
++        if !matches!(
++            parsed.authorization(),
++            CheckedAuthorization::AnonymousHidden(proof) if proof.default_owner_tag.is_none()
++        ) || transfer.no_spend
++            || transfer.policy.is_none()
++            || transfer.entry
++            || transfer.vouched
++            || !transfer.interface_transfers.is_empty()
++            || transfer.outputs.iter().any(|output| output.is_exit())
++            || transfer.extensions.data_hash.is_some()
++            || transfer.extensions.ring_data_hash.is_some()
++            || !transfer.extensions.messages.is_empty()
++            || transfer.extensions.cache.is_some()
++            || transfer.transfer_circuit(0).map_err(invalid)?
++                != (RingCircuit::Transfer {
++                    outputs: 2,
++                    inputs: 24,
++                    withdrawals: 4,
++                    owners: 4,
++                    entry: false,
++                    wide: false,
++                })
++        {
++            return Err(invalid(CustomRingError::InvalidInstructionData));
++        }
++        return Ok(parsed);
++    }
+     let rail = InstructionTag::try_from(tag)
+         .and_then(|tag| RingRail::of(tag, mode))
+         .map_err(invalid)?;
 diff --git a/sdk-libs/ts/src/experimental/spawn-room/codec.ts b/sdk-libs/ts/src/experimental/spawn-room/codec.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..150dff48e31a364429f0133d55e8092742bfbef7
@@ -6772,10 +6856,9 @@ index 0000000000000000000000000000000000000000..d2f9ac8c4ed5b4007e52f5c699f7621a
 +}
 diff --git a/sdk-tests/spawn-room/localnet-journey.test.ts b/sdk-tests/spawn-room/localnet-journey.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..15a3358f52e7740dfe28e096a1746da4adae10ab
 --- /dev/null
 +++ b/sdk-tests/spawn-room/localnet-journey.test.ts
-@@ -0,0 +1,1273 @@
+@@ -0,0 +1,1316 @@
 +/** Real local-validator journey. Invoked only by tools/run-spawn-room-localnet.mjs. */
 +import { mkdir, readFile, writeFile } from "node:fs/promises";
 +import { join, resolve } from "node:path";
@@ -6814,7 +6897,9 @@ index 0000000000000000000000000000000000000000..15a3358f52e7740dfe28e096a1746da4
 +import { SHIELDED_POOL_PROGRAM_ID, TRANSACTION_SIZE_LIMIT } from "@heliuslabs/spr/interface";
 +import { createCustomRingClient } from "../../sdk-libs/ts/src/rpc/client.js";
 +import {
++  RingReaderGrantRequest,
 +  RingRpc,
++  messageSignerReader,
 +  signCreateRecordsRegistryRequest,
 +  signRegisterEnrollmentRingRequest,
 +} from "../../sdk-libs/ts/src/rpc/ring-rpc.js";
@@ -6837,6 +6922,7 @@ index 0000000000000000000000000000000000000000..15a3358f52e7740dfe28e096a1746da4
 +import {
 +  createSpawnRoomGenesis,
 +  encodeSpawnRoomState,
++  hashSpawnRoomState,
 +  spawnGrantRoot,
 +  spawnRoomIdentity,
 +  spawnScalarBytes,
@@ -7742,6 +7828,46 @@ index 0000000000000000000000000000000000000000..15a3358f52e7740dfe28e096a1746da4
 +      nativeConfirmationReceipt: "deliberately absent until independent recovery",
 +    });
 +    await evidence("running");
++
++    const auditReaderSeed = crypto.getRandomValues(new Uint8Array(32));
++    const auditReader = await createKeyPairSignerFromBytes(
++      Uint8Array.of(...auditReaderSeed, ...ed25519.getPublicKey(auditReaderSeed)),
++    );
++    await ringRpc.setReaderGrant(
++      await RingReaderGrantRequest.forGrant(target, {
++        reader: auditReader.address,
++        action: "grant",
++      }).sign(upgrade),
++    );
++    const auditedAdvance = await poll(async () => {
++      const page = await ringRpc.getDecryptedTransactions({
++        target,
++        signer: messageSignerReader(auditReader),
++      });
++      return page.items.find((entry) => entry.signature === advancement.signature);
++    }, "authorized application audit view");
++    expect(auditedAdvance.slot).toBe(advancement.slot);
++    expect(auditedAdvance.signers).toEqual([payer.address]);
++    expect(auditedAdvance.payloadErrors).toHaveLength(0);
++    expect(auditedAdvance.withdrawals).toHaveLength(0);
++    const auditedOutput = auditedAdvance.outputs.find((output) =>
++      equalBytes(output.outputContext.hash, current.entry.outputContext.hash),
++    );
++    if (auditedOutput?.opening.kind !== "ring")
++      throw new Error("authorized auditor did not open the confirmed room output");
++    expect(auditedOutput.opening.utxo.amount).toBe(0n);
++    expect(auditedOutput.opening.utxo.ownerKey).toEqual(addressBytes(writer.address, "fixture audit writer"));
++    const auditedDataHash = auditedOutput.opening.utxo.dataHash;
++    if (auditedDataHash !== undefined)
++      expect(auditedDataHash).toEqual(hashSpawnRoomState(current.room.state));
++    steps.push({
++      name: "application-auditor-read",
++      status: "passed",
++      ownerRecordVerified: true,
++      applicationDataHashVerified: auditedDataHash !== undefined,
++    });
++    await evidence("running");
++
 +    await refuse({
 +      name: "reject-replay",
 +      instruction: advanceInstruction,
@@ -9507,10 +9633,9 @@ index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c9
 +sha256sum target/deploy/custom_ring_program.so
 diff --git a/tools/run-spawn-room-localnet.mjs b/tools/run-spawn-room-localnet.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..24be80614529e52f3e5a38a95fe00a05d43fe038
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.mjs
-@@ -0,0 +1,486 @@
+@@ -0,0 +1,489 @@
 +#!/usr/bin/env node
 +// All services and the journey are descendants of this process. In particular,
 +// this also works in executors whose separate commands cannot share loopback.
@@ -9620,6 +9745,7 @@ index 0000000000000000000000000000000000000000..24be80614529e52f3e5a38a95fe00a05
 +  'reject-generic-merge',
 +  'reject-generic-set-delegate',
 +  'advance',
++  'application-auditor-read',
 +  'reject-replay',
 +  'recovery',
 +  'native-worker-idempotent-reentry',
@@ -9821,12 +9947,14 @@ index 0000000000000000000000000000000000000000..24be80614529e52f3e5a38a95fe00a05
 +  try {
 +    await requireAvailablePorts([...Object.values(ports), ports.rpc + 1, ports.rpc + 2]);
 +    portPreflightPassed = true;
++    await executable(undefined, 'lsof');
++    await executable(undefined, 'kill');
 +    const requested = config.binaries ?? {};
 +    binaries = {};
 +    for (const [name, fallback] of Object.entries({
 +      zolana: join(nativeRepo, 'zolana/target/debug/zolana'), xtask: join(nativeRepo, 'zolana/target/debug/xtask'),
 +      photon: join(nativeRepo, 'target/debug/photon'), ringIndexer: join(nativeRepo, 'target/debug/ring-indexer'),
-+      ringRpc: join(nativeRepo, 'target/debug/ring-rpc'), prover: join(APP_ROOT, 'target/spawn-room-prover'),
++      ringRpc: join(APP_ROOT, 'target/debug/ring-rpc'), prover: join(APP_ROOT, 'target/spawn-room-prover'),
 +      surfpool: 'surfpool', solana: 'solana', solanaKeygen: 'solana-keygen', npm: 'npm',
 +    })) binaries[name] = await executable(requested[name], fallback);
 +    const programSo = await realpath(resolve(config.programSo ?? join(APP_ROOT, 'target/deploy/custom_ring_program.so')));
@@ -9999,10 +10127,9 @@ index 0000000000000000000000000000000000000000..24be80614529e52f3e5a38a95fe00a05
 +}
 diff --git a/tools/run-spawn-room-localnet.test.mjs b/tools/run-spawn-room-localnet.test.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a6cb14f5e20ebab48e7bb069e3c64ba07eef834
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.test.mjs
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,86 @@
 +import test from 'node:test';
 +import assert from 'node:assert/strict';
 +import { createServer, connect } from 'node:net';
@@ -10024,9 +10151,11 @@ index 0000000000000000000000000000000000000000..4a6cb14f5e20ebab48e7bb069e3c64ba
 +  assert.throws(() => validateJourneyResult(report(), { ...evidence(), steps: [...evidence().steps, { name: 'negative-cases', status: 'failed' }] }));
 +});
 +
-+test('the localnet receipt requires each of its 25 named steps exactly once', () => {
++test('the localnet receipt requires each of its 26 named steps exactly once', () => {
 +  const complete = evidence();
-+  assert.equal(complete.steps.length, 25);
++  assert.equal(complete.steps.length, 26);
++  const missingAuditor = complete.steps.filter(({ name }) => name !== 'application-auditor-read');
++  assert.throws(() => validateJourneyResult(report(), { ...complete, steps: missingAuditor }), /did not verify application-auditor-read/);
 +  const summarySteps = complete.steps.filter(({ name }) => ['create', 'advance', 'recovery', 'reuse'].includes(name));
 +  assert.throws(() => validateJourneyResult(report(), { ...complete, steps: summarySteps }), /did not verify setup/);
 +  const missingRetention = complete.steps.filter(({ name }) => name !== 'revocation-retention');
@@ -10089,10 +10218,9 @@ index 0000000000000000000000000000000000000000..4a6cb14f5e20ebab48e7bb069e3c64ba
 +});
 diff --git a/tools/spawn-room-localnet.md b/tools/spawn-room-localnet.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..f6966c035f5c87cb2acef8e6f1763731a817d1cb
 --- /dev/null
 +++ b/tools/spawn-room-localnet.md
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,155 @@
 +# Run the experimental room journey locally
 +
 +`run-spawn-room-localnet.mjs` runs a fresh local validator, Photon, ring indexer,
@@ -10109,7 +10237,8 @@ index 0000000000000000000000000000000000000000..f6966c035f5c87cb2acef8e6f1763731
 +
 +Use the Go version in `prover/go.mod`, the Rust toolchain in
 +`rust-toolchain.toml`, and SBF platform tools v1.54. Install the native compiler
-+dependencies required by the pinned upstream checkout. On smaller machines,
++dependencies required by the pinned upstream checkout, including `lsof` and an external `kill` for
++scoped service shutdown. On smaller machines,
 +build with `CARGO_BUILD_JOBS=1`, `CARGO_PROFILE_DEV_DEBUG=0`, and
 +`CARGO_PROFILE_TEST_DEBUG=0`.
 +
@@ -10142,7 +10271,8 @@ index 0000000000000000000000000000000000000000..f6966c035f5c87cb2acef8e6f1763731
 +directory. That clean checkout must be at Backrooms commit
 +`08822c65254cd73c5f2dccbdf182ce1df2c7510a`. The journey imports its real
 +`reference-host` and Flue source; the runner verifies the revision and clean
-+status before and after the run.
++status before and after the run. Build RingRPC in the application checkout
++with `just build-ring-rpc` so the service includes the application audit decoder.
 +
 +The application preparation command is expensive on its first run. It creates
 +the two separate experimental keys, runs their full proof tests, exports the

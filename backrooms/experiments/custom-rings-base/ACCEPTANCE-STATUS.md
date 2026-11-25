@@ -6,6 +6,22 @@ This map records evidence and remaining qualification for the five acceptance bu
 
 **The observed application run passed 25 steps within one executed Vitest test, including 15 ledger-confirmed refusal transactions. Full CR04 acceptance and final independent review remain open.** Missing evidence below means the cited records do not establish that part of the acceptance wording; it is not a newly identified implementation defect.
 
+## Native VM qualification on November 24, 2026
+
+The patched localnet run passed all 26 required steps, including the 15 existing
+ledger refusal cases and a read of the confirmed application advance by an
+authorized auditor. The auditor opened the expected fixture writer's ring
+record and matched its public commitment. The run did not establish a verified
+application data hash in the audit response. The runner exited zero and released
+all eight loopback ports. Scoped shutdown requires both `lsof` and an external
+`kill` command. The two named circuit suites also passed, including their
+network-binding checks. [Redacted run receipt](evidence/cr04-native-vm-qualification.json)
+
+The log screen checked one synthetic lesson value and three synthetic Solana
+keypairs in 23 service and command logs. Separate ledger coverage for the
+remaining CR04 variants and native preview activation are still open. The VM
+run used synthetic identities and made no production changes.
+
 ## Published checkpoint and evidence sources
 
 The application references below are frozen to PR39 commit `1f012d15f6a8fba8d8d2244d7aa1ef7118747a9f`. The local publication receipt records remote publication and readback. The source overlay is 59 files with patch SHA-256 `2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462`.
