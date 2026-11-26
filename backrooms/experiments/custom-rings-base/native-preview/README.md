@@ -40,6 +40,6 @@ node --test readiness.test.mjs
 node fixtures/run.mjs
 ```
 
-The [historical execution evidence](evidence/README.md) records the commands, outputs, and source digests for the overlay before recovery pagination was bounded. These checks exercise the display contract with constructed inputs. The current descriptor pins the revised overlay.
+The [historical execution evidence](evidence/README.md) records the commands, outputs, and source digests for the overlay before recovery pagination was bounded. These checks exercise the display contract with constructed inputs. The descriptor retains the overlay identity from the recorded 26-step run. The current application manifest identifies the later auditor qualification harness, which still needs a native run.
 
 The CLI accepts a JSON pack path or `-` for stdin. The default pack is in [fixtures/cases.mjs](fixtures/cases.mjs). Every report and result is explicitly synthetic and non-qualifying. The CLI exits with code 1 for a malformed pack, an empty pack, or an expectation mismatch. The behavior suite checks the generated descriptor against its source. Regenerate it with `node descriptor.mjs > descriptor.json` after an approved contract edit.

@@ -172,9 +172,11 @@ A fresh private run directory contains `run-receipt.json`,
 `journey-evidence.json`, `vitest-results.json`, separate native process traces
 and exit records, measured runtime/resource data, and diagnostic logs. A pass
 requires executed, unskipped tests, all 26 named journey steps passing exactly
-once, source stability and completed service cleanup. The application auditor
-step records owner-record and application-data-hash verification separately.
-Report both results as recorded. A stale running receipt is incomplete.
+once, source stability and completed service cleanup. The auditor must open
+the confirmed room output and return the successor state hash after its
+enrollment index catches up. A missing or mismatched hash cannot pass.
+The retained 26-step run verified the owner record only. Its data-hash result
+remains false pending a fresh run of this harness.
 
 Do not publish the entire directory: it also contains local signing material,
 databases and private logs. Publish a reviewed synthetic evidence extract with

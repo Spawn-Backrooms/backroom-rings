@@ -6708,6 +6708,27 @@ index 0000000000000000000000000000000000000000..46e47b919f4dd19cb9799c64a902bea8
 +    ).toThrow(/localnet_only/);
 +  });
 +});
+diff --git a/sdk-tests/spawn-room/auditor.ts b/sdk-tests/spawn-room/auditor.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..a68c718566704cb1adb57ad6129f5f472bf3d852
+--- /dev/null
++++ b/sdk-tests/spawn-room/auditor.ts
+@@ -0,0 +1,15 @@
++import { Buffer } from "node:buffer";
++import type { AuditedUtxo } from "../../sdk-libs/ts/src/operations/audit/audit.js";
++
++// A paged read can see the owner record before the auditor indexes its enrollment.
++export function hasAuditedStateHash(
++  opening: Pick<AuditedUtxo, "nullifierPk" | "dataHash">,
++  expected: Uint8Array,
++): boolean {
++  if (opening.nullifierPk === undefined && opening.dataHash === undefined) return false;
++  if (opening.nullifierPk === undefined || opening.dataHash === undefined ||
++      !Buffer.from(opening.dataHash).equals(expected)) {
++    throw new Error("auditor could not verify the application state hash");
++  }
++  return true;
++}
 diff --git a/sdk-tests/spawn-room/live-refusals.ts b/sdk-tests/spawn-room/live-refusals.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..d2f9ac8c4ed5b4007e52f5c699f7621a84a0946f
@@ -6856,9 +6877,10 @@ index 0000000000000000000000000000000000000000..d2f9ac8c4ed5b4007e52f5c699f7621a
 +}
 diff --git a/sdk-tests/spawn-room/localnet-journey.test.ts b/sdk-tests/spawn-room/localnet-journey.test.ts
 new file mode 100644
+index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc97ff3763d
 --- /dev/null
 +++ b/sdk-tests/spawn-room/localnet-journey.test.ts
-@@ -0,0 +1,1316 @@
+@@ -0,0 +1,1317 @@
 +/** Real local-validator journey. Invoked only by tools/run-spawn-room-localnet.mjs. */
 +import { mkdir, readFile, writeFile } from "node:fs/promises";
 +import { join, resolve } from "node:path";
@@ -6966,6 +6988,7 @@ new file mode 100644
 +  type NativeWorkerResult,
 +} from "./native-worker.js";
 +import { spawnRoomLiveRefusals } from "./live-refusals.js";
++import { hasAuditedStateHash } from "./auditor.js";
 +interface Step {
 +  name: string;
 +  status: "passed" | "failed";
@@ -7006,13 +7029,13 @@ new file mode 100644
 +    throw new Error("invalid local signer file");
 +  return createKeyPairSignerFromBytes(Uint8Array.from(raw));
 +}
-+async function poll<T>(read: () => Promise<T | undefined>, description: string): Promise<T> {
++async function poll<T>(read: () => Promise<T | undefined>, description: string, intervalMs = 500): Promise<T> {
 +  const until = Date.now() + 240_000;
 +  for (;;) {
 +    const found = await read();
 +    if (found !== undefined) return found;
 +    if (Date.now() > until) throw new Error(`timed out waiting for ${description}`);
-+    await new Promise((resolve) => setTimeout(resolve, 500));
++    await new Promise((resolve) => setTimeout(resolve, intervalMs));
 +  }
 +}
 +function oneGrantPath(): SpawnGrantPath {
@@ -7839,32 +7862,32 @@ new file mode 100644
 +        action: "grant",
 +      }).sign(upgrade),
 +    );
-+    const auditedAdvance = await poll(async () => {
++    const expectedStateHash = hashSpawnRoomState(current.room.state);
++    const applicationDataHashVerified = await poll(async () => {
 +      const page = await ringRpc.getDecryptedTransactions({
 +        target,
 +        signer: messageSignerReader(auditReader),
 +      });
-+      return page.items.find((entry) => entry.signature === advancement.signature);
-+    }, "authorized application audit view");
-+    expect(auditedAdvance.slot).toBe(advancement.slot);
-+    expect(auditedAdvance.signers).toEqual([payer.address]);
-+    expect(auditedAdvance.payloadErrors).toHaveLength(0);
-+    expect(auditedAdvance.withdrawals).toHaveLength(0);
-+    const auditedOutput = auditedAdvance.outputs.find((output) =>
-+      equalBytes(output.outputContext.hash, current.entry.outputContext.hash),
-+    );
-+    if (auditedOutput?.opening.kind !== "ring")
-+      throw new Error("authorized auditor did not open the confirmed room output");
-+    expect(auditedOutput.opening.utxo.amount).toBe(0n);
-+    expect(auditedOutput.opening.utxo.ownerKey).toEqual(addressBytes(writer.address, "fixture audit writer"));
-+    const auditedDataHash = auditedOutput.opening.utxo.dataHash;
-+    if (auditedDataHash !== undefined)
-+      expect(auditedDataHash).toEqual(hashSpawnRoomState(current.room.state));
++      const auditedAdvance = page.items.find((entry) => entry.signature === advancement.signature);
++      if (auditedAdvance === undefined) return undefined;
++      expect(auditedAdvance.slot).toBe(advancement.slot);
++      expect(auditedAdvance.signers).toEqual([payer.address]);
++      expect(auditedAdvance.payloadErrors).toHaveLength(0);
++      expect(auditedAdvance.withdrawals).toHaveLength(0);
++      const output = auditedAdvance.outputs.find((item) =>
++        equalBytes(item.outputContext.hash, current.entry.outputContext.hash),
++      );
++      if (output?.opening.kind !== "ring")
++        throw new Error("authorized auditor did not open the confirmed room output");
++      expect(output.opening.utxo.amount).toBe(0n);
++      expect(output.opening.utxo.ownerKey).toEqual(addressBytes(writer.address, "fixture audit writer"));
++      return hasAuditedStateHash(output.opening.utxo, expectedStateHash) ? true : undefined;
++    }, "commitment-verified application auditor data hash", 5_000);
 +    steps.push({
 +      name: "application-auditor-read",
 +      status: "passed",
 +      ownerRecordVerified: true,
-+      applicationDataHashVerified: auditedDataHash !== undefined,
++      applicationDataHashVerified,
 +    });
 +    await evidence("running");
 +
@@ -9633,9 +9656,10 @@ index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c9
 +sha256sum target/deploy/custom_ring_program.so
 diff --git a/tools/run-spawn-room-localnet.mjs b/tools/run-spawn-room-localnet.mjs
 new file mode 100644
+index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c4676f0d4
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.mjs
-@@ -0,0 +1,489 @@
+@@ -0,0 +1,493 @@
 +#!/usr/bin/env node
 +// All services and the journey are descendants of this process. In particular,
 +// this also works in executors whose separate commands cannot share loopback.
@@ -9766,6 +9790,10 @@ new file mode 100644
 +    requireThat(typeof step?.name === 'string' && step.name.trim() !== '' && step.status === 'passed',
 +      'Journey contains an unnamed or unsuccessful step');
 +    requireThat(!verifiedSteps.has(step.name), 'Journey contains duplicate steps');
++    if (step.name === 'application-auditor-read') {
++      requireThat(step.ownerRecordVerified === true && step.applicationDataHashVerified === true,
++        'Journey did not verify the application auditor owner record and data hash');
++    }
 +    verifiedSteps.add(step.name);
 +  }
 +  for (const name of REQUIRED_JOURNEY_STEPS) {
@@ -10127,19 +10155,36 @@ new file mode 100644
 +}
 diff --git a/tools/run-spawn-room-localnet.test.mjs b/tools/run-spawn-room-localnet.test.mjs
 new file mode 100644
+index 0000000000000000000000000000000000000000..208e50f75401451f91e01cd109032830b3fc721f
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.test.mjs
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,102 @@
 +import test from 'node:test';
 +import assert from 'node:assert/strict';
 +import { createServer, connect } from 'node:net';
 +import { normalizedPorts, requireAvailablePorts, waitForAvailablePorts, validateJourneyResult, REQUIRED_JOURNEY_STEPS } from './run-spawn-room-localnet.mjs';
 +import { LocalnetResourceMonitor } from './localnet-resource-monitor.mjs';
++import { hasAuditedStateHash } from '../sdk-tests/spawn-room/auditor.ts';
 +
 +const report = () => ({ success: true, numPassedTests: 1, numFailedTests: 0, numPendingTests: 0, numTodoTests: 0,
 +  testResults: [{ assertionResults: [{ status: 'passed' }] }] });
 +const evidence = () => ({ schema: 'spawn-room-localnet-journey-v1', status: 'passed',
-+  steps: REQUIRED_JOURNEY_STEPS.map((name) => ({ name, status: 'passed' })) });
++  steps: REQUIRED_JOURNEY_STEPS.map((name) => name === 'application-auditor-read'
++    ? { name, status: 'passed', ownerRecordVerified: true, applicationDataHashVerified: true }
++    : { name, status: 'passed' }) });
++
++test('the auditor qualifies the resolved successor state hash', () => {
++  // Public application codec known answers for the predecessor and successor.
++  const old = Buffer.from('2e4305dcc6f85eb7b3785632ff5a58b9a36c586e4ba03e6f329d6ab8bc7b9e2e', 'hex');
++  const next = Buffer.from('0a0077d99d38d457ec84647a8617f98e4e4f53637865e39a671bdb876a00fba6', 'hex');
++  const nullifierPk = Buffer.alloc(32, 1);
++  assert.equal(hasAuditedStateHash({}, next), false);
++  assert.equal(hasAuditedStateHash({ nullifierPk, dataHash: Buffer.from(next) }, next), true);
++  assert.throws(() => hasAuditedStateHash({ nullifierPk, dataHash: old }, next), /state hash/);
++  const partial = evidence();
++  partial.steps.find(({ name }) => name === 'application-auditor-read').applicationDataHashVerified = false;
++  assert.throws(() => validateJourneyResult(report(), partial), /application auditor/);
++});
 +
 +test('no tests, skipped tests and incomplete chain journeys cannot become a passed run', () => {
 +  assert.doesNotThrow(() => validateJourneyResult(report(), evidence()));

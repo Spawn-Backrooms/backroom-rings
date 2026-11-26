@@ -3,7 +3,7 @@
   "customRingBase": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
   "zolanaBase": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
   "patch": "application-core.patch",
-  "patchSha256": "243ae5f816731a03cb85420919e62cc76db26213de87a4387c654d7423228288",
+  "patchSha256": "1b99de16ea777bc4057140bfb74aadf99b489cce77746f4a1028d197e62648c8",
   "files": {
     "Cargo.lock": "f2b8525534786280cf3b1de747751c5b231290273da27c65ec973e8d6b6fe0e7",
     "program-libs/interface/src/accounts/spawn_room_profile.rs": "9b88914c5b50b059b41fd9429d1d2537a8b8289b748b71b1067c6964e88d81c2",
@@ -50,8 +50,9 @@
     "sdk-libs/ts/test/experimental/spawn-room-payload.test.ts": "0af96e0ba1997725b1bfa0151b74859f4cb34b6e7d57d0e5dd50dea29bbe5370",
     "sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts": "c0f2eb05d7e19e757b4d3b729662d02704981aa3d7f53dadf5678459f4c943cb",
     "sdk-libs/ts/test/experimental/spawn-room-staging.test.ts": "a29afe5d0f439f954ec203129d345f8ed8cdd6c5abc30131f4bbc519b457de88",
+    "sdk-tests/spawn-room/auditor.ts": "e5b25398a81ed21b9d89b81543283afda132da1bdd5f58aeb2071d15154d249c",
     "sdk-tests/spawn-room/live-refusals.ts": "228a18012e39a183fa85fce908cc053666c396784438edf88655ebb794738b80",
-    "sdk-tests/spawn-room/localnet-journey.test.ts": "0b7b7776696be908075455467ad76b1a5efc3d8eaf8a619aa273010224ac68c5",
+    "sdk-tests/spawn-room/localnet-journey.test.ts": "3e8e4c3665b04ff98c35dcda0576917bfb812881c87a5ad1844aa0e6bde17e9e",
     "sdk-tests/spawn-room/native-restart.test.ts": "e64e71e6445da33e81c77e5e01558fa348ebd7b44a4d4e946a6363e56fafdee3",
     "sdk-tests/spawn-room/native-worker-runner.test.ts": "1248f1b4e29ac48ac48d2cbdfc75c0f6c3a825138f65b965a97aeba726895f2a",
     "sdk-tests/spawn-room/native-worker.test.ts": "7d7bb8423369d0734e1b6a9c8e03ac947d72e03f71d0490f6e1e4c0d60b1ba2a",
@@ -62,8 +63,8 @@
     "test-vectors/proof/spawn-room-genesis-v1.json": "d5ee32d2e937a19fee9d09d625f1955a62afe65abdb327bd1f67f932933e98e9",
     "tools/localnet-resource-monitor.mjs": "6c7fafcbea91738b6955575b2e1f164a332a21c1b0707bd401c5df2a7c4fb646",
     "tools/prepare-spawn-room-localnet.sh": "0a343a1e91f64702d84ae6a8795e0e4ed62f903c4d3ac26ad553d359afbd0e24",
-    "tools/run-spawn-room-localnet.mjs": "69a07ca1d713aa8045b243e5b69f4159bc3aebd8ee2d4df547bccec055d2fa66",
-    "tools/run-spawn-room-localnet.test.mjs": "ff2a90620394790f6cd65e2e5eac7cd4b85fc6230395acae6a99a737bd7a07db",
+    "tools/run-spawn-room-localnet.mjs": "7fc3cdff7aad042056017d62ba0d02f0658202f122fc4fac1018f0f823abf162",
+    "tools/run-spawn-room-localnet.test.mjs": "f85f6c8d19696e8f5f025fb4707046c7727684ed176f2d132d4681d00a143cc4",
     "tools/spawn-room-localnet.md": "eb36509bfd6e788093e939465fb2b9768b665daef151dc0ba762206682e89c37"
   }
 }
