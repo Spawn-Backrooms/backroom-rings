@@ -162,6 +162,14 @@ controlled stop after durable confirmation, another fresh retry and completed
 job re-entry without additional inference. The coordinator stays running;
 the controlled interruption is not presented as a power-loss test.
 
+To test a coordinator crash, set `"coordinatorReceiptRestartOnly": true` in
+the localnet config and run the same command with a fresh work directory.
+The supervisor observes the coordinator die while it holds the receipt database.
+A new process then checks the saved transaction bytes and slot against the
+validator. This run writes a `spawn-room-localnet-receipt-restart-v1` receipt
+and leaves the interrupted worker job pending. Use the default configuration
+in a separate run for the full 26-step journey.
+
 The same run requires duplicate-genesis, generic-bypass, replay and revoked
 grant transactions to fail with unchanged accepted state. A coherent third
 proof must simulate successfully before its admission is revoked.

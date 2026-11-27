@@ -3776,9 +3776,10 @@ index 0000000000000000000000000000000000000000..6226dd92c215b393c9cfea457f71b2b9
 +	}
 +}
 diff --git a/sdk-libs/client/src/codec/origin/mod.rs b/sdk-libs/client/src/codec/origin/mod.rs
+index 2a315fc4d59cd94a9acffb605ef10c4796eb773d..935fae0a6f5dbba293ef146960395b4260c05c96 100644
 --- a/sdk-libs/client/src/codec/origin/mod.rs
 +++ b/sdk-libs/client/src/codec/origin/mod.rs
-@@ -16,8 +16,9 @@
+@@ -16,8 +16,9 @@ use spr_transaction::{ShieldedTransaction, SOL_MINT};
  
  use crate::AuditError;
  use custom_ring_interface::{
@@ -3790,7 +3791,7 @@ diff --git a/sdk-libs/client/src/codec/origin/mod.rs b/sdk-libs/client/src/codec
  };
  
  /// What a confirmed transaction says about its ring, its signers and the value it settled out.
-@@ -287,12 +288,22 @@
+@@ -287,12 +288,22 @@ fn confirmed_transact(
          return None;
      }
      let caller = direct_caller(groups, source)?;
@@ -3819,7 +3820,7 @@ diff --git a/sdk-libs/client/src/codec/origin/mod.rs b/sdk-libs/client/src/codec
  }
  
  fn audit_frame_of(frame: &[u8], mode: RingMode) -> Result<AuditStreamLayout, AuditError> {
-@@ -302,6 +313,39 @@
+@@ -302,6 +313,39 @@ fn audit_frame_of(frame: &[u8], mode: RingMode) -> Result<AuditStreamLayout, Aud
  fn parse_frame(mode: RingMode, frame: &[u8]) -> Result<ParsedTransact<'_>, AuditError> {
      let invalid = |error: CustomRingError| AuditError::InvalidTransactData(error.to_string());
      let (&tag, data) = frame.split_first().ok_or(AuditError::MissingRingTransact)?;
@@ -6877,12 +6878,12 @@ index 0000000000000000000000000000000000000000..d2f9ac8c4ed5b4007e52f5c699f7621a
 +}
 diff --git a/sdk-tests/spawn-room/localnet-journey.test.ts b/sdk-tests/spawn-room/localnet-journey.test.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc97ff3763d
+index 0000000000000000000000000000000000000000..ad76ec52f9dc6a446a3b2f4071615ad7f6a14246
 --- /dev/null
 +++ b/sdk-tests/spawn-room/localnet-journey.test.ts
-@@ -0,0 +1,1317 @@
+@@ -0,0 +1,1367 @@
 +/** Real local-validator journey. Invoked only by tools/run-spawn-room-localnet.mjs. */
-+import { mkdir, readFile, writeFile } from "node:fs/promises";
++import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 +import { join, resolve } from "node:path";
 +import { pathToFileURL } from "node:url";
 +import { expect, it } from "vitest";
@@ -6989,6 +6990,7 @@ index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc9
 +} from "./native-worker.js";
 +import { spawnRoomLiveRefusals } from "./live-refusals.js";
 +import { hasAuditedStateHash } from "./auditor.js";
++import { receiptDigest, reconcileOriginalReceipt } from "./receipt-restart.mjs";
 +interface Step {
 +  name: string;
 +  status: "passed" | "failed";
@@ -7050,6 +7052,43 @@ index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc9
 +  };
 +}
 +
++const restartPhase = process.env.SPAWN_TEST_COORDINATOR_RECEIPT_PHASE;
++if (restartPhase === "reconcile") {
++  it("reconciles the original receipt after the producing coordinator exits", async () => {
++    const directory = join(config.workDirectory, "native-host");
++    const recordsPath = join(directory, "private-records.sqlite");
++    const keyPath = join(directory, "development.key");
++    expect((await stat(recordsPath)).isFile()).toBe(true);
++    expect((await stat(keyPath)).isFile()).toBe(true);
++    const { RuntimeOwnership } = await import(pathToFileURL(join(nativeRoot, "runtime-ownership.ts")).href);
++    const owner = RuntimeOwnership.acquire(directory);
++    try {
++      const records = await EncryptedSqliteRecords.open(recordsPath, await loadDevelopmentKey(keyPath), "spawn-room-localnet-v1");
++      try {
++        const checkpoint = JSON.parse(await readFile(join(config.workDirectory, "receipt-handoff.json"), "utf8"));
++        const report = await reconcileOriginalReceipt({
++          checkpoint,
++          read: (key: string) => records.read(key),
++          lookupConfirmed: async (signature: string) => {
++            const response = await fetch(config.rpcUrl, {
++              method: "POST",
++              redirect: "error",
++              headers: { "Content-Type": "application/json" },
++              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransaction",
++                params: [signature, { commitment: "confirmed", encoding: "base64", maxSupportedTransactionVersion: 1 }] }),
++              signal: AbortSignal.timeout(10_000),
++            });
++            expect(response.ok).toBe(true);
++            const body = await response.json();
++            expect(body.error).toBeUndefined();
++            return body.result;
++          },
++        });
++        await writeFile(join(config.workDirectory, "reconciled-receipt.json"), JSON.stringify(report), { mode: 0o600, flag: "wx" });
++      } finally { records.close(); }
++    } finally { owner.release(); }
++  });
++} else {
 +it("creates, advances, restarts and recovers, then reuses the native learned lesson on a real local validator", async () => {
 +  await mkdir(config.workDirectory, { recursive: true, mode: 0o700 });
 +  const steps: Step[] = [];
@@ -7929,6 +7968,17 @@ index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc9
 +    expect(await records.read("spawn-room-v1/process-result/recovery")).toBeUndefined();
 +    const receiptBeforeRetry = await records.read(`receipt/${pending.authorization.operationId}`);
 +    expect(receiptBeforeRetry).toBeDefined();
++    if (restartPhase === "crash") {
++      const { RuntimeOwnership } = await import(pathToFileURL(join(nativeRoot, "runtime-ownership.ts")).href);
++      const owner = RuntimeOwnership.acquire(nativeDirectory);
++      try {
++        const checkpoint = { schema: "spawn-room-receipt-handoff-v1", predecessorPid: process.pid,
++          receiptSha256: receiptDigest(receiptBeforeRetry) };
++        await writeFile(join(config.workDirectory, "receipt-handoff.json"), JSON.stringify(checkpoint), { mode: 0o600, flag: "wx" });
++        process.kill(process.pid, "SIGKILL");
++        throw new Error("Coordinator unexpectedly survived the crash checkpoint");
++      } finally { owner.release(); }
++    }
 +    const secondWorker = await executeNativeJob("recovery");
 +    expect(secondWorker.run.trace.pid).not.toBe(firstWorker.run.trace.pid);
 +    expect(secondWorker.run.trace.pid).not.toBe(interrupted.trace?.pid);
@@ -8198,6 +8248,7 @@ index 0000000000000000000000000000000000000000..f952aef0619aa8ff81b9e1001bf7bdc9
 +    records?.close();
 +  }
 +}, 1_800_000);
++}
 diff --git a/sdk-tests/spawn-room/native-restart.test.ts b/sdk-tests/spawn-room/native-restart.test.ts
 new file mode 100644
 index 0000000000000000000000000000000000000000..8d80f2078c67ee7350888188e162e4fac2e0424f
@@ -9298,6 +9349,97 @@ index 0000000000000000000000000000000000000000..c27100bab4322cacdd4cc64aa9e023c4
 +    logPath,
 +  };
 +}
+diff --git a/sdk-tests/spawn-room/receipt-restart.d.mts b/sdk-tests/spawn-room/receipt-restart.d.mts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7d76e440cfade1d83ac0f76d41ff7fa6c4a706da
+--- /dev/null
++++ b/sdk-tests/spawn-room/receipt-restart.d.mts
+@@ -0,0 +1,31 @@
++interface StoredRecord {
++  readonly value: unknown;
++}
++
++interface Checkpoint {
++  readonly schema: "spawn-room-receipt-handoff-v1";
++  readonly predecessorPid: number;
++  readonly receiptSha256: string;
++}
++
++interface ConfirmedTransaction {
++  readonly slot: number;
++  readonly meta: { readonly err: unknown } | null;
++  readonly transaction: readonly [string, "base64"];
++}
++
++export function receiptDigest(record: StoredRecord): string;
++
++export function reconcileOriginalReceipt(input: {
++  checkpoint: Checkpoint;
++  read: (key: string) => Promise<StoredRecord | undefined>;
++  lookupConfirmed: (signature: string) => Promise<ConfirmedTransaction | null>;
++}): Promise<{
++  schema: "spawn-room-reconciled-original-v1";
++  predecessorPid: number;
++  successorPid: number;
++  receiptSha256: string;
++  originalConfirmed: true;
++  originalReceiptUnchanged: true;
++  workerJobOutstanding: true;
++}>;
+diff --git a/sdk-tests/spawn-room/receipt-restart.mjs b/sdk-tests/spawn-room/receipt-restart.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..d5c47ba840648e45acd2e9dee0fec746af1e81ce
+--- /dev/null
++++ b/sdk-tests/spawn-room/receipt-restart.mjs
+@@ -0,0 +1,48 @@
++// Qualification only. The successor can read the original outcome but cannot run the predecessor's job.
++import assert from 'node:assert/strict';
++import { createHash } from 'node:crypto';
++
++export function receiptDigest(record) {
++  return createHash('sha256').update(JSON.stringify(record)).digest('hex');
++}
++
++export async function reconcileOriginalReceipt({ checkpoint, read, lookupConfirmed }) {
++  assert.equal(checkpoint?.schema, 'spawn-room-receipt-handoff-v1');
++  assert.ok(Number.isSafeInteger(checkpoint.predecessorPid) && checkpoint.predecessorPid > 0);
++  assert.notEqual(checkpoint.predecessorPid, process.pid);
++  try {
++    process.kill(checkpoint.predecessorPid, 0);
++    throw Error('Previous coordinator is still running');
++  } catch (error) {
++    if (error.code !== 'ESRCH') throw error;
++  }
++  const job = (await read('spawn-room-v1/process-job/recovery'))?.value;
++  const submission = (await read('spawn-room-v1/submission/first'))?.value;
++  assert.ok(job && submission);
++  assert.equal(job.coordinatorPid, checkpoint.predecessorPid);
++  assert.equal(job.resumeInterruptedCommit, true);
++  assert.equal(job.previousOperationId, submission.operationId);
++  assert.equal(job.observed.signature, submission.signature);
++  assert.equal(await read('spawn-room-v1/process-result/recovery'), undefined);
++  const key = 'receipt/' + submission.operationId;
++  const receipt = await read(key);
++  assert.ok(receipt && receiptDigest(receipt) === checkpoint.receiptSha256);
++  assert.equal(receipt.value.authorization.operationId, submission.operationId);
++  assert.equal(receipt.value.room.signature, submission.signature);
++  const landed = await lookupConfirmed(submission.signature);
++  // The error text on a mismatch must never include transaction bytes.
++  assert.ok(landed && landed.meta?.err === null && landed.transaction?.[1] === 'base64');
++  assert.ok(landed.transaction[0] === submission.wireTransaction, 'Confirmed transaction differs from original');
++  assert.ok(Number.isSafeInteger(landed.slot) && String(landed.slot) === receipt.value.room.slot);
++  assert.ok(receiptDigest(await read(key)) === checkpoint.receiptSha256);
++  assert.equal(await read('spawn-room-v1/process-result/recovery'), undefined);
++  return {
++    schema: 'spawn-room-reconciled-original-v1',
++    predecessorPid: checkpoint.predecessorPid,
++    successorPid: process.pid,
++    receiptSha256: checkpoint.receiptSha256,
++    originalConfirmed: true,
++    originalReceiptUnchanged: true,
++    workerJobOutstanding: true,
++  };
++}
 diff --git a/sdk-tests/spawn-room/tsconfig.json b/sdk-tests/spawn-room/tsconfig.json
 new file mode 100644
 index 0000000000000000000000000000000000000000..a5a3786220764a5790e8f34b621e7a593e369da8
@@ -9656,10 +9798,10 @@ index 0000000000000000000000000000000000000000..246e3201f0b75829a7223732f0be03c9
 +sha256sum target/deploy/custom_ring_program.so
 diff --git a/tools/run-spawn-room-localnet.mjs b/tools/run-spawn-room-localnet.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c4676f0d4
+index 0000000000000000000000000000000000000000..a02e7ef11df1f0663ed555c992acca39c7b114b8
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.mjs
-@@ -0,0 +1,493 @@
+@@ -0,0 +1,534 @@
 +#!/usr/bin/env node
 +// All services and the journey are descendants of this process. In particular,
 +// this also works in executors whose separate commands cannot share loopback.
@@ -9720,6 +9862,14 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +  return ports;
 +}
 +
++// The crash phase runs Vitest in a single worker thread of this exact child process.
++export function verifyCoordinatorCrash(command, checkpoint) {
++  requireThat(command.signal === 'SIGKILL' && command.exitCode === null && command.timedOut === false,
++    'Coordinator was not killed at the receipt checkpoint');
++  requireThat(Number.isSafeInteger(command.pid) && command.pid > 1 && command.pid === checkpoint.predecessorPid,
++    'Checkpoint did not belong to the supervised coordinator');
++}
++
 +export async function requireAvailablePorts(ports) {
 +  // Keep every successful bind until the whole check finishes. Never kill a
 +  // listener to make a requested port available.
@@ -9778,11 +9928,15 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +  'revocation-retention',
 +]);
 +
-+export function validateJourneyResult(vitest, evidence) {
++function requirePassingVitest(vitest) {
 +  requireThat(vitest.success === true && vitest.numPassedTests > 0 && vitest.numFailedTests === 0 &&
 +    vitest.numPendingTests === 0 && vitest.numTodoTests === 0, 'Vitest must execute and pass the journey without skipped tests');
 +  const assertions = vitest.testResults?.flatMap((suite) => suite.assertionResults ?? []) ?? [];
 +  requireThat(assertions.length > 0 && assertions.every((test) => test.status === 'passed'), 'No complete passing journey assertions');
++}
++
++export function validateJourneyResult(vitest, evidence) {
++  requirePassingVitest(vitest);
 +  requireThat(evidence.schema === 'spawn-room-localnet-journey-v1' && evidence.status === 'passed', 'Journey did not produce a passing evidence receipt');
 +  requireThat(Array.isArray(evidence.steps), 'Journey contains no step list');
 +  const verifiedSteps = new Set();
@@ -9879,7 +10033,8 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +  const home = join(workDirectory, 'config');
 +  for (const path of [logDirectory, scope, home]) await mkdir(path, { mode: 0o700 });
 +  const receiptPath = join(workDirectory, 'run-receipt.json');
-+  const receipt = { schema: 'spawn-room-localnet-run-v1', status: 'running', startedAt: now(), workDirectory,
++  const restartOnly = config.coordinatorReceiptRestartOnly === true;
++  const receipt = { schema: restartOnly ? 'spawn-room-localnet-receipt-restart-v1' : 'spawn-room-localnet-run-v1', status: 'running', startedAt: now(), workDirectory,
 +    sameParentServices: true, setup: 'experimental localnet only', nativeRevision: NATIVE_PIN, zolanaRevision: ZOLANA_PIN, appZolanaRevision: ZOLANA_PIN,
 +    runtime: { node: process.version, platform: process.platform, arch: process.arch },
 +    appRevision: git(APP_ROOT, 'rev-parse', 'HEAD'), appDiffSha256: createHash('sha256').update(git(APP_ROOT, 'diff', '--binary', 'HEAD')).digest('hex'),
@@ -9921,6 +10076,7 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +    receipt.commands.push(row); await save();
 +    const fd = openSync(logPath, 'wx', 0o600);
 +    const child = spawn(binary, args, { cwd, env, detached: true, stdio: ['ignore', fd, fd] });
++    row.pid = child.pid;
 +    measurement.registerGroup(child.pid, `command:${name}`);
 +    closeSync(fd);
 +    activeCommands.add(child);
@@ -10077,14 +10233,41 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +      feePayerKeypairPath: actors.feePayer.path, publisherKeypairPath: actors.publisher.path, workDirectory };
 +    env.SPAWN_JOURNEY_CONFIG = join(workDirectory, 'journey-config.json');
 +    await writeJson(env.SPAWN_JOURNEY_CONFIG, journeyConfig);
++    async function runJourney(name, vitestPath, crash = false) {
++      const cli = ['run', '--config', 'sdk-tests/spawn-room/vitest.config.ts',
++        'sdk-tests/spawn-room/localnet-journey.test.ts', '--maxWorkers=1', '--reporter=json', `--outputFile=${vitestPath}`];
++      if (crash) {
++        return command(name, process.execPath, [join(APP_ROOT, 'node_modules/vitest/vitest.mjs'), ...cli, '--pool=threads'],
++          { timeoutMs: 3_600_000, allowFailure: true });
++      }
++      return command(name, binaries.npm, ['exec', '--no', '--', 'vitest', ...cli], { timeoutMs: 3_600_000 });
++    }
 +    const vitestPath = join(workDirectory, 'vitest-results.json');
-+    await command('journey', binaries.npm, ['exec', '--no', '--', 'vitest', 'run', '--config', 'sdk-tests/spawn-room/vitest.config.ts',
-+      'sdk-tests/spawn-room/localnet-journey.test.ts', '--maxWorkers=1', '--reporter=json', `--outputFile=${vitestPath}`], { timeoutMs: 3_600_000 });
-+    const evidencePath = join(workDirectory, 'journey-evidence.json');
-+    const evidence = await json(evidencePath);
-+    validateJourneyResult(await json(vitestPath), evidence);
-+    receipt.journey = { evidencePath, evidenceSha256: (await hashFile(evidencePath)).sha256, steps: evidence.steps,
-+      vitestPath, vitestSha256: (await hashFile(vitestPath)).sha256 };
++    delete env.SPAWN_TEST_COORDINATOR_RECEIPT_PHASE;
++    if (restartOnly) env.SPAWN_TEST_COORDINATOR_RECEIPT_PHASE = 'crash';
++    const first = await runJourney('journey', vitestPath, restartOnly);
++    if (restartOnly) {
++      const checkpoint = await json(join(workDirectory, 'receipt-handoff.json'));
++      verifyCoordinatorCrash(first, checkpoint);
++      first.status = 'expected_crash';
++      await save();
++      env.SPAWN_TEST_COORDINATOR_RECEIPT_PHASE = 'reconcile';
++      const successorPath = join(workDirectory, 'successor-vitest.json');
++      await runJourney('receipt-successor', successorPath);
++      requirePassingVitest(await json(successorPath));
++      const report = await json(join(workDirectory, 'reconciled-receipt.json'));
++      requireThat(report.schema === 'spawn-room-reconciled-original-v1' && report.originalConfirmed === true &&
++        report.originalReceiptUnchanged === true && report.workerJobOutstanding === true &&
++        report.predecessorPid === checkpoint.predecessorPid && report.predecessorPid !== report.successorPid &&
++        report.receiptSha256 === checkpoint.receiptSha256, 'Incomplete coordinator restart observation');
++      receipt.reconciliation = report;
++    } else {
++      const evidencePath = join(workDirectory, 'journey-evidence.json');
++      const evidence = await json(evidencePath);
++      validateJourneyResult(await json(vitestPath), evidence);
++      receipt.journey = { evidencePath, evidenceSha256: (await hashFile(evidencePath)).sha256, steps: evidence.steps,
++        vitestPath, vitestSha256: (await hashFile(vitestPath)).sha256 };
++    }
 +    receipt.status = 'passed';
 +  } catch (error) {
 +    receipt.status = 'failed'; receipt.error = error instanceof Error ? error.message : String(error);
@@ -10155,14 +10338,14 @@ index 0000000000000000000000000000000000000000..50d43ea5be23bb4f67e34dce028a3a1c
 +}
 diff --git a/tools/run-spawn-room-localnet.test.mjs b/tools/run-spawn-room-localnet.test.mjs
 new file mode 100644
-index 0000000000000000000000000000000000000000..208e50f75401451f91e01cd109032830b3fc721f
+index 0000000000000000000000000000000000000000..871a01ce4eb5ec700c4e572896413f9a88ccb727
 --- /dev/null
 +++ b/tools/run-spawn-room-localnet.test.mjs
-@@ -0,0 +1,102 @@
+@@ -0,0 +1,111 @@
 +import test from 'node:test';
 +import assert from 'node:assert/strict';
 +import { createServer, connect } from 'node:net';
-+import { normalizedPorts, requireAvailablePorts, waitForAvailablePorts, validateJourneyResult, REQUIRED_JOURNEY_STEPS } from './run-spawn-room-localnet.mjs';
++import { normalizedPorts, requireAvailablePorts, waitForAvailablePorts, validateJourneyResult, verifyCoordinatorCrash, REQUIRED_JOURNEY_STEPS } from './run-spawn-room-localnet.mjs';
 +import { LocalnetResourceMonitor } from './localnet-resource-monitor.mjs';
 +import { hasAuditedStateHash } from '../sdk-tests/spawn-room/auditor.ts';
 +
@@ -10172,6 +10355,15 @@ index 0000000000000000000000000000000000000000..208e50f75401451f91e01cd109032830
 +  steps: REQUIRED_JOURNEY_STEPS.map((name) => name === 'application-auditor-read'
 +    ? { name, status: 'passed', ownerRecordVerified: true, applicationDataHashVerified: true }
 +    : { name, status: 'passed' }) });
++
++test('coordinator recovery requires the checkpoint owner to die by signal before the command timeout', () => {
++  const command = { pid: 12345, exitCode: null, signal: 'SIGKILL', timedOut: false };
++  const checkpoint = { predecessorPid: command.pid };
++  assert.doesNotThrow(() => verifyCoordinatorCrash(command, checkpoint));
++  assert.throws(() => verifyCoordinatorCrash({ ...command, exitCode: 0, signal: null }, checkpoint), /not killed/);
++  assert.throws(() => verifyCoordinatorCrash({ ...command, timedOut: true }, checkpoint), /not killed/);
++  assert.throws(() => verifyCoordinatorCrash(command, { predecessorPid: command.pid + 1 }), /supervised coordinator/);
++});
 +
 +test('the auditor qualifies the resolved successor state hash', () => {
 +  // Public application codec known answers for the predecessor and successor.
@@ -10263,6 +10455,7 @@ index 0000000000000000000000000000000000000000..208e50f75401451f91e01cd109032830
 +});
 diff --git a/tools/spawn-room-localnet.md b/tools/spawn-room-localnet.md
 new file mode 100644
+index 0000000000000000000000000000000000000000..0aee7159b445e4be6b8186a5e0d4daa422577dae
 --- /dev/null
 +++ b/tools/spawn-room-localnet.md
 @@ -0,0 +1,155 @@
