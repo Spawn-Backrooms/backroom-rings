@@ -1,0 +1,24 @@
+{
+  "schema": "spawn-app-harness-tests-v1",
+  "command": [
+    "node",
+    "--test",
+    "tools/run-spawn-room-localnet.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/06977f839292/custom-rings-app",
+  "status": "failed",
+  "exitCode": 0,
+  "startedAt": "2026-11-24T02:56:48.193212+00:00",
+  "finishedAt": "2026-11-24T02:56:48.736856+00:00",
+  "durationSeconds": 0.544,
+  "counts": {},
+  "sourceSha256": {
+    "tools/run-spawn-room-localnet.mjs": "4dd310b5f17598b70b4b8b1d81a9c0f2fa35c64aeac072bac78ca5e7e4beefe3",
+    "tools/run-spawn-room-localnet.test.mjs": "e5bf10ff3e0f612134a966f046e48ce428a803d005ee5e3fdc2082c41a5486aa",
+    "tools/localnet-resource-monitor.mjs": "6c7fafcbea91738b6955575b2e1f164a332a21c1b0707bd401c5df2a7c4fb646"
+  },
+  "sourceUnchanged": true,
+  "logPath": "/workspace/scratch/06977f839292/context/final-app-harness-tests.log",
+  "logSha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee",
+  "scope": "existing lightweight local runner guard tests; no live validator journey or independent review"
+}

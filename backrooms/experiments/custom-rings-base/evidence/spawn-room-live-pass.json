@@ -1,0 +1,2355 @@
+{
+  "schema": "spawn-room-localnet-public-evidence-v1",
+  "status": "passed",
+  "scope": "Observed synthetic disposable localnet execution and evidence packaging; this is not a replacement independent review. Final independent review remains separately blocked.",
+  "generatedAt": "2026-11-24T03:17:22.556225+00:00",
+  "runId": "journey-KXteXY",
+  "sameParentServices": true,
+  "ringProgramId": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+  "inference": "existing deterministic Flue fixture; no external provider",
+  "startedAt": "2026-11-24T03:04:05.555Z",
+  "finishedAt": "2026-11-24T03:09:34.649Z",
+  "supervisorExitCode": 0,
+  "supervisorDurationSeconds": 334.208,
+  "supervisorResourceScope": "The application receipt measures its Node harness and owned descendants; this lightweight outer Python supervisor is excluded.",
+  "runtime": {
+    "node": "v24.22.3",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "configuredResources": {
+    "GOMAXPROCS": "1",
+    "GOMEMLIMIT": "3GiB",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "vitest": {
+    "success": true,
+    "numTotalTests": 1,
+    "numPassedTests": 1,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "stepCount": 25,
+  "steps": [
+    {
+      "name": "setup",
+      "status": "passed",
+      "signature": "4MtKFis1eFbFt5KztbL2wxUgSCowcgJ9sJ7zyh67TN1HM85RZNWbSJwKYZnF2hZnhBsTW3LjDvwDzwyCa5A9fTHw"
+    },
+    {
+      "name": "create",
+      "status": "passed",
+      "signature": "4kbtPeFKnrk8fCVrdzobH7r93jWsUYsoYSQz64rkTipqAFTKUXjcV9VJ2qiwwhcvbpbaz9fJqFZAwgvi4FvYxTy6",
+      "slot": "321",
+      "visibleWriter": "5w42ptm4vtSYXQ4EipmZe3dCWhcKgGec2TYA3RSBc2xr",
+      "serializedBytes": 2740,
+      "signerCount": 2
+    },
+    {
+      "name": "eligible-second-room",
+      "status": "passed",
+      "signature": "5vueWwJExSAxLaw8BeUSQRMwJ4qDd9Jtivob65P9m7cqFyxo1Q1b2GLgFnvtX6rHn1osfrXNbGDZLprLt9aF9zDC",
+      "slot": "385",
+      "eligibleWriters": 2,
+      "unspentRoomNotes": 2,
+      "privacyScope": "two local candidates; no claim of production anonymity"
+    },
+    {
+      "name": "reject-duplicate-genesis",
+      "status": "passed",
+      "signature": "5Qvz1mC4pYuakmCR6E6jQ76ESCxSubocaf3Zy2ZTUnhi2vTRznS2vZTCJmAeHq2PJTpezo1Coa9bLSeYfPv6MkgU",
+      "slot": "388",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "instructionError": "AccountAlreadyInitialized",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "29f7597ab31ac3b496ee24188a21b7042bdcf6447fb24e5dbb87d725fac40abe"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "3ptKZjVxsKnJC5Ptm59LmChUbf6CoivBjiHCMPtoEUqu",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "967440",
+          "dataHash": "0ac53479b8eb6f84080230c365f92f5d479bc2eecc631ddb47dacf6776f28983"
+        },
+        {
+          "address": "3e3phLUKBMyfSxQT2arGQiWNa94ThqZ5CsCZpFZjJ8Np",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "967440",
+          "dataHash": "d061fb79934e0cc5977377a48a76aae865383f3d10f65297a58bde4cb5c3d975"
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "native-process-first",
+      "status": "passed",
+      "coordinatorPid": 415,
+      "workerPid": 468,
+      "exitCode": 0,
+      "exitedAt": "2026-11-24T03:06:52.879Z",
+      "originalDigest": "d44ccd0f158b04add38ea3e8dbd9522db46c6b88f0261d65f93d94a59337a7ff",
+      "resources": {
+        "maxRssKiB": 205204,
+        "elapsedWallMs": 3393,
+        "taskElapsedWallMs": 809,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "workerTraceId": "first-episode"
+    },
+    {
+      "name": "adversarial-valid-control",
+      "status": "passed",
+      "scope": "same unspent hidden advance successfully simulated before frame mutations"
+    },
+    {
+      "name": "reject-wrong-application-config",
+      "status": "passed",
+      "signature": "66yWyUvNxWAdh7mfP7CSVrqGs8p7VsvRppDkYXjRh8vyFHSomU1t6FRqTjTA7Z8uBgfsqCYak9J9NFQWRLLWrB7q",
+      "slot": "586",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "canonical application config account admission",
+      "sppInvoked": false,
+      "instructionError": "InvalidAccountData",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-wrong-ring-policy",
+      "status": "passed",
+      "signature": "5N48rHLX1xv5xPuNVMAfZLDgDaynZ1gswm2Mw3bmehaHWHF6NkF3wboupsACVxJbGScN5uGKRAET43ehVYXzkmY5",
+      "slot": "588",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "ring policy owner/discriminator admission",
+      "sppInvoked": false,
+      "instructionError": {
+        "Custom": 8300
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-unapproved-settlement-program",
+      "status": "passed",
+      "signature": "39nDrXQJqKj4ycr573NgnmUo1DrsvPbEPBn4Ya5SBdmNkCUUo6Ym4x8mQBci984CyWbJhGq6d7kWCECgzx82mocR",
+      "slot": "592",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "pinned SPP executable after combined application verification",
+      "sppInvoked": false,
+      "instructionError": {
+        "Custom": 8103
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-wrong-operation-key",
+      "status": "passed",
+      "signature": "5SSzzRPQ4akF4a5m225QpXh9r4N85SDghyBNVgwJA2bZxZ2KCengKqs4a513fB3buFMAFSKVBVF3Ddec71HCBnBx",
+      "slot": "594",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "real valid genesis proof refused by the pinned advance verifier",
+      "sppInvoked": false,
+      "instructionError": {
+        "Custom": 8101
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-reordered-audit-frame",
+      "status": "passed",
+      "signature": "5qLqz5e1TYPYVa3arZUTxuTGDzevnLtsnuEsbWNJjyJETRTz7wQ1jZie3n8zZCioqXX9BYxWVW9NjNhqQEzpAkKk",
+      "slot": "597",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "ordered encrypted audit-envelope blocks; lengths and count byte preserved",
+      "sppInvoked": false,
+      "instructionError": {
+        "Custom": 8101
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-peer-room-input",
+      "status": "passed",
+      "signature": "27ebJ4fE5pGbMeDDwvvnx15tuxVdaQrFbqMj7BuNBpj1GfLEQuBaoPKfErHLqXHCeoMq4yYvLT2Wt5hUnfY18wup",
+      "slot": "599",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "actual unspent peer room nullifier substituted under the first writer's proof",
+      "sppInvoked": false,
+      "instructionError": {
+        "Custom": 8101
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "HL8w78ueWEsyQ7Tggno1nCQxJwWY8K1pMsh3TtXmcyN9",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-bound-output-substitution",
+      "status": "passed",
+      "signature": "QfVuQpTZUQa6TeDD3TekWH11rCtzkKF8aRYFZCq4R1EF4FUdso3Vya3vBuUBRywD8zwfpyB2iwvwaNNGm5jaUGC",
+      "slot": "602",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "actual peer note commitment substituted after both proofs were authorized",
+      "sppInvoked": true,
+      "instructionError": {
+        "Custom": 7008
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-ciphertext-substitution",
+      "status": "passed",
+      "signature": "i8EJZoTT5hSAkDKVjsAaDVS8qp5WNP7jcvFprLE8HfFLUvDhpgAbt1oAoLvpK3hS1iVeeW1xnt9EiqUJkucCYED",
+      "slot": "604",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "scope": "recipient payload byte changed with all lengths, note hash and proofs preserved",
+      "sppInvoked": true,
+      "instructionError": {
+        "Custom": 7008
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-generic-transfer",
+      "status": "passed",
+      "signature": "4JnfmCwgxiakQbQnNbQX4DDfa2HSrbc9PcYzJWq5qenJasDWHi4d61nsTySTsByRHeDypxhKMEVFQ4rwDy8sgksJ",
+      "slot": "607",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "instructionError": "InvalidInstructionData",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-generic-authority-transfer",
+      "status": "passed",
+      "signature": "3sogFTmQuCTJzmDJmGK8qa8V6VYJGLFQkXqLQD1bNQRZ21ApNoCP4Ywg7aCWP2knDeAtotVMzkBYWytSkpg9T65v",
+      "slot": "609",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "instructionError": "InvalidInstructionData",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-generic-merge",
+      "status": "passed",
+      "signature": "3fv2gPoGs7aTEBy3yHAo5EUceXwM2gs4isuCC62arqt6QBJVV9sVS561xFi5gknyAPM7qYFN2CKddYaMvXb1Tamc",
+      "slot": "612",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "instructionError": "InvalidInstructionData",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "reject-generic-set-delegate",
+      "status": "passed",
+      "signature": "5gRjSUwSJWY9HMFC1umQdS1no4oLNHaEso3g6VDBuUABDYcworwdHWGddE8ZVCGnKNYGZzBeir9H1rsqLjQU29S6",
+      "slot": "613",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "instructionError": "InvalidInstructionData",
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059168560880",
+          "dataHash": "ad79ac34a3574b9b85a1ff3b015b37c51328ebb03c6ed59a33cb6dae8a502a66"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": false
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": false
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "advance",
+      "status": "passed",
+      "signature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+      "slot": "615",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "originalDigest": "d44ccd0f158b04add38ea3e8dbd9522db46c6b88f0261d65f93d94a59337a7ff",
+      "selectedProcedure": 0,
+      "originalValue": 9,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true,
+      "nativeWorkerPid": 468,
+      "nativeWorkerExitCode": 0,
+      "eligibleUnspentRoomNotesBefore": 2,
+      "nativeConfirmationReceipt": "deliberately absent until independent recovery",
+      "scores": [
+        40,
+        50
+      ]
+    },
+    {
+      "name": "reject-replay",
+      "status": "passed",
+      "signature": "2sEWmFL684UFtmXQqWBqNTLYpYadsVnVj9WgCRPAN2pyvzoMp69YoEXt3vTR29BRZQpiQeDLNcUqPLe8bVtHLqeN",
+      "slot": "617",
+      "acceptedRevision": "1",
+      "acceptedCommitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+      "instructionError": {
+        "Custom": 7043
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "6bca13d41a46cb2245c4750daaf90d1d450716d28a751ffe42794432d2365f84"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059166631000",
+          "dataHash": "c115601ec04a2dac141d175a1b0fc1f8aaa38a8ff2e6541326f7085944598859"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "4Wo1Qzj7RsJLQTbmcEBfWsH5GpFXkWmqt3CEoh2ha9SF",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "967440",
+          "dataHash": "8327e8e7c7a784858d955f1d1c4ecd0c699fe6ac9807239cb77ff3e8c4a95028"
+        },
+        {
+          "address": "41Skm5QupzthfkmkdY2pb4hQzCuo8Xiq3BXpFaKzk62V",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "967440",
+          "dataHash": "7d4e293848ac5737518799e293b997065d0fdb8d14037cf737f2e91fa7e08e9a"
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+          "spent": false
+        },
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": true
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "recovery",
+      "status": "passed",
+      "coordinatorPid": 415,
+      "originalDigest": "d44ccd0f158b04add38ea3e8dbd9522db46c6b88f0261d65f93d94a59337a7ff",
+      "revision": "1",
+      "coverage": "Complete",
+      "resumedInferenceCalls": 0,
+      "priorNativePid": 468,
+      "recoveredNativePid": 575,
+      "priorProcessExitedAt": "2026-11-24T03:06:52.879Z",
+      "workerExitCode": 0,
+      "interruptedCommitRecovered": true,
+      "sameSavedSubmissionSignature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+      "coordinatorRemainedRunning": true,
+      "resources": {
+        "maxRssKiB": 257304,
+        "elapsedWallMs": 2270,
+        "taskElapsedWallMs": 874,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "controlledReceiptInterruption": {
+        "workerPid": 528,
+        "exitCode": 1,
+        "reason": "spawn_worker_after_receipt_interruption",
+        "receiptRetainedExactly": true
+      },
+      "workerTraceIds": [
+        "first-episode",
+        "recovery-interruption-after-receipt",
+        "recovery-retry-and-later-episode"
+      ]
+    },
+    {
+      "name": "native-worker-idempotent-reentry",
+      "status": "passed",
+      "workerPid": 622,
+      "exitCode": 0,
+      "originalDigest": "978eca8af8f7815d529588d2bbcce9f2df769ffe2761576adfaa6d8f48472898",
+      "repeatedInferenceCalls": 0,
+      "originalGrantNonceAndReceiptUnchanged": true,
+      "resources": {
+        "maxRssKiB": 204864,
+        "elapsedWallMs": 2588,
+        "taskElapsedWallMs": 675,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "workerTraceId": "completed-job-reentry"
+    },
+    {
+      "name": "reuse",
+      "status": "passed",
+      "signature": "2BBFRnfmECWgrmJgWXQPB2atwwRCnkBG5ua6fgrKPXXA9Etr9PcxwjzJWQbtGEJe7ASvxBTY2gCrkUB2mLRGoywB",
+      "slot": "711",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "selectedProcedure": 1,
+      "learnedValue": 5,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true,
+      "nativeWorkerPid": 575,
+      "nativeWorkerExitCode": 0,
+      "scores": [
+        40,
+        60
+      ],
+      "syntheticLessonUsed": true,
+      "lessonContentOmitted": true
+    },
+    {
+      "name": "reject-revoked-grant",
+      "status": "passed",
+      "signature": "5K3SocoYuNaajQ9SQ6ynpNtVCStofV5izpWibMGj99WtTYKBQ79uSiyYkQ1VPG7QHxz2yoYrbLP3w797jPutuzWe",
+      "slot": "798",
+      "acceptedRevision": "2",
+      "acceptedCommitment": "15aab2f67ac4718c8c4bc60926759db55315d759ce9969e370c5dbc675aea58f",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "unchangedAccounts": [
+        {
+          "address": "8Ai4bQmXWuWET8ButUTQJGaWunTChh5Xc4zgSdYzrddZ",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "1893120",
+          "dataHash": "cea9e16af05ba54229a1dd424328a2fe9e97fd40d880ce6956126624ba1d6a7c"
+        },
+        {
+          "address": "81cooPzUAQ32H2G4wdXMeqnHPySyabH9hPZU9qYXDoeF",
+          "exists": true,
+          "owner": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+          "lamports": "946560",
+          "dataHash": "701ace2562c09492dec9430fbf82bdd19e88274ae1f680a061ad4aacd70081b0"
+        },
+        {
+          "address": "777pvSGe5LaBd9nCczvE2FXEauiwtfGJ5XRpjKyniGor",
+          "exists": true,
+          "owner": "ring1GaLCuJnkUMVkX2JeZLTTX17wKsV4fZmPVzXANW",
+          "lamports": "1059164701120",
+          "dataHash": "af369f4149e6c8074b45d4bd5e3c02aeb69d28921f31f11597bfb4de8d4409b7"
+        },
+        {
+          "address": "qEYErTWpDSnip6T1U5EjZKfSkMXRqs4W6CPu3byYtyr",
+          "exists": true,
+          "owner": "rnGSTosTQ9gToNQP44THEZph8xtBtuGa5FEwzhKrWjL",
+          "lamports": "44390880",
+          "dataHash": "848a715cd3bf24280c14f218d2f4277ecf9ed38e2b623df32a7c905daa18e311"
+        },
+        {
+          "address": "BDXMrGi2AkiKrQesyC4B4gmeaTN9bnpykCKhow7N8JXY",
+          "exists": false
+        },
+        {
+          "address": "73UqQMp7ehC9WgcaGJAFdTCq9gvZNSyVtxphEecD5yk7",
+          "exists": false
+        }
+      ],
+      "unchangedWalletNotes": [
+        {
+          "commitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+          "spent": true
+        },
+        {
+          "commitment": "15aab2f67ac4718c8c4bc60926759db55315d759ce9969e370c5dbc675aea58f",
+          "spent": false
+        },
+        {
+          "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+          "spent": true
+        }
+      ],
+      "unchangedPeerRoom": {
+        "commitment": "2d6dd1091bf668920728ac285e1c8489d6a6694b9c88ff32ed299658d73046a9",
+        "revision": "0",
+        "spent": false
+      }
+    },
+    {
+      "name": "revocation-retention",
+      "status": "passed",
+      "acceptedRevision": "2",
+      "originalDigest": "98630d6690fb81c91bde0c1644f3bf110740771bcbe814930bb581c6bcf5b1fd",
+      "validBeforeRevocation": true,
+      "admittedEpoch": "3",
+      "revokedEpoch": "4",
+      "originalAndNonceRetained": true,
+      "pendingRevision": "3",
+      "acceptedScores": [
+        40,
+        60
+      ]
+    }
+  ],
+  "workers": [
+    {
+      "id": "first-episode",
+      "phase": "first",
+      "status": "passed",
+      "pid": 468,
+      "ppid": 433,
+      "coordinatorPid": 415,
+      "startedAt": "2026-11-24T03:06:52.030Z",
+      "completedAt": "2026-11-24T03:06:52.838Z",
+      "nativeRuntimeStopped": true,
+      "recordsClosed": true,
+      "originalReused": false,
+      "resources": {
+        "maxRssKiB": 205204,
+        "elapsedWallMs": 3393,
+        "taskElapsedWallMs": 809,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "separateFromCoordinator": true,
+      "observedByResourceMonitor": true,
+      "recoveredNote": {
+        "commitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+        "revision": "0",
+        "contextSlot": "397",
+        "coverage": "Complete"
+      },
+      "exit": {
+        "phase": "first",
+        "coordinatorPid": 415,
+        "launcherPid": 433,
+        "code": 0,
+        "signal": null,
+        "timedOut": false,
+        "exitedAt": "2026-11-24T03:06:52.879Z",
+        "elapsedWallMs": 4040,
+        "durationScope": "native worker Vitest launch through observed process exit"
+      },
+      "privateTraceSha256": "d657b3ac732074ff19797448cf84f464c60d1470174c04f9da0c2b5e81e33792",
+      "privateExitReceiptSha256": "7fc9b32a7a77a8b5cae1a86a1f3bff40493bd77723bed342ffb307b03de31887",
+      "syntheticTaskResult": {
+        "selectedProcedure": 0,
+        "value": 9,
+        "memoryRevision": "0",
+        "inferenceCalls": 4
+      }
+    },
+    {
+      "id": "recovery-interruption-after-receipt",
+      "phase": "recovery",
+      "status": "failed",
+      "pid": 528,
+      "ppid": 493,
+      "coordinatorPid": 415,
+      "startedAt": "2026-11-24T03:08:23.483Z",
+      "completedAt": "2026-11-24T03:08:24.080Z",
+      "nativeRuntimeStopped": true,
+      "recordsClosed": true,
+      "resources": {
+        "maxRssKiB": 202888,
+        "elapsedWallMs": 2691,
+        "taskElapsedWallMs": 597,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "separateFromCoordinator": true,
+      "observedByResourceMonitor": true,
+      "recoveredNote": {
+        "commitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+        "revision": "1",
+        "contextSlot": "625",
+        "coverage": "Complete"
+      },
+      "exit": {
+        "phase": "recovery",
+        "coordinatorPid": 415,
+        "launcherPid": 493,
+        "code": 1,
+        "signal": null,
+        "timedOut": false,
+        "exitedAt": "2026-11-24T03:08:24.133Z",
+        "elapsedWallMs": 3214,
+        "durationScope": "native worker Vitest launch through observed process exit"
+      },
+      "privateTraceSha256": "444dae6e21fbec2813c1e4886493b22547d0adc77a75f8c7d83512451de6d1dc",
+      "privateExitReceiptSha256": "8fdd1caf8fae12c6b2f0e72477229ab9cee6fb0c620aa24fc64e67fbae6782b2",
+      "signedWireReconciliation": {
+        "receiptAbsentOnEntry": true,
+        "savedSignature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+        "observedSlot": "615",
+        "savedFrameMatchesLedger": true,
+        "receiptRetained": true
+      },
+      "priorAuthorizationRetention": {
+        "referencedWorker": "first-episode",
+        "originalResultCommitmentMatches": true,
+        "grantLeafMatches": true,
+        "acceptanceNonceHashMatches": true,
+        "inferenceCallsBeforeTask": 0
+      },
+      "expectedInterruption": "spawn_worker_after_receipt_interruption"
+    },
+    {
+      "id": "recovery-retry-and-later-episode",
+      "phase": "recovery",
+      "status": "passed",
+      "pid": 575,
+      "ppid": 540,
+      "coordinatorPid": 415,
+      "startedAt": "2026-11-24T03:08:25.880Z",
+      "completedAt": "2026-11-24T03:08:26.754Z",
+      "nativeRuntimeStopped": true,
+      "recordsClosed": true,
+      "originalReused": false,
+      "resources": {
+        "maxRssKiB": 257304,
+        "elapsedWallMs": 2270,
+        "taskElapsedWallMs": 874,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "separateFromCoordinator": true,
+      "observedByResourceMonitor": true,
+      "recoveredNote": {
+        "commitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+        "revision": "1",
+        "contextSlot": "631",
+        "coverage": "Complete"
+      },
+      "exit": {
+        "phase": "recovery",
+        "coordinatorPid": 415,
+        "launcherPid": 540,
+        "code": 0,
+        "signal": null,
+        "timedOut": false,
+        "exitedAt": "2026-11-24T03:08:26.791Z",
+        "elapsedWallMs": 2647,
+        "durationScope": "native worker Vitest launch through observed process exit"
+      },
+      "privateTraceSha256": "bc67ba3dfe4903d897102ebaa01ca9e6f973a2618deb6045ae9006ede0398083",
+      "privateExitReceiptSha256": "830a2a2fa750e3ad66aa274a94df115d17353caf5e46c6492dabef92d557f02f",
+      "signedWireReconciliation": {
+        "receiptAbsentOnEntry": false,
+        "savedSignature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+        "observedSlot": "615",
+        "savedFrameMatchesLedger": true,
+        "receiptRetained": true
+      },
+      "priorAuthorizationRetention": {
+        "referencedWorker": "first-episode",
+        "originalResultCommitmentMatches": true,
+        "grantLeafMatches": true,
+        "acceptanceNonceHashMatches": true,
+        "inferenceCallsBeforeTask": 0
+      },
+      "syntheticTaskResult": {
+        "selectedProcedure": 1,
+        "value": 5,
+        "memoryRevision": "1",
+        "inferenceCalls": 4
+      }
+    },
+    {
+      "id": "completed-job-reentry",
+      "phase": "recovery",
+      "status": "passed",
+      "pid": 622,
+      "ppid": 587,
+      "coordinatorPid": 415,
+      "startedAt": "2026-11-24T03:08:29.143Z",
+      "completedAt": "2026-11-24T03:08:29.818Z",
+      "nativeRuntimeStopped": true,
+      "recordsClosed": true,
+      "originalReused": true,
+      "resources": {
+        "maxRssKiB": 204864,
+        "elapsedWallMs": 2588,
+        "taskElapsedWallMs": 675,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "separateFromCoordinator": true,
+      "observedByResourceMonitor": true,
+      "recoveredNote": {
+        "commitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b",
+        "revision": "1",
+        "contextSlot": "640",
+        "coverage": "Complete"
+      },
+      "exit": {
+        "phase": "recovery",
+        "coordinatorPid": 415,
+        "launcherPid": 587,
+        "code": 0,
+        "signal": null,
+        "timedOut": false,
+        "exitedAt": "2026-11-24T03:08:29.883Z",
+        "elapsedWallMs": 3000,
+        "durationScope": "native worker Vitest launch through observed process exit"
+      },
+      "privateTraceSha256": "0da1f0e8b9303e0f44c1c1a121b434539580a1d589e9ece610453ff071589f0b",
+      "privateExitReceiptSha256": "3b38d5edbecae0dd31aa344279a05fcd91b77af57f4b909ba87c6b3756922260",
+      "signedWireReconciliation": {
+        "receiptAbsentOnEntry": false,
+        "savedSignature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+        "observedSlot": "615",
+        "savedFrameMatchesLedger": true,
+        "receiptRetained": true
+      },
+      "priorAuthorizationRetention": {
+        "referencedWorker": "first-episode",
+        "originalResultCommitmentMatches": true,
+        "grantLeafMatches": true,
+        "acceptanceNonceHashMatches": true,
+        "inferenceCallsBeforeTask": 0
+      },
+      "syntheticTaskResult": {
+        "selectedProcedure": 1,
+        "value": 5,
+        "memoryRevision": "1",
+        "inferenceCalls": 0
+      }
+    },
+    {
+      "id": "revocation-preparation",
+      "phase": "revocation",
+      "status": "passed",
+      "pid": 675,
+      "ppid": 638,
+      "coordinatorPid": 415,
+      "startedAt": "2026-11-24T03:09:00.932Z",
+      "completedAt": "2026-11-24T03:09:01.693Z",
+      "nativeRuntimeStopped": true,
+      "recordsClosed": true,
+      "originalReused": false,
+      "resources": {
+        "maxRssKiB": 213768,
+        "elapsedWallMs": 2642,
+        "taskElapsedWallMs": 761,
+        "platform": "linux",
+        "scope": "maxRSS and elapsedWallMs cover this native worker OS process through receipt finalization; taskElapsedWallMs covers the test body including cleanup; excludes launcher, coordinator, and services"
+      },
+      "separateFromCoordinator": true,
+      "observedByResourceMonitor": true,
+      "recoveredNote": {
+        "commitment": "15aab2f67ac4718c8c4bc60926759db55315d759ce9969e370c5dbc675aea58f",
+        "revision": "2",
+        "contextSlot": "719",
+        "coverage": "Complete"
+      },
+      "exit": {
+        "phase": "revocation",
+        "coordinatorPid": 415,
+        "launcherPid": 638,
+        "code": 0,
+        "signal": null,
+        "timedOut": false,
+        "exitedAt": "2026-11-24T03:09:01.747Z",
+        "elapsedWallMs": 3294,
+        "durationScope": "native worker Vitest launch through observed process exit"
+      },
+      "privateTraceSha256": "d778b933e7a21e501ecf0e0df0a1d365f3dbf9e0728c6a43e15ffef9b5f5acb4",
+      "privateExitReceiptSha256": "067b43f71045419964672bdb036206be4811a4f3a9fb94d49caca11eb2c04b03",
+      "priorAuthorizationRetention": {
+        "referencedWorker": "recovery-retry-and-later-episode",
+        "originalResultCommitmentMatches": true,
+        "grantLeafMatches": true,
+        "acceptanceNonceHashMatches": true,
+        "inferenceCallsBeforeTask": 0
+      },
+      "syntheticTaskResult": {
+        "selectedProcedure": 1,
+        "value": 5,
+        "memoryRevision": "2",
+        "inferenceCalls": 4
+      }
+    }
+  ],
+  "signedWireReconciliation": {
+    "confirmedSignature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+    "confirmedSlot": "615",
+    "savedFrameMatchesConfirmedLedger": true,
+    "savedSignatureMatchesAdvance": true,
+    "observedSlotMatchesAdvance": true,
+    "evidence": "Executed worker assertions compare the retained signed frame with the confirmed ledger frame and bind signature, slot, ring and full note commitment. Raw signed wire and encrypted recovery jobs are omitted."
+  },
+  "receiptVersionPreservation": {
+    "retryWholeRecordIncludingVersionEqualityPassed": true,
+    "completedReentryWholeRecordIncludingVersionEqualityPassed": true,
+    "workerReceiptProtocolVersionAssertion": "backrooms.v0",
+    "numericRecordVersionValuesRecordedInTrace": false,
+    "evidence": "The passing journey compares the complete records.read receipt object before and after retry and completed re-entry. The worker also asserts the confirmation receipt protocolVersion. Numeric storage-version values were not separately emitted."
+  },
+  "sourceIdentity": {
+    "nativeCustomRingsRevision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "nativeZolanaRevision": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "applicationZolanaRevision": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "backroomsRevision": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+    "applicationBaseRevision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "overlayPatchSha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+    "overlayManifestSha256": "f0fded9848ee7e30ec9d64e963efcd8e2176e9e9a13f25e27b115bbba676e614",
+    "overlayFileCount": 59,
+    "overlayFileSha256": {
+      "Cargo.lock": "f2b8525534786280cf3b1de747751c5b231290273da27c65ec973e8d6b6fe0e7",
+      "program-libs/interface/src/accounts/spawn_room_profile.rs": "9b88914c5b50b059b41fd9429d1d2537a8b8289b748b71b1067c6964e88d81c2",
+      "program-libs/interface/src/lib.rs": "93bfcb41c9ebe18fb96128127169d2c9a0b88ac2fc886308cbef914a063014f9",
+      "program-libs/interface/src/proof/spawn_room.rs": "12e98320e887f8cc36c7538110245baf42b93d50e202b0901c6425cf475ba6af",
+      "programs/custom-ring/Cargo.toml": "544ee10c03fee7615ddb48e8deeb2a64589e7d3582d6c8249c4d3a177a46cf9e",
+      "programs/custom-ring/src/instructions/mod.rs": "23c7bd9b03b758c2b8278de4f45b45a39f7e108a1d2834fc3f999b80263f3ea5",
+      "programs/custom-ring/src/instructions/spawn_room/keys.rs": "22b6dc9722f4131f9bf42be28c3ce38c4bd90dbfee35c3324c015a8c0f1b8f63",
+      "programs/custom-ring/src/instructions/spawn_room/keys/advance.rs": "abc841f2b74901dc99f8fa4d9546ae7a98a44344243c9bbe5ecdbe86668febd3",
+      "programs/custom-ring/src/instructions/spawn_room/keys/genesis.rs": "ca48b33f2f12e3c10269277405227d49b154f2d18b601c2ec251a472f5607fc1",
+      "programs/custom-ring/src/instructions/spawn_room/mod.rs": "c526523cb0e1f8f44927524adee426e237ef0fb29b1d9c12f0cd1097a4957600",
+      "programs/custom-ring/src/instructions/transfer/mod.rs": "1339be01faba3dd854341fe330dd817a7bdceb539eed41d0b50891833795d49d",
+      "programs/custom-ring/src/instructions/transfer/processor.rs": "826d11b9d07d3c5844fbac213cc42f0f11873c8125289009ab9a52886dd18e42",
+      "programs/custom-ring/src/instructions/transfer/verify.rs": "5f5b5ea1e7c55bb75813da66a7e371de05b250cb4d07db0558104b68d79e817e",
+      "programs/custom-ring/src/lib.rs": "0b004d54aa3ea53e54b7459fcc4ee93b1024275efe3cf1202195eb199763277a",
+      "programs/custom-ring/tests/spawn_room.rs": "5bf6d62fdaab7af0e2bd4e463b667d7870b09d72d5a7cd9a4bbad95c62ab37a6",
+      "programs/custom-ring/tests/spawn_room_proofs.rs": "17ffc241be0d8f9663cf33d07f6fb05ae45a7671aeb4ae4f64227e8f48693978",
+      "prover/circuits/transfer/spawn_room_advance.go": "d26b5880b591e0ec41e016b693fb6f3a647f8554ae9e001164bca5b9addb0fee",
+      "prover/circuits/transfer/spawn_room_advance_test.go": "668257758ba27488a4f7f62b7b0a72d706fcf4c0f979f9d7f4baaa5f8969882e",
+      "prover/circuits/transfer/spawn_room_application.go": "70cfbf1d1ddfdbed57032afc585aaa12127ba70c49d7f9a1e4ee5837b9d54087",
+      "prover/circuits/transfer/spawn_room_application_test.go": "9f717a58850a3ccb0b996bd43a4dbbac7fafece0ab167e6fe3c0a4ea02d7f159",
+      "prover/circuits/transfer/spawn_room_full_test.go": "d4af3446ada960156cf61e756f90010ffaaa77f226ea73c871f43d9bacdd4c8e",
+      "prover/circuits/transfer/spawn_room_genesis.go": "81e39049c178e45613faf8c974305abc76f0ecdf6dc54a3dde58ca5baeecaf13",
+      "prover/circuits/transfer/spawn_room_genesis_test.go": "74ff86dc190f5cbc49b42915c7ee3d8fbb1b05ca57b61ab4c0572fd7d6e79a83",
+      "prover/circuits/transfer/spawn_room_proof_test.go": "b55076450ff209454ac5d413456691ef6da19dc63e14d6a6b63f3164986537d0",
+      "prover/circuits/transfer/spawn_room_state.go": "878115896951eb7792a34bb1898038524e3e3f91a3c50d16c33b230a9dac6e48",
+      "prover/circuits/transfer/spawn_room_state_test.go": "c38cbe60d47be2d46299ead50ef1e417e676df5a178010cb611eaee03a808f48",
+      "prover/circuits/transfer/spawn_room_wire_test.go": "96d95f70c1bcc0e4a9d49df0deb71762e1bf5def189c8798c6863d649417ea7c",
+      "prover/cmd/spawn-room-prover/main.go": "5ccfa1cdd3980a207af8276bfff581265dd49fb89196eb592ce33b838667df3e",
+      "prover/ring/spawn_room.go": "792a800213d9448265b9bf3d777ddc91d33e200f260a1ed7eb9916a5e19a7979",
+      "prover/ring/spawn_room_http_test.go": "320d164bab42b892026f00bde9a368e1f914eebc3b9dc138b3e1a1fba3952831",
+      "prover/ring/spawn_room_test.go": "d141031112cbef149018d2aa453553323ecb814632e3ad7b3fe889ec64312ec2",
+      "sdk-libs/ts/src/experimental/spawn-room/codec.ts": "3950a73a25a625cd2fe3e54c58f5a11790c1099a16567626e96bf6df9ff1b5c0",
+      "sdk-libs/ts/src/experimental/spawn-room/instructions.ts": "082c0289b4cf28cc1941e8842fea25fe0bd1e9c0f6da5f135e099ccfb2525260",
+      "sdk-libs/ts/src/experimental/spawn-room/localnet-keys.ts": "77c44c4d26f9944b37a38464c3deb4db63b60a41f70cb8d3f8359486a517a808",
+      "sdk-libs/ts/src/experimental/spawn-room/native-adapter.ts": "fd71574652a537562fa87fd7bdfd17bf8d5750faf8a17d2f487e588588a5fad2",
+      "sdk-libs/ts/src/experimental/spawn-room/payload.ts": "0809151d682cd9a889a4f7fe1005a45e0b7352c19c86af517f128863f6d2c9a6",
+      "sdk-libs/ts/src/experimental/spawn-room/prover.ts": "ce3e710331c1d9a74907e9fbecd4b87127af7380d04e803dc9f88420ec958f41",
+      "sdk-libs/ts/src/experimental/spawn-room/recovery.ts": "8cd78468734af9ade7b343d9c3988a5e6b2d810137dc13899e99ff34c1e9cc87",
+      "sdk-libs/ts/src/experimental/spawn-room/staging.ts": "2d301ebbe54f3475a6e0c74d08add774e1f806bbec4c6219069a24e00f2aebc7",
+      "sdk-libs/ts/test/experimental/spawn-room-codec.test.ts": "920f3caf8ffd0ab8800fed47aad5897185119730ef79ce784857b84d5984cea0",
+      "sdk-libs/ts/test/experimental/spawn-room-fixture.ts": "038231187f6f0d3cb4067cb1eac86b740d22cca99ebbfb49de3dd84bd825cf13",
+      "sdk-libs/ts/test/experimental/spawn-room-payload.test.ts": "0af96e0ba1997725b1bfa0151b74859f4cb34b6e7d57d0e5dd50dea29bbe5370",
+      "sdk-libs/ts/test/experimental/spawn-room-recovery.test.ts": "379d067ef6a224085e00844fd7ba8d3c07dda0d9af9f56146e995723e7619b24",
+      "sdk-libs/ts/test/experimental/spawn-room-staging.test.ts": "a29afe5d0f439f954ec203129d345f8ed8cdd6c5abc30131f4bbc519b457de88",
+      "sdk-tests/spawn-room/live-refusals.ts": "228a18012e39a183fa85fce908cc053666c396784438edf88655ebb794738b80",
+      "sdk-tests/spawn-room/localnet-journey.test.ts": "38fdb0fed3cc2eedd672482c24cbc27ebcb674efead56caf220fc1e437ba6b34",
+      "sdk-tests/spawn-room/native-restart.test.ts": "e64e71e6445da33e81c77e5e01558fa348ebd7b44a4d4e946a6363e56fafdee3",
+      "sdk-tests/spawn-room/native-worker-runner.test.ts": "1248f1b4e29ac48ac48d2cbdfc75c0f6c3a825138f65b965a97aeba726895f2a",
+      "sdk-tests/spawn-room/native-worker.test.ts": "01f0e4fbdd8a8e2070cc973a5903606f4237ba70228d6b252c1038db0b73d505",
+      "sdk-tests/spawn-room/native-worker.ts": "a922a28238382485ec84a68e7659a16fef128e9d1f32b7eba80dd158401ff950",
+      "sdk-tests/spawn-room/tsconfig.json": "df45dec88e85779e199663f610e98d7fda7e524522d42d92d11c3054a181a850",
+      "sdk-tests/spawn-room/vitest.config.ts": "08f7a9e748809c0282ab09b9c76e9765e3f5027eec304696795dfa9697bc4bb7",
+      "test-vectors/proof/spawn-room-advance-v1.json": "77c946e496cdd4aa4882a9340099d7b28bb87b10aa218903472ac517c09b2f37",
+      "test-vectors/proof/spawn-room-genesis-v1.json": "d5ee32d2e937a19fee9d09d625f1955a62afe65abdb327bd1f67f932933e98e9",
+      "tools/localnet-resource-monitor.mjs": "6c7fafcbea91738b6955575b2e1f164a332a21c1b0707bd401c5df2a7c4fb646",
+      "tools/prepare-spawn-room-localnet.sh": "0a343a1e91f64702d84ae6a8795e0e4ed62f903c4d3ac26ad553d359afbd0e24",
+      "tools/run-spawn-room-localnet.mjs": "4dd310b5f17598b70b4b8b1d81a9c0f2fa35c64aeac072bac78ca5e7e4beefe3",
+      "tools/run-spawn-room-localnet.test.mjs": "e5bf10ff3e0f612134a966f046e48ce428a803d005ee5e3fdc2082c41a5486aa",
+      "tools/spawn-room-localnet.md": "312331f78ce0122633e7e9cdf41e455933bf8bc73dcdcd2971134b25e9a16316"
+    },
+    "before": {
+      "application": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "sha256": "4fb74de78e125796fa561c12971a98f244c03e021fb2eca1fccf412310248650"
+      },
+      "referenceHost": {
+        "revision": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+        "sha256": "ec6b3e5840f4d823234a3df33336a726480295ae3779ea190ccb05c53bc6bc03"
+      }
+    },
+    "after": {
+      "application": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "sha256": "4fb74de78e125796fa561c12971a98f244c03e021fb2eca1fccf412310248650"
+      },
+      "referenceHost": {
+        "revision": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+        "sha256": "ec6b3e5840f4d823234a3df33336a726480295ae3779ea190ccb05c53bc6bc03"
+      }
+    },
+    "unchanged": true,
+    "appZolanaUnchanged": true,
+    "referenceHostUnchanged": true,
+    "frozenOverlayVerifiedBeforeAndAfter": true,
+    "referenceHostDependencies": {
+      "package.json": {
+        "size": 1151,
+        "sha256": "577f28080366153b41e51ec3d2c7765d55e996901979fa0e09f24c7118f4bae2"
+      },
+      "package-lock.json": {
+        "size": 85531,
+        "sha256": "727b84f8431630d6ad24bec3cc94243829fbfd78279a15ef996f4f1186f89fd5"
+      }
+    }
+  },
+  "artifacts": {
+    "appProgram": {
+      "size": 526024,
+      "sha256": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d"
+    },
+    "sppProgram": {
+      "size": 634344,
+      "sha256": "bbcdf41cf0426fe8c661f2fd53348d0c25f8e8bf625a3f04f122712d7bc2887c"
+    },
+    "userRegistryProgram": {
+      "size": 47784,
+      "sha256": "bacf7b1d3c8f59b5c80c7a04888b561f50c4fe48847d67f75ba889729ec6756e"
+    },
+    "storageProgram": {
+      "size": 171824,
+      "sha256": "1fa7b2cfd808799a62e8a0b1ab107dd6eb84665a4ffb684976a065a8b36a5e5a"
+    },
+    "zolana": {
+      "size": 73992704,
+      "sha256": "d0cb573c4c0e3c3c410cddc4f797a0adea1bfbd84594e34c3fde066c575852ed"
+    },
+    "xtask": {
+      "size": 69484056,
+      "sha256": "f8e44d62d887bb9a6adfbba3682a4cac45d258101bd3f78ae73b3b494b91f052"
+    },
+    "photon": {
+      "size": 74317720,
+      "sha256": "c9e88acb646a2b1a4d5cca83b6696e9c49313c0681ec633610ec82ce3c6d0826"
+    },
+    "ringIndexer": {
+      "size": 60298656,
+      "sha256": "caaef50177e4d4967181a84dbb5deecf28c17eb9853f138c9b22c0a43af551df"
+    },
+    "ringRpc": {
+      "size": 132902192,
+      "sha256": "922878f2ab371369632ea04eeba43ece6dea34b45d52368290d43791054fee68"
+    },
+    "prover": {
+      "size": 49330426,
+      "sha256": "abc228278641225a116a16873da07bc997f94e8358f41e46e27d54da92155a73"
+    },
+    "surfpool": {
+      "size": 84393824,
+      "sha256": "b26055c302b8b47ff6fb4fa633a6b34111f5b1b37222f889295375ec93c10f31"
+    },
+    "solana": {
+      "size": 32605400,
+      "sha256": "5d69e5ec2b50d78a8f1c99bcd9cd3bec83b13c8ecf2d6185597844bec23e47a8"
+    },
+    "solanaKeygen": {
+      "size": 6498208,
+      "sha256": "aaa600face9d36ec82aec9ef43d68106b5cdf141b65e00efb76cb78dc93ae95e"
+    },
+    "npm": {
+      "size": 54,
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "provingKeyArtifacts": {
+    "custom_ring_apply_enrollments_1.key": {
+      "size": 7430633,
+      "sha256": "3d238da30b162fd46e4725b58af2ded1d25112766a1e25cc8dedd1d634e8193b"
+    },
+    "custom_ring_apply_enrollments_2.key": {
+      "size": 14851658,
+      "sha256": "5b4062c084d45b64b1c4a9bfa080173af6d43b1b5b6652a12dadd7a458913a64"
+    },
+    "custom_ring_apply_enrollments_4.key": {
+      "size": 29662267,
+      "sha256": "0ddf9a8b8bbe6089370ebb7f885001a45ea36b99a99db06614fbbaf124f5dd79"
+    },
+    "custom_ring_apply_enrollments_8.key": {
+      "size": 59282986,
+      "sha256": "25e761192caaedaf15663e5060c7ac3582de8a88589776a16e275860865312bf"
+    },
+    "custom_ring_apply_records_1.key": {
+      "size": 6714211,
+      "sha256": "5d1b02af6650d908c95662ad370c667ba08ac368b389573c0f920f01d94d23bb"
+    },
+    "custom_ring_apply_records_16.key": {
+      "size": 106784225,
+      "sha256": "fbd80a216491ce475f6fdfa96d3fb1b56833c5f5aa6b6c4b94543e3f7fab9a85"
+    },
+    "custom_ring_apply_records_2.key": {
+      "size": 13399938,
+      "sha256": "11ab04f10df5f39bc06fd1637a70729a7ad77e9c224d7c3100f814f5c836fbb8"
+    },
+    "custom_ring_apply_records_4.key": {
+      "size": 26751581,
+      "sha256": "b24358187d78532b656f3aa89fac9427f2ec97afde87d28f954a37d0a3210805"
+    },
+    "custom_ring_apply_records_8.key": {
+      "size": 53437485,
+      "sha256": "6109969bbef6607c3fcc8e4d884f03a3721a4479888720f78c380b96f66f47d6"
+    },
+    "custom_ring_apply_records_private_1.key": {
+      "size": 8730945,
+      "sha256": "192c0739123e3c4cb80587ff6d8cc8240ef8d6746d3abc2bb5272d8789799985"
+    },
+    "custom_ring_apply_records_private_16.key": {
+      "size": 136257965,
+      "sha256": "0462d1e07946f3741940bc35e2ab2b11cc57618634cdfff4a7f060ccb88e0b70"
+    },
+    "custom_ring_apply_records_private_2.key": {
+      "size": 17240117,
+      "sha256": "2f34912fd4666239d326def947587be87667af9ff33165128ef0fa71af98d07e"
+    },
+    "custom_ring_apply_records_private_4.key": {
+      "size": 34243920,
+      "sha256": "a057052789177e1f5dda6e307527b6144768ccfee3bf7ea6f190708eab4e3520"
+    },
+    "custom_ring_apply_records_private_8.key": {
+      "size": 68253916,
+      "sha256": "b174f62ff8bf932d44d015039376528df54d8e1542508e39302b459696cb3289"
+    },
+    "custom_ring_merge.key": {
+      "size": 38162616,
+      "sha256": "64a8ab474e1ad0aeb2a520cd21fab2bbef75c7b6e7a8ae506c18980bc893db2f"
+    },
+    "custom_ring_register_key.key": {
+      "size": 17797993,
+      "sha256": "90d0f3a05edf2bef59de6726aa1e3c4b08abed8dd4c627f94a169752a49fcfe6"
+    },
+    "custom_ring_transfer_16_in4_w4_s2.key": {
+      "size": 650892617,
+      "sha256": "7708af1286eedfc245d84641deaf6da68c932ea14418cfbac2b2c4285180c11f"
+    },
+    "custom_ring_transfer_2_in24_w4_s4.key": {
+      "size": 285409001,
+      "sha256": "3921ac82248a03e9b03f836d457d636667cc0d4c96125f24fea838b4f9be8c5b"
+    },
+    "custom_ring_transfer_4_in24_w4_s4.key": {
+      "size": 330207713,
+      "sha256": "c343825a5429feef491f0042c7da363ec9b288f8bc7d5f6d1b85e5cc4955a9cb"
+    },
+    "custom_ring_transfer_8_in16_w4_s4.key": {
+      "size": 396921639,
+      "sha256": "61c5ab9df37df49928ef543c05afc9b5979938e6d59c027294d2a37511fba569"
+    },
+    "custom_ring_transfer_entry_4_in8_w4_s8.key": {
+      "size": 413536211,
+      "sha256": "ea2b68fcffa03f93c49dd2c36ae0c41cd107589401a4d5a77655dc89c1624a44"
+    },
+    "custom_ring_transfer_entry_8_in2_w4_s2.key": {
+      "size": 426950438,
+      "sha256": "cbaeda1e963a45d7741c4d63de4a402594789a45510ccd67da2d21f2467f5666"
+    },
+    "custom_ring_transfer_entry_8_in5_w4_s4.key": {
+      "size": 499173553,
+      "sha256": "2072ae7d9f14c9a91831e7b289a7803688262de0870af064b4acf421b3b2d129"
+    },
+    "custom_ring_transfer_entry_8_in8_w32_s8.key": {
+      "size": 691202058,
+      "sha256": "6b7ee5da650a78ed37e39fb417c352edd95396baa9af9dc299b649038458c375"
+    },
+    "custom_ring_transfer_wide_2_in40_w4_s9.key": {
+      "size": 359679572,
+      "sha256": "97ea032322421e594476bd47d0d6d71fd11785ba74bf918c79cb2100094f6bee"
+    },
+    "custom_ring_transfer_wide_8_in24_w32_s13.key": {
+      "size": 718695694,
+      "sha256": "ea0f805642fe5c2af0238628764c5ad1fc8212c9c42fb470a8965413300ef031"
+    },
+    "merge_ring_8_1.key": {
+      "size": 55779149,
+      "sha256": "635f9f6d7d74447f2313264c691b818bc6a5611aedb0dcca3abd24405919d4a4"
+    },
+    "transfer_eddsa_ring_1_2.key": {
+      "size": 89967710,
+      "sha256": "be870f661af275e750811807628d07117a6ff353d6dd69695e16940bbea4f016"
+    },
+    "transfer_eddsa_ring_2_2.key": {
+      "size": 96916793,
+      "sha256": "e8fcba9c9b940ab64d79fe78a79c356967eb54f5f556f79cdbb7ac3edf608a66"
+    },
+    "transfer_ring_1_2.key": {
+      "size": 9278456,
+      "sha256": "22437f8f22194cb10bf8938a4c66c634d75f6d2abf4c8ed0b1f4c4e3ba9a09fe"
+    },
+    "transfer_ring_2_2.key": {
+      "size": 16422284,
+      "sha256": "b5438902ead95e7dae05eb98d22592ba67698d99ff855e4d3b4f5bf7c4ead0a7"
+    },
+    "spawn_room_advance_v1.key": {
+      "size": 294753109,
+      "sha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822"
+    },
+    "spawn_room_genesis_v1.key": {
+      "size": 287934208,
+      "sha256": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57"
+    }
+  },
+  "measurements": {
+    "scope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+    "supported": true,
+    "platform": "linux",
+    "method": "Linux /proc VmRSS and process-lifetime VmHWM, sampled while each owned process exists",
+    "sampleIntervalMs": 250,
+    "samples": 1322,
+    "startedAt": "2026-11-24T03:04:05.592Z",
+    "finishedAt": "2026-11-24T03:09:36.905Z",
+    "measuredDurationMs": 331313,
+    "sampledPeakConcurrentRssKiB": 4145344,
+    "processes": [
+      {
+        "pid": 15,
+        "startTicks": "5383782",
+        "name": "MainThread",
+        "scope": "harness",
+        "firstObservedAt": "2026-11-24T03:04:05.844Z",
+        "lastObservedAt": "2026-11-24T03:09:36.904Z",
+        "sampledPeakRssKiB": 145052,
+        "observedOsHighWaterRssKiB": 149828
+      },
+      {
+        "pid": 63,
+        "startTicks": "5385687",
+        "name": "xtask",
+        "scope": "command:program-ids",
+        "firstObservedAt": "2026-11-24T03:04:24.350Z",
+        "lastObservedAt": "2026-11-24T03:04:24.350Z",
+        "sampledPeakRssKiB": 368,
+        "observedOsHighWaterRssKiB": 368
+      },
+      {
+        "pid": 64,
+        "startTicks": "5385705",
+        "name": "xtask",
+        "scope": "command:protocol-snapshot",
+        "firstObservedAt": "2026-11-24T03:04:24.600Z",
+        "lastObservedAt": "2026-11-24T03:04:24.600Z",
+        "sampledPeakRssKiB": 18776,
+        "observedOsHighWaterRssKiB": 18776
+      },
+      {
+        "pid": 71,
+        "startTicks": "5385748",
+        "name": "zolana",
+        "scope": "command:validator-start",
+        "firstObservedAt": "2026-11-24T03:04:25.103Z",
+        "lastObservedAt": "2026-11-24T03:04:25.616Z",
+        "sampledPeakRssKiB": 16220,
+        "observedOsHighWaterRssKiB": 16220
+      },
+      {
+        "pid": 74,
+        "startTicks": "5385762",
+        "name": "surfpool",
+        "scope": "command:validator-start",
+        "firstObservedAt": "2026-11-24T03:04:25.103Z",
+        "lastObservedAt": "2026-11-24T03:09:34.433Z",
+        "sampledPeakRssKiB": 95792,
+        "observedOsHighWaterRssKiB": 95792
+      },
+      {
+        "pid": 138,
+        "startTicks": "5385786",
+        "name": "photon",
+        "scope": "command:validator-start",
+        "firstObservedAt": "2026-11-24T03:04:25.356Z",
+        "lastObservedAt": "2026-11-24T03:09:34.189Z",
+        "sampledPeakRssKiB": 39700,
+        "observedOsHighWaterRssKiB": 39700
+      },
+      {
+        "pid": 177,
+        "startTicks": "5385823",
+        "name": "ring-indexer",
+        "scope": "service:ring-indexer",
+        "firstObservedAt": "2026-11-24T03:04:25.859Z",
+        "lastObservedAt": "2026-11-24T03:09:34.189Z",
+        "sampledPeakRssKiB": 33904,
+        "observedOsHighWaterRssKiB": 33904
+      },
+      {
+        "pid": 190,
+        "startTicks": "5385851",
+        "name": "spawn-room-prov",
+        "scope": "service:prover",
+        "firstObservedAt": "2026-11-24T03:04:26.109Z",
+        "lastObservedAt": "2026-11-24T03:09:34.189Z",
+        "sampledPeakRssKiB": 3105372,
+        "observedOsHighWaterRssKiB": 3105372
+      },
+      {
+        "pid": 195,
+        "startTicks": "5385878",
+        "name": "MainThread",
+        "scope": "service:localnet-kms",
+        "firstObservedAt": "2026-11-24T03:04:26.359Z",
+        "lastObservedAt": "2026-11-24T03:09:33.805Z",
+        "sampledPeakRssKiB": 42316,
+        "observedOsHighWaterRssKiB": 42316
+      },
+      {
+        "pid": 203,
+        "startTicks": "5385905",
+        "name": "bash",
+        "scope": "command:enrollment-writer",
+        "firstObservedAt": "2026-11-24T03:04:26.610Z",
+        "lastObservedAt": "2026-11-24T03:04:26.610Z",
+        "sampledPeakRssKiB": 2020,
+        "observedOsHighWaterRssKiB": 2020
+      },
+      {
+        "pid": 207,
+        "startTicks": "5385909",
+        "name": "ring-rpc",
+        "scope": "command:enrollment-writer",
+        "firstObservedAt": "2026-11-24T03:04:26.610Z",
+        "lastObservedAt": "2026-11-24T03:04:26.610Z",
+        "sampledPeakRssKiB": 9212,
+        "observedOsHighWaterRssKiB": 9212
+      },
+      {
+        "pid": 217,
+        "startTicks": "5385925",
+        "name": "bash",
+        "scope": "command:rpc-custody",
+        "firstObservedAt": "2026-11-24T03:04:26.860Z",
+        "lastObservedAt": "2026-11-24T03:04:26.860Z",
+        "sampledPeakRssKiB": 2028,
+        "observedOsHighWaterRssKiB": 2028
+      },
+      {
+        "pid": 257,
+        "startTicks": "5385937",
+        "name": "ring-rpc",
+        "scope": "command:rpc-custody",
+        "firstObservedAt": "2026-11-24T03:04:26.860Z",
+        "lastObservedAt": "2026-11-24T03:04:26.860Z",
+        "sampledPeakRssKiB": 2144,
+        "observedOsHighWaterRssKiB": 2144
+      },
+      {
+        "pid": 284,
+        "startTicks": "5385943",
+        "name": "solana",
+        "scope": "command:fund-upgradeAuthority",
+        "firstObservedAt": "2026-11-24T03:04:27.110Z",
+        "lastObservedAt": "2026-11-24T03:04:27.361Z",
+        "sampledPeakRssKiB": 15924,
+        "observedOsHighWaterRssKiB": 15924
+      },
+      {
+        "pid": 295,
+        "startTicks": "5385999",
+        "name": "solana",
+        "scope": "command:fund-feePayer",
+        "firstObservedAt": "2026-11-24T03:04:27.611Z",
+        "lastObservedAt": "2026-11-24T03:04:27.862Z",
+        "sampledPeakRssKiB": 16172,
+        "observedOsHighWaterRssKiB": 16172
+      },
+      {
+        "pid": 308,
+        "startTicks": "5386052",
+        "name": "solana",
+        "scope": "command:fund-publisher",
+        "firstObservedAt": "2026-11-24T03:04:28.113Z",
+        "lastObservedAt": "2026-11-24T03:04:28.365Z",
+        "sampledPeakRssKiB": 16012,
+        "observedOsHighWaterRssKiB": 16012
+      },
+      {
+        "pid": 319,
+        "startTicks": "5386104",
+        "name": "solana",
+        "scope": "command:fund-storage_authority",
+        "firstObservedAt": "2026-11-24T03:04:28.614Z",
+        "lastObservedAt": "2026-11-24T03:04:28.864Z",
+        "sampledPeakRssKiB": 16076,
+        "observedOsHighWaterRssKiB": 16076
+      },
+      {
+        "pid": 330,
+        "startTicks": "5386157",
+        "name": "solana",
+        "scope": "command:fund-fee_payer",
+        "firstObservedAt": "2026-11-24T03:04:29.114Z",
+        "lastObservedAt": "2026-11-24T03:04:29.364Z",
+        "sampledPeakRssKiB": 16000,
+        "observedOsHighWaterRssKiB": 16000
+      },
+      {
+        "pid": 341,
+        "startTicks": "5386211",
+        "name": "solana",
+        "scope": "command:fund-enrollment_applier",
+        "firstObservedAt": "2026-11-24T03:04:29.613Z",
+        "lastObservedAt": "2026-11-24T03:04:29.863Z",
+        "sampledPeakRssKiB": 16172,
+        "observedOsHighWaterRssKiB": 16172
+      },
+      {
+        "pid": 352,
+        "startTicks": "5386263",
+        "name": "ring-rpc",
+        "scope": "service:ring-rpc",
+        "firstObservedAt": "2026-11-24T03:04:30.115Z",
+        "lastObservedAt": "2026-11-24T03:09:33.805Z",
+        "sampledPeakRssKiB": 61504,
+        "observedOsHighWaterRssKiB": 61504
+      },
+      {
+        "pid": 366,
+        "startTicks": "5386290",
+        "name": "npm exec vitest",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:04:30.613Z",
+        "lastObservedAt": "2026-11-24T03:09:33.678Z",
+        "sampledPeakRssKiB": 70648,
+        "observedOsHighWaterRssKiB": 70952
+      },
+      {
+        "pid": 378,
+        "startTicks": "5386334",
+        "name": "sh",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:04:30.864Z",
+        "lastObservedAt": "2026-11-24T03:09:33.443Z",
+        "sampledPeakRssKiB": 768,
+        "observedOsHighWaterRssKiB": 768
+      },
+      {
+        "pid": 379,
+        "startTicks": "5386334",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:04:30.864Z",
+        "lastObservedAt": "2026-11-24T03:09:33.443Z",
+        "sampledPeakRssKiB": 139404,
+        "observedOsHighWaterRssKiB": 142428
+      },
+      {
+        "pid": 415,
+        "startTicks": "5386401",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:04:31.656Z",
+        "lastObservedAt": "2026-11-24T03:09:33.443Z",
+        "sampledPeakRssKiB": 204644,
+        "observedOsHighWaterRssKiB": 204644
+      },
+      {
+        "pid": 433,
+        "startTicks": "5400138",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:06:49.005Z",
+        "lastObservedAt": "2026-11-24T03:06:52.763Z",
+        "sampledPeakRssKiB": 129632,
+        "observedOsHighWaterRssKiB": 129632
+      },
+      {
+        "pid": 468,
+        "startTicks": "5400196",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:06:49.505Z",
+        "lastObservedAt": "2026-11-24T03:06:52.763Z",
+        "sampledPeakRssKiB": 205200,
+        "observedOsHighWaterRssKiB": 205200
+      },
+      {
+        "pid": 493,
+        "startTicks": "5409345",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:20.935Z",
+        "lastObservedAt": "2026-11-24T03:08:23.947Z",
+        "sampledPeakRssKiB": 120748,
+        "observedOsHighWaterRssKiB": 120748
+      },
+      {
+        "pid": 528,
+        "startTicks": "5409391",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:21.437Z",
+        "lastObservedAt": "2026-11-24T03:08:23.947Z",
+        "sampledPeakRssKiB": 198132,
+        "observedOsHighWaterRssKiB": 202888
+      },
+      {
+        "pid": 540,
+        "startTicks": "5409667",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:24.195Z",
+        "lastObservedAt": "2026-11-24T03:08:26.699Z",
+        "sampledPeakRssKiB": 120984,
+        "observedOsHighWaterRssKiB": 120984
+      },
+      {
+        "pid": 575,
+        "startTicks": "5409700",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:24.695Z",
+        "lastObservedAt": "2026-11-24T03:08:26.699Z",
+        "sampledPeakRssKiB": 257924,
+        "observedOsHighWaterRssKiB": 257924
+      },
+      {
+        "pid": 587,
+        "startTicks": "5409941",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:26.958Z",
+        "lastObservedAt": "2026-11-24T03:08:29.703Z",
+        "sampledPeakRssKiB": 119572,
+        "observedOsHighWaterRssKiB": 119572
+      },
+      {
+        "pid": 622,
+        "startTicks": "5409975",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:27.453Z",
+        "lastObservedAt": "2026-11-24T03:08:29.703Z",
+        "sampledPeakRssKiB": 197288,
+        "observedOsHighWaterRssKiB": 204864
+      },
+      {
+        "pid": 638,
+        "startTicks": "5413099",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:58.598Z",
+        "lastObservedAt": "2026-11-24T03:09:01.601Z",
+        "sampledPeakRssKiB": 120424,
+        "observedOsHighWaterRssKiB": 120424
+      },
+      {
+        "pid": 675,
+        "startTicks": "5413157",
+        "name": "MainThread",
+        "scope": "command:journey",
+        "firstObservedAt": "2026-11-24T03:08:59.099Z",
+        "lastObservedAt": "2026-11-24T03:09:01.601Z",
+        "sampledPeakRssKiB": 205916,
+        "observedOsHighWaterRssKiB": 205916
+      },
+      {
+        "pid": 691,
+        "startTicks": "5416682",
+        "name": "zolana",
+        "scope": "command:validator-stop",
+        "firstObservedAt": "2026-11-24T03:09:34.433Z",
+        "lastObservedAt": "2026-11-24T03:09:34.433Z",
+        "sampledPeakRssKiB": 14996,
+        "observedOsHighWaterRssKiB": 14996
+      }
+    ],
+    "limitations": [
+      "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+      "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+      "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+      "These are measurements of this disposable local run, not production performance claims."
+    ],
+    "lastSamplingErrorField": {
+      "present": false
+    }
+  },
+  "resourceCoverage": {
+    "allFiveWorkerPidsObserved": true,
+    "surfpoolObserved": true,
+    "photonObserved": true,
+    "allDirectServicePidsObserved": true
+  },
+  "commands": [
+    {
+      "name": "program-ids",
+      "startedAt": "2026-11-24T03:04:24.334Z",
+      "finishedAt": "2026-11-24T03:04:24.513Z",
+      "status": "passed",
+      "measuredDurationMs": 179,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "a5ee9cf4428096dd5f1beb1a3653a87b0329858f7e9810e66badb9ef738611f3"
+    },
+    {
+      "name": "protocol-snapshot",
+      "startedAt": "2026-11-24T03:04:24.521Z",
+      "finishedAt": "2026-11-24T03:04:24.839Z",
+      "status": "passed",
+      "measuredDurationMs": 318,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "03132ba2c1f660ceea68aaf8a8c28390b82fd0dc730167451d592c0e8ba49814"
+    },
+    {
+      "name": "keypair-upgradeAuthority",
+      "startedAt": "2026-11-24T03:04:24.848Z",
+      "finishedAt": "2026-11-24T03:04:24.868Z",
+      "status": "passed",
+      "measuredDurationMs": 20,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "fbccfc54f314a29792647a28c0bddf000f2aa979904c6c8ca543e614a4d915ee"
+    },
+    {
+      "name": "pubkey-upgradeAuthority",
+      "startedAt": "2026-11-24T03:04:24.873Z",
+      "finishedAt": "2026-11-24T03:04:24.884Z",
+      "status": "passed",
+      "measuredDurationMs": 11,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "08c5568c54ab2dedc45b9e38f0ee214dadc3547e42ffdcde0c53cfe381a6d648"
+    },
+    {
+      "name": "keypair-feePayer",
+      "startedAt": "2026-11-24T03:04:24.890Z",
+      "finishedAt": "2026-11-24T03:04:24.903Z",
+      "status": "passed",
+      "measuredDurationMs": 13,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "9f0ca01badea41e878e3517b196082dfca3c4eba46bde2dfa414acb7df2fb7b2"
+    },
+    {
+      "name": "pubkey-feePayer",
+      "startedAt": "2026-11-24T03:04:24.905Z",
+      "finishedAt": "2026-11-24T03:04:24.914Z",
+      "status": "passed",
+      "measuredDurationMs": 9,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "789fa57e0f100ac86031cf2ab7b708e2efd7af6f22f57f368691835799676340"
+    },
+    {
+      "name": "keypair-publisher",
+      "startedAt": "2026-11-24T03:04:24.918Z",
+      "finishedAt": "2026-11-24T03:04:24.929Z",
+      "status": "passed",
+      "measuredDurationMs": 11,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "219b064e2f620f40a0ff47efcc05c63c3c074f5e11aa64d1b317190875b3f299"
+    },
+    {
+      "name": "pubkey-publisher",
+      "startedAt": "2026-11-24T03:04:24.932Z",
+      "finishedAt": "2026-11-24T03:04:24.942Z",
+      "status": "passed",
+      "measuredDurationMs": 10,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "9a3105e553fe5cc05133e90ec9286ecf8e21c9c34612aa7b34c6a862140be8b2"
+    },
+    {
+      "name": "validator-start",
+      "startedAt": "2026-11-24T03:04:24.947Z",
+      "finishedAt": "2026-11-24T03:04:25.649Z",
+      "status": "passed",
+      "measuredDurationMs": 702,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "73061dde8d200eeab166ab48817a4de86da52b84d5467daddfc4be7138b22f63"
+    },
+    {
+      "name": "enrollment-writer",
+      "startedAt": "2026-11-24T03:04:26.518Z",
+      "finishedAt": "2026-11-24T03:04:26.703Z",
+      "status": "passed",
+      "measuredDurationMs": 185,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "9a4b260a1bdc84525db34a09b826eb9a1dc9b209ff93748523272805dabf4153"
+    },
+    {
+      "name": "rpc-custody",
+      "startedAt": "2026-11-24T03:04:26.724Z",
+      "finishedAt": "2026-11-24T03:04:26.901Z",
+      "status": "passed",
+      "measuredDurationMs": 177,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "cbe03ff236e4d688adee879dcc2762092ff486c59b21352571a698c42fa32a7e"
+    },
+    {
+      "name": "fund-upgradeAuthority",
+      "startedAt": "2026-11-24T03:04:26.905Z",
+      "finishedAt": "2026-11-24T03:04:27.455Z",
+      "status": "passed",
+      "measuredDurationMs": 549,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "a03350adc252ac89a7541c999392fc5c24cea0a2be6dba59b22a7a913fa0c459"
+    },
+    {
+      "name": "fund-feePayer",
+      "startedAt": "2026-11-24T03:04:27.458Z",
+      "finishedAt": "2026-11-24T03:04:27.982Z",
+      "status": "passed",
+      "measuredDurationMs": 524,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "08111c4192f561dd9dc6e34f5e8024a1aababeaaa71cc881203d3e9b1f2d7824"
+    },
+    {
+      "name": "fund-publisher",
+      "startedAt": "2026-11-24T03:04:27.986Z",
+      "finishedAt": "2026-11-24T03:04:28.511Z",
+      "status": "passed",
+      "measuredDurationMs": 524,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "2f81ec7a593a95508e4d57461f595f9487062c166e4c3140c88abc088fe5d68c"
+    },
+    {
+      "name": "fund-storage_authority",
+      "startedAt": "2026-11-24T03:04:28.514Z",
+      "finishedAt": "2026-11-24T03:04:29.038Z",
+      "status": "passed",
+      "measuredDurationMs": 525,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "289f6a644d3369eb7be8b27e73ac8b6b52b013b80f0b6d444e11d5ac080c2a8d"
+    },
+    {
+      "name": "fund-fee_payer",
+      "startedAt": "2026-11-24T03:04:29.043Z",
+      "finishedAt": "2026-11-24T03:04:29.573Z",
+      "status": "passed",
+      "measuredDurationMs": 530,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "348ef24c56b4896d0cdb4f9b696a80826c7501936ddd2bef6130027fb6778d35"
+    },
+    {
+      "name": "fund-enrollment_applier",
+      "startedAt": "2026-11-24T03:04:29.577Z",
+      "finishedAt": "2026-11-24T03:04:30.100Z",
+      "status": "passed",
+      "measuredDurationMs": 523,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "50f8e0e411d4c2cb8d880cf58ca197d7f2dcc5d97b037405621743e2fd854044"
+    },
+    {
+      "name": "journey",
+      "startedAt": "2026-11-24T03:04:30.370Z",
+      "finishedAt": "2026-11-24T03:09:33.770Z",
+      "status": "passed",
+      "measuredDurationMs": 303400,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "f471592e84acd843e82cc7f6a3ae36751add744b03974e8716abffb2cfd75608"
+    },
+    {
+      "name": "validator-stop",
+      "startedAt": "2026-11-24T03:09:34.258Z",
+      "finishedAt": "2026-11-24T03:09:34.633Z",
+      "status": "passed",
+      "measuredDurationMs": 375,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "logSha256": "9bdd4c23fbbc09ff4329e2d00be30e36bef6ce71f64925760ae3694edd910c98"
+    }
+  ],
+  "serviceExits": [
+    {
+      "name": "ring-indexer",
+      "pid": 177,
+      "exitCode": null,
+      "signal": "SIGTERM"
+    },
+    {
+      "name": "prover",
+      "pid": 190,
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "name": "localnet-kms",
+      "pid": 195,
+      "exitCode": null,
+      "signal": "SIGTERM"
+    },
+    {
+      "name": "ring-rpc",
+      "pid": 352,
+      "exitCode": null,
+      "signal": "SIGTERM"
+    }
+  ],
+  "cleanup": [
+    {
+      "name": "ring-rpc",
+      "stopped": true
+    },
+    {
+      "name": "localnet-kms",
+      "stopped": true
+    },
+    {
+      "name": "prover",
+      "stopped": true
+    },
+    {
+      "name": "ring-indexer",
+      "stopped": true
+    },
+    {
+      "name": "scoped-validator-and-photon",
+      "stopped": true
+    }
+  ],
+  "privateEvidenceSha256": {
+    "run-receipt.json": "2733c25234cbc478d1ef186274dbb3fa5a83d7dea7507d6a5a46ec8764dfb7cd",
+    "journey-evidence.json": "a16bd829d0478d6def9e390f390d1bbeb940ea85fcb276f627754c9c441aea2b",
+    "vitest-results.json": "d46ec97127516d5ac3e4e804ea137796e840b6e30247097891d3c141df5ff234"
+  },
+  "supervisorReceiptSha256": "7bc8f1e04d82c02794ff6215a0b511b8db876326d947c1efa870fdf88c4ef920",
+  "redaction": "No signing key material, keypair files, private witness values, raw signed frames, encrypted job contents, prompt/lesson text, operation IDs, service arguments or raw private logs are included. Synthetic public addresses, transaction signatures, commitment/account-data hashes and scalar test results are retained."
+}

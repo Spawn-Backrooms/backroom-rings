@@ -1,0 +1,8 @@
+=== RUN   TestSpawnRoomApplicationGroth16Proof
+    spawn_room_proof_test.go:46: compiling full spawn-room-advance-v1
+    spawn_room_proof_test.go:46: reloading explicitly requested local key and comparing the complete constraint system
+    spawn_room_proof_test.go:46: proving full spawn-room-advance-v1
+    spawn_room_proof_test.go:46: verified real proof, rejected both changed public inputs; key SHA256 b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822
+--- PASS: TestSpawnRoomApplicationGroth16Proof (64.33s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	64.537s

@@ -1,0 +1,8 @@
+=== RUN   TestSpawnRoomFullRequestRoundTrip
+=== RUN   TestSpawnRoomFullRequestRoundTrip/spawn-room-advance-v1
+=== RUN   TestSpawnRoomFullRequestRoundTrip/spawn-room-genesis-v1
+--- PASS: TestSpawnRoomFullRequestRoundTrip (10.52s)
+    --- PASS: TestSpawnRoomFullRequestRoundTrip/spawn-room-advance-v1 (5.75s)
+    --- PASS: TestSpawnRoomFullRequestRoundTrip/spawn-room-genesis-v1 (4.76s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	10.560s

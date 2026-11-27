@@ -1,0 +1,237 @@
+{
+  "schema": "spawn-room-cr04-native-vm-qualification-v1",
+  "scope": "Disposable native Linux localnet with synthetic identities and fixture inference",
+  "startingPrHead": "f944fee75e4e4292bab010acae04869fb671fd4e",
+  "overlaySha256": "243ae5f816731a03cb85420919e62cc76db26213de87a4387c654d7423228288",
+  "testFileSha256": "0b7b7776696be908075455467ad76b1a5efc3d8eaf8a619aa273010224ac68c5",
+  "runtime": {
+    "reboundPorts": 8,
+    "runtime": {
+      "node": "v24.22.3",
+      "platform": "linux",
+      "arch": "x64"
+    },
+    "sourceUnchanged": true,
+    "appZolanaUnchanged": true,
+    "referenceHostUnchanged": true,
+    "nativeRevision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolanaRevision": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "backroomsRevision": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+    "artifacts": {
+      "appProgram": {
+        "sha256": "ca9ac26bd498e1a7c8f38c3471eaba3c13b356ad3993d466a8c34cbc404c3e0c",
+        "size": 526024
+      },
+      "sppProgram": {
+        "sha256": "bbcdf41cf0426fe8c661f2fd53348d0c25f8e8bf625a3f04f122712d7bc2887c",
+        "size": 634344
+      },
+      "userRegistryProgram": {
+        "sha256": "bacf7b1d3c8f59b5c80c7a04888b561f50c4fe48847d67f75ba889729ec6756e",
+        "size": 47784
+      },
+      "storageProgram": {
+        "sha256": "1fa7b2cfd808799a62e8a0b1ab107dd6eb84665a4ffb684976a065a8b36a5e5a",
+        "size": 171824
+      },
+      "zolana": {
+        "sha256": "daacfbbdcc5c98c47ee3c1b9938bf08c274f5676b0a5df89bdcd9cbe9cbd1339",
+        "size": 74131032
+      },
+      "xtask": {
+        "sha256": "41e8033506f48c6f0de12b50d6494ef11f0facd620bd1bd88088d97c47f4d38c",
+        "size": 69535376
+      },
+      "photon": {
+        "sha256": "3859aa046fb39e1b8b078b38ba298f942afa1c7c210f7ddd763326a6279d2b7c",
+        "size": 74307080
+      },
+      "ringIndexer": {
+        "sha256": "33480238172e6bd1f214ef55930d9f8d461e8d51ef5e9c52071cc352eec2db92",
+        "size": 60290056
+      },
+      "ringRpc": {
+        "sha256": "f44879c9d796b0ef455be972f43e5ff43d13334bff0cd20a016b275e21a1835e",
+        "size": 132907256
+      },
+      "prover": {
+        "sha256": "e7a0b037cac203ffef191e8b0c19d1c30e9b3384379cf343b9aef1bd7ff7d3ff",
+        "size": 49196248
+      },
+      "surfpool": {
+        "sha256": "b26055c302b8b47ff6fb4fa633a6b34111f5b1b37222f889295375ec93c10f31",
+        "size": 84393824
+      },
+      "solana": {
+        "sha256": "5d69e5ec2b50d78a8f1c99bcd9cd3bec83b13c8ecf2d6185597844bec23e47a8",
+        "size": 32605400
+      },
+      "solanaKeygen": {
+        "sha256": "aaa600face9d36ec82aec9ef43d68106b5cdf141b65e00efb76cb78dc93ae95e",
+        "size": 6498208
+      },
+      "npm": {
+        "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+        "size": 54
+      }
+    },
+    "peakConcurrentRssKiB": 4409468
+  },
+  "supervisor": {
+    "schema": "spawn-room-localnet-run-v1",
+    "status": "passed",
+    "supervisorExit": 0,
+    "failureCheck": null,
+    "auditor": [
+      {
+        "ownerRecordVerified": true,
+        "applicationDataHashVerified": false
+      }
+    ],
+    "stepCount": 26,
+    "steps": [
+      {
+        "name": "setup",
+        "status": "passed"
+      },
+      {
+        "name": "create",
+        "status": "passed"
+      },
+      {
+        "name": "eligible-second-room",
+        "status": "passed"
+      },
+      {
+        "name": "reject-duplicate-genesis",
+        "status": "passed"
+      },
+      {
+        "name": "native-process-first",
+        "status": "passed"
+      },
+      {
+        "name": "adversarial-valid-control",
+        "status": "passed"
+      },
+      {
+        "name": "reject-wrong-application-config",
+        "status": "passed"
+      },
+      {
+        "name": "reject-wrong-ring-policy",
+        "status": "passed"
+      },
+      {
+        "name": "reject-unapproved-settlement-program",
+        "status": "passed"
+      },
+      {
+        "name": "reject-wrong-operation-key",
+        "status": "passed"
+      },
+      {
+        "name": "reject-reordered-audit-frame",
+        "status": "passed"
+      },
+      {
+        "name": "reject-peer-room-input",
+        "status": "passed"
+      },
+      {
+        "name": "reject-bound-output-substitution",
+        "status": "passed"
+      },
+      {
+        "name": "reject-ciphertext-substitution",
+        "status": "passed"
+      },
+      {
+        "name": "reject-generic-transfer",
+        "status": "passed"
+      },
+      {
+        "name": "reject-generic-authority-transfer",
+        "status": "passed"
+      },
+      {
+        "name": "reject-generic-merge",
+        "status": "passed"
+      },
+      {
+        "name": "reject-generic-set-delegate",
+        "status": "passed"
+      },
+      {
+        "name": "advance",
+        "status": "passed"
+      },
+      {
+        "name": "application-auditor-read",
+        "status": "passed"
+      },
+      {
+        "name": "reject-replay",
+        "status": "passed"
+      },
+      {
+        "name": "recovery",
+        "status": "passed"
+      },
+      {
+        "name": "native-worker-idempotent-reentry",
+        "status": "passed"
+      },
+      {
+        "name": "reuse",
+        "status": "passed"
+      },
+      {
+        "name": "reject-revoked-grant",
+        "status": "passed"
+      },
+      {
+        "name": "revocation-retention",
+        "status": "passed"
+      }
+    ],
+    "sourceUnchanged": true,
+    "cleanup": [
+      {
+        "name": "ring-rpc",
+        "stopped": true
+      },
+      {
+        "name": "localnet-kms",
+        "stopped": true
+      },
+      {
+        "name": "prover",
+        "stopped": true
+      },
+      {
+        "name": "ring-indexer",
+        "stopped": true
+      },
+      {
+        "name": "scoped-validator-and-photon",
+        "stopped": true
+      }
+    ],
+    "failedCommands": [],
+    "journeyDigest": "3e3c6305ec19d836e9aedf5832ed0764b1f735fb388dc0edbbd8009e1fd2e6bb",
+    "vitestDigest": "0bda4ab103ea09506901450d72d221c2a7bbbda4d8ef431a2cc9e1e00c4d39fa"
+  },
+  "logChecks": {
+    "terminalStatus": "passed",
+    "serviceAndCommandLogsChecked": 23,
+    "syntheticKeypairsChecked": 3,
+    "fixtureLessonValuesChecked": 1,
+    "matchingLogFiles": []
+  },
+  "focusedCircuitChecks": [
+    "TestSpawnRoomApplicationHonestAndBoundStatements",
+    "TestSpawnRoomGenesisRelation"
+  ],
+  "fullCr04Accepted": false
+}

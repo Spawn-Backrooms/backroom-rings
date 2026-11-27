@@ -1,0 +1,72 @@
+{
+  "schema": "cr05-public-profile-comparison.v1",
+  "sourceRevision": "d1abad088b9d6f9ed80330b5c002b6d733fd3dca",
+  "sources": {
+    "APPLICATION-EVIDENCE.json": {
+      "bytes": 50389,
+      "sha256": "942acfe55f5c00e2ba85d2e3336f41eb19d28264e9e3fb7d672ae87e3d2789b5"
+    },
+    "evidence/spawn-room-live-pass.json": {
+      "bytes": 91251,
+      "sha256": "057b96ccfffc3b6d04980ff26fda758665b6eaf5bf6f45df4a83c7321a1bff52"
+    }
+  },
+  "artifactIdentities": {
+    "customRingsSource": {
+      "expected": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "actual": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "equal": true
+    },
+    "zolanaSource": {
+      "expected": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "actual": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "equal": true
+    },
+    "backroomsReferenceHost": {
+      "expected": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+      "actual": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+      "equal": true
+    },
+    "overlaySha256": {
+      "expected": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "actual": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "equal": true
+    },
+    "programId": {
+      "expected": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+      "actual": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+      "equal": true
+    },
+    "programSha256": {
+      "expected": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d",
+      "actual": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d",
+      "equal": true
+    },
+    "genesisKeySha256": {
+      "expected": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
+      "actual": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
+      "equal": true
+    },
+    "advanceKeySha256": {
+      "expected": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
+      "actual": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
+      "equal": true
+    }
+  },
+  "runtimeCommitments": {
+    "seedCommitment": {
+      "expected": "33be649119e365fa0fd1922f794c9903c4cf5cf30f5e82474d5a6a63e512a138",
+      "actual": "33be649119e365fa0fd1922f794c9903c4cf5cf30f5e82474d5a6a63e512a138",
+      "equal": true
+    },
+    "membershipCommitment": {
+      "expected": "4bffd551c58ebd26411ceb47ff0da6b79aba1d3ccd074f636c7afd9e86735eba",
+      "actual": "4bffd551c58ebd26411ceb47ff0da6b79aba1d3ccd074f636c7afd9e86735eba",
+      "equal": true
+    }
+  },
+  "liveExtractProgramMatches": true,
+  "liveExtractKeysMatch": true,
+  "liveExtractOverlayMatches": true,
+  "status": "passed"
+}

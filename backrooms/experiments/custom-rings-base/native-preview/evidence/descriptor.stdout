@@ -1,0 +1,548 @@
+{
+  "schema": "cr05-readiness-contract.v1",
+  "inputSchema": "cr05-readiness-input.v1",
+  "capabilities": {
+    "purpose": "display-only",
+    "activationAuthorized": false,
+    "productionAvailable": false
+  },
+  "profileScopeSchema": "cr05-profile-scope.v1",
+  "profile": {
+    "namespace": "public",
+    "selection": {
+      "profile": "anonymous-localnet-v1",
+      "network": "localnet",
+      "artifactVersion": "spawn-room.v1",
+      "protocolVersion": "backrooms.v0",
+      "programFeature": "spawn-room-v1",
+      "testKeySet": "spawn-room-v1-localnet-keys",
+      "localnetTestKeys": true,
+      "runtime": "seeded-flue",
+      "inference": "deterministic-local",
+      "authority": "anonymous-owner",
+      "providerSpend": false
+    },
+    "artifacts": {
+      "customRingsSource": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+      "zolanaSource": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+      "backroomsReferenceHost": "08822c65254cd73c5f2dccbdf182ce1df2c7510a",
+      "overlaySha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "programId": "2t8SPCrLAxKjhYjY1Yy1Dwx2ktRaKZ6fGf5khcY5zb5Y",
+      "programSha256": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d",
+      "genesisKeySha256": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
+      "advanceKeySha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822"
+    },
+    "runtime": {
+      "seedCommitment": "33be649119e365fa0fd1922f794c9903c4cf5cf30f5e82474d5a6a63e512a138",
+      "membershipCommitment": "4bffd551c58ebd26411ceb47ff0da6b79aba1d3ccd074f636c7afd9e86735eba"
+    },
+    "nativeBuild": null,
+    "gates": {
+      "upstream-go": {
+        "status": "recorded",
+        "source": "25439b26fcbaa1d938ea2be4c23b7ced132037ec",
+        "rawReceipts": 18,
+        "expectedReceipts": 18
+      },
+      "cr02-independent-acceptance": {
+        "status": "open"
+      },
+      "cr03-dependency": {
+        "status": "open"
+      },
+      "cr04-independent-acceptance": {
+        "status": "open"
+      },
+      "native-integration": {
+        "status": "open"
+      }
+    },
+    "scopeSha256": "90f5377662823753ad132e97c4ed13ae45e672f11b8c07d90c24d1b4e2d2bfbd",
+    "maxAgeMs": 60000
+  },
+  "qualificationReferences": {
+    "gateNames": [
+      "upstream-go",
+      "cr02-independent-acceptance",
+      "cr03-dependency",
+      "cr04-independent-acceptance",
+      "native-integration"
+    ],
+    "keys": [
+      "kind",
+      "scopeSha256",
+      "reviewedEvidenceSha256"
+    ],
+    "kind": "maintainer-reference",
+    "role": "context-only"
+  },
+  "statusContext": {
+    "daybreak": {
+      "status": "outstanding",
+      "runtimePrerequisite": false
+    }
+  },
+  "inputs": {
+    "required": [
+      "schema",
+      "nowMs",
+      "selection",
+      "observations"
+    ],
+    "observationNames": [
+      "artifacts",
+      "runtime",
+      "validator",
+      "prover",
+      "indexer",
+      "recovery"
+    ],
+    "observationKeys": [
+      "scopeSha256",
+      "observedAtMs",
+      "value"
+    ],
+    "observationValues": {
+      "artifacts": [
+        "customRingsSource",
+        "zolanaSource",
+        "backroomsReferenceHost",
+        "overlaySha256",
+        "programId",
+        "programSha256",
+        "genesisKeySha256",
+        "advanceKeySha256",
+        "nativeSource",
+        "toolchainSha256"
+      ],
+      "runtime": [
+        "seedCommitment",
+        "membershipCommitment"
+      ],
+      "validator": [
+        "endpoint",
+        "status"
+      ],
+      "prover": [
+        "endpoint",
+        "status"
+      ],
+      "indexer": [
+        "endpoint",
+        "status"
+      ],
+      "recovery": [
+        "complete",
+        "incomplete",
+        "unknown-submission"
+      ]
+    },
+    "serviceStates": [
+      "reachable",
+      "unreachable"
+    ]
+  },
+  "invalidInput": {
+    "check": "input",
+    "code": "malformed-input",
+    "message": "The preview input has an unsupported format.",
+    "primaryAction": {
+      "code": "check-preview-input",
+      "label": "Check the preview input"
+    }
+  },
+  "readyAction": {
+    "code": "view-local-preview",
+    "label": "View local preview"
+  },
+  "checks": [
+    {
+      "check": "selection",
+      "reasons": {
+        "unsupported-profile": {
+          "message": "The selection must match the anonymous localnet profile.",
+          "primaryAction": {
+            "code": "select-localnet-profile",
+            "label": "Select the anonymous localnet profile"
+          }
+        },
+        "unsupported-network": {
+          "message": "The anonymous preview requires localnet.",
+          "primaryAction": {
+            "code": "select-localnet-profile",
+            "label": "Select the anonymous localnet profile"
+          }
+        }
+      }
+    },
+    {
+      "check": "artifacts",
+      "reasons": {
+        "missing": {
+          "message": "The artifact observation is missing.",
+          "primaryAction": {
+            "code": "check-artifacts",
+            "label": "Check the local preview artifacts"
+          }
+        },
+        "malformed": {
+          "message": "The artifact observation is malformed.",
+          "primaryAction": {
+            "code": "check-artifacts",
+            "label": "Check the local preview artifacts"
+          }
+        },
+        "stale": {
+          "message": "The artifact observation is stale.",
+          "primaryAction": {
+            "code": "check-artifacts",
+            "label": "Check the local preview artifacts"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The artifact observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-artifacts",
+            "label": "Check the local preview artifacts"
+          }
+        },
+        "fingerprint-mismatch": {
+          "message": "The local artifact fingerprints differ from the profile pins.",
+          "primaryAction": {
+            "code": "check-artifacts",
+            "label": "Check the local preview artifacts"
+          }
+        }
+      }
+    },
+    {
+      "check": "upstream-go",
+      "reasons": {
+        "qualification-open": {
+          "message": "The upstream Go baseline is open.",
+          "primaryAction": {
+            "code": "check-upstream-go",
+            "label": "Check the upstream Go baseline"
+          }
+        }
+      }
+    },
+    {
+      "check": "cr02-independent-acceptance",
+      "reasons": {
+        "qualification-open": {
+          "message": "Independent CR02 acceptance is open.",
+          "primaryAction": {
+            "code": "obtain-cr02-acceptance",
+            "label": "Obtain independent CR02 acceptance"
+          }
+        }
+      }
+    },
+    {
+      "check": "cr03-dependency",
+      "reasons": {
+        "qualification-open": {
+          "message": "CR03 dependency acceptance is open.",
+          "primaryAction": {
+            "code": "obtain-cr03-acceptance",
+            "label": "Obtain CR03 dependency acceptance"
+          }
+        }
+      }
+    },
+    {
+      "check": "cr04-independent-acceptance",
+      "reasons": {
+        "qualification-open": {
+          "message": "Independent CR04 acceptance is open.",
+          "primaryAction": {
+            "code": "obtain-cr04-acceptance",
+            "label": "Obtain independent CR04 acceptance"
+          }
+        }
+      }
+    },
+    {
+      "check": "native-integration",
+      "reasons": {
+        "qualification-open": {
+          "message": "The exact maintainer-approved native source, build, and integration evidence are open.",
+          "primaryAction": {
+            "code": "obtain-native-integration-evidence",
+            "label": "Obtain native integration evidence"
+          }
+        }
+      }
+    },
+    {
+      "check": "runtime",
+      "reasons": {
+        "missing": {
+          "message": "The runtime observation is missing.",
+          "primaryAction": {
+            "code": "check-runtime-binding",
+            "label": "Check the seeded Flue binding"
+          }
+        },
+        "malformed": {
+          "message": "The runtime observation is malformed.",
+          "primaryAction": {
+            "code": "check-runtime-binding",
+            "label": "Check the seeded Flue binding"
+          }
+        },
+        "stale": {
+          "message": "The runtime observation is stale.",
+          "primaryAction": {
+            "code": "check-runtime-binding",
+            "label": "Check the seeded Flue binding"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The runtime observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-runtime-binding",
+            "label": "Check the seeded Flue binding"
+          }
+        },
+        "runtime-mismatch": {
+          "message": "The runtime commitments differ from the seeded Flue profile.",
+          "primaryAction": {
+            "code": "check-runtime-binding",
+            "label": "Check the seeded Flue binding"
+          }
+        }
+      }
+    },
+    {
+      "check": "validator",
+      "reasons": {
+        "missing": {
+          "message": "The validator observation is missing.",
+          "primaryAction": {
+            "code": "start-local-validator",
+            "label": "Start the local validator"
+          }
+        },
+        "malformed": {
+          "message": "The validator observation is malformed.",
+          "primaryAction": {
+            "code": "check-local-validator",
+            "label": "Check the local validator endpoint"
+          }
+        },
+        "stale": {
+          "message": "The validator observation is stale.",
+          "primaryAction": {
+            "code": "check-local-validator",
+            "label": "Check the local validator endpoint"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The validator observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-local-validator",
+            "label": "Check the local validator endpoint"
+          }
+        },
+        "non-loopback-service": {
+          "message": "The validator endpoint must use explicit HTTP or HTTPS loopback.",
+          "primaryAction": {
+            "code": "check-local-validator",
+            "label": "Check the local validator endpoint"
+          }
+        },
+        "unreachable": {
+          "message": "The local validator is reported unreachable.",
+          "primaryAction": {
+            "code": "start-local-validator",
+            "label": "Start the local validator"
+          }
+        }
+      }
+    },
+    {
+      "check": "prover",
+      "reasons": {
+        "missing": {
+          "message": "The prover observation is missing.",
+          "primaryAction": {
+            "code": "start-local-prover",
+            "label": "Start the local prover"
+          }
+        },
+        "malformed": {
+          "message": "The prover observation is malformed.",
+          "primaryAction": {
+            "code": "check-local-prover",
+            "label": "Check the local prover endpoint"
+          }
+        },
+        "stale": {
+          "message": "The prover observation is stale.",
+          "primaryAction": {
+            "code": "check-local-prover",
+            "label": "Check the local prover endpoint"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The prover observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-local-prover",
+            "label": "Check the local prover endpoint"
+          }
+        },
+        "non-loopback-service": {
+          "message": "The prover endpoint must use explicit HTTP or HTTPS loopback.",
+          "primaryAction": {
+            "code": "check-local-prover",
+            "label": "Check the local prover endpoint"
+          }
+        },
+        "unreachable": {
+          "message": "The local prover is reported unreachable.",
+          "primaryAction": {
+            "code": "start-local-prover",
+            "label": "Start the local prover"
+          }
+        }
+      }
+    },
+    {
+      "check": "indexer",
+      "reasons": {
+        "missing": {
+          "message": "The indexer observation is missing.",
+          "primaryAction": {
+            "code": "start-local-indexer",
+            "label": "Start the local indexer"
+          }
+        },
+        "malformed": {
+          "message": "The indexer observation is malformed.",
+          "primaryAction": {
+            "code": "check-local-indexer",
+            "label": "Check the local indexer endpoint"
+          }
+        },
+        "stale": {
+          "message": "The indexer observation is stale.",
+          "primaryAction": {
+            "code": "check-local-indexer",
+            "label": "Check the local indexer endpoint"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The indexer observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-local-indexer",
+            "label": "Check the local indexer endpoint"
+          }
+        },
+        "non-loopback-service": {
+          "message": "The indexer endpoint must use explicit HTTP or HTTPS loopback.",
+          "primaryAction": {
+            "code": "check-local-indexer",
+            "label": "Check the local indexer endpoint"
+          }
+        },
+        "unreachable": {
+          "message": "The local indexer is reported unreachable.",
+          "primaryAction": {
+            "code": "start-local-indexer",
+            "label": "Start the local indexer"
+          }
+        }
+      }
+    },
+    {
+      "check": "recovery",
+      "reasons": {
+        "missing": {
+          "message": "The recovery observation is missing.",
+          "primaryAction": {
+            "code": "check-room-recovery",
+            "label": "Check room recovery"
+          }
+        },
+        "malformed": {
+          "message": "The recovery observation is malformed.",
+          "primaryAction": {
+            "code": "check-room-recovery",
+            "label": "Check room recovery"
+          }
+        },
+        "stale": {
+          "message": "The recovery observation is stale.",
+          "primaryAction": {
+            "code": "check-room-recovery",
+            "label": "Check room recovery"
+          }
+        },
+        "scope-mismatch": {
+          "message": "The recovery observation is for a different profile scope.",
+          "primaryAction": {
+            "code": "check-room-recovery",
+            "label": "Check room recovery"
+          }
+        },
+        "recovery-incomplete": {
+          "message": "Room recovery is incomplete.",
+          "primaryAction": {
+            "code": "finish-room-recovery",
+            "label": "Finish room recovery"
+          }
+        },
+        "recovery-unresolved": {
+          "message": "The submission outcome is unknown.",
+          "primaryAction": {
+            "code": "reconcile-submission",
+            "label": "Reconcile the unknown submission"
+          }
+        }
+      }
+    }
+  ],
+  "disclosures": {
+    "public-enrollment-and-genesis": "Enrollment and room genesis are visible on the chain.",
+    "public-global-config-and-root-changes": "Global configuration and admission root changes are public.",
+    "public-payer-and-timing": "Chain fee payer and timing metadata remain public.",
+    "designated-auditor-ring-access": "The designated auditor can inspect the ring stream.",
+    "native-host-private-originals-and-learning-state": "The native host retains private originals and learning state.",
+    "operator-provider-and-network-anonymity-unqualified": "Operator, provider, and network anonymity remain unqualified.",
+    "multiple-eligible-note-owners-required-for-journey": "The local journey requires multiple eligible note owners with live eligible notes.",
+    "insecure-keys-localnet-only": "The insecure single-party proving keys are for localnet use only."
+  },
+  "returnEnvelope": {
+    "schema": "cr05-maintainer-evidence.v1",
+    "stages": [
+      "independent-review",
+      "proof-verification",
+      "validator-execution",
+      "native-activation",
+      "profile-selection",
+      "native-journey",
+      "chain-and-recovered-revision",
+      "ui-readiness-and-blockers"
+    ],
+    "outcomes": [
+      "passed",
+      "failed",
+      "skipped"
+    ],
+    "keys": [
+      "schema",
+      "kind",
+      "profileScopeSha256",
+      "nativeSource",
+      "artifactFingerprintSha256",
+      "toolchainSha256",
+      "evidence"
+    ],
+    "entryKeys": [
+      "outcome",
+      "reviewedExtractSha256"
+    ]
+  }
+}

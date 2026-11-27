@@ -1,0 +1,1339 @@
+{
+  "schema": 1,
+  "scope": "implemented combined application, SDK/native adapter and runner; complete 25-step real-validator create/hidden-update/restart/retry/reuse journey passed; fresh terminal Go qualification covers all 18 upstream packages at unchanged source; final independent review, broader CR02/CR04 acceptance, Daybreak scan and native product activation remain pending",
+  "sourcePins": {
+    "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+    "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+    "backrooms": "08822c65254cd73c5f2dccbdf182ce1df2c7510a"
+  },
+  "patchSha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+  "keys": {
+    "advance": {
+      "sha256": "b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822",
+      "bytes": 294753109,
+      "constraints": 618360
+    },
+    "genesis": {
+      "sha256": "734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57",
+      "bytes": 287934208,
+      "constraints": 594484
+    }
+  },
+  "publicInputs": 2,
+  "privateBsb22Commitments": 1,
+  "setup": "insecure single-party localnet only",
+  "applicationProgram": {
+    "bytes": 526024,
+    "sha256": "81e618d960fcb87d5c79b559d3c3fb16ba358ab03657b5c5dabd62fe19b2a19d"
+  },
+  "logDigests": {
+    "application-proof-reloaded.log": {
+      "sha256": "3154c01e6de3a6c5cb66ef05fcaba48382b6b851222ef216b33126d46764d091",
+      "bytes": 613
+    },
+    "genesis-proof.log": {
+      "sha256": "cbfed2e3d99af2fad177911a30d7d28b272701d063e49da3d5914cae08c39965",
+      "bytes": 586
+    },
+    "full-wire-roundtrip.log": {
+      "sha256": "4deb1f4eb633cf55c1a7b39cff2ad0b2cf99631f584cbe682d64d337175c3134",
+      "bytes": 471
+    },
+    "spawn-wire-tests-green.log": {
+      "sha256": "05309d12741cce20bb9acdf2c91cc6e01fdecadad3f4b35151f6b64709a9ade5",
+      "bytes": 1930
+    },
+    "spawn-http-proofs.log": {
+      "sha256": "32e379088d72519d561ff7180c36f30c09bd8faec46974814e4f1a6efb73c1d7",
+      "bytes": 668
+    },
+    "typescript-go-request-solve.log": {
+      "sha256": "874d3ca3c32af1e5d626918a25680987911b65eac229392c76918c439667037c",
+      "bytes": 501
+    },
+    "spawn-room-real-proof.log": {
+      "sha256": "ebd7cd406d0e2b96e2dfbaf0cfbfc833d748438b685cd7a31184de7f7f6e182f",
+      "bytes": 959
+    },
+    "spawn-room-regressions.log": {
+      "sha256": "91743b0f83f2c8549b16c4f59b54e09667d4ccdc4bce8f39a55b2fe745fca0e6",
+      "bytes": 3783
+    },
+    "spawn-profile-sbf-final.log": {
+      "sha256": "8b6ca1015cac4ce720d50c89d5ad949fde3e7ef71397ab4a070edf62fa640db9",
+      "bytes": 229
+    },
+    "cr01-check-all-resume.log": {
+      "sha256": "65bad1c5cf24f9d7f170d0eea65544f1bdd5922e389e6a3e8e5a493d3d3287a3",
+      "bytes": 1160
+    },
+    "typescript-go-final-request-solve.log": {
+      "sha256": "05c7a59ae208dd02fb6ae74082deb7a4973587f9a360eba585f5a7092070e847",
+      "bytes": 501
+    },
+    "cr01-stage-build-zolana-cli-20261124T005153Z.log": {
+      "sha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698",
+      "bytes": 19305
+    },
+    "cr01-stage-build-photon-20261124T010636Z.log": {
+      "sha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de",
+      "bytes": 14617
+    },
+    "full-note-go-tests.log": {
+      "sha256": "4ffaa8e10fada1e3bc88b10eb3abc9f55dbb3c3a3e9e6861731b53dea894960e",
+      "bytes": 2172
+    },
+    "application-green.log": {
+      "sha256": "c84528288047fdfe1925daedb369f42c871eee481b3cc247da27648e76bfba89",
+      "bytes": 1137
+    },
+    "genesis-green.log": {
+      "sha256": "95130801fa93129fd067da420197ea623ede1fb16d573b9878a8e20f79521bd5",
+      "bytes": 1007
+    },
+    "application-state-conformance.log": {
+      "sha256": "c39159f02bbe7e4d8a05f17aae89e5622f465274df12fb59e40f0d2abef7a261",
+      "bytes": 10954
+    },
+    "final-sdk-tests.log": {
+      "sha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41",
+      "bytes": 1034
+    },
+    "final-native-tests.log": {
+      "sha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758",
+      "bytes": 846
+    },
+    "final-app-harness-tests.log": {
+      "sha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee",
+      "bytes": 587
+    },
+    "final-sdk-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-journey-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-focused-lint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "cr01-stage-test-hermetic-20261124T014430Z.log": {
+      "sha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e",
+      "bytes": 240436
+    },
+    "cr01-progress-parser-green.log": {
+      "sha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde",
+      "bytes": 1856
+    }
+  },
+  "completed": [
+    "Go full genesis and advance Groth16 proof generation and verification",
+    "refusal of either changed public input",
+    "real HTTP proof service for both exact key families",
+    "strict full request witness round trip",
+    "strict decode and full circuit solve of actual TypeScript SDK requests",
+    "all 14 non-opt-in TestSpawnRoom functions plus two TestSpawnRequests functions have terminal passing coverage",
+    "state gate: 5 top-level tests and 57 subcases (7 positive, 50 negative), zero failures/skips",
+    "Rust verification of actual Go proof vectors with BSB22 commitments",
+    "40 interface tests and 3 program entrypoint tests",
+    "generic and unkeyed application build checks",
+    "dedicated application SBF build",
+    "18 focused SDK tests and 3 off-chain native/worker-launcher tests",
+    "SDK/integration type checks and focused lint",
+    "5 focused localnet runner tests, zero failures/cancellations/skips",
+    "historical independent core, SDK/native, worker/resource reviews with their recorded corrections; not a review of later helper/corpus",
+    "clean pristine upstream just check-all, all eight native build stages, and just test-hermetic",
+    "18/18 upstream whole packages covered at unchanged source: 12 passing test packages and 6 explicit no-test-files results, using separate unfiltered package commands with complete terminal evidence; no single whole-suite command exit is claimed",
+    "both exact upstream anonymous-validator cases passed with full command exit0 and unchanged source pins",
+    "full real-validator journey passed all 25 steps and its one executed Vitest test, with zero failures/pending tests",
+    "two eligible room notes, both actual hidden updates and retained-lesson reuse settled on the local validator",
+    "fresh-process interrupted-confirmation recovery, controlled post-receipt failure/retry and completed-job re-entry preserved exact records without repeated inference",
+    "15 named ledger-confirmed refusal transactions retained accepted account, wallet-note and peer-room state",
+    "five owned service groups stopped and application, Zolana and reference-host source remained unchanged",
+    "public CR05 display-readiness contract: 16 behavior tests and 47 explicitly synthetic fixtures passed; no independent application acceptance or native activation"
+  ],
+  "pending": [
+    "complete the broader CR02/CR04 qualification listed in ACCEPTANCE-STATUS.md; the executed named live corpus does not establish every acceptance variant",
+    "final independent review of indexed-note recovery helper and expanded live corpus; automated review blocked",
+    "Daybreak environment/credits setup and exact-applied-source scan; no scan launched",
+    "authorized native-maintainer developer-preview activation; no production activation"
+  ],
+  "sourceFiles": 59,
+  "finalTypeScriptRequestCheck": {
+    "status": "complete",
+    "command": [
+      "/workspace/scratch/06977f839292/toolchains/go1.27.3/go/bin/go",
+      "test",
+      "-p",
+      "1",
+      "./circuits/transfer",
+      "-run",
+      "^TestSpawnRoomTypeScriptRequestFixtures$",
+      "-count=1",
+      "-v"
+    ],
+    "startedEpoch": 1795482947.7886453,
+    "privateFixtureSha256": {
+      "typescript-advance.request.json": "e669775ccb590095560fb8788f2596033d76252f5774c19bf415535705de2700",
+      "typescript-genesis.request.json": "afa329fdfa1038d5fcb4a62401affdb77b39d17eec38847a9cd8517db8d5c92c"
+    },
+    "exitCode": 0,
+    "elapsedSeconds": 22.923484802246094,
+    "unchangedFixtures": true,
+    "logSha256": "05c7a59ae208dd02fb6ae74082deb7a4973587f9a360eba585f5a7092070e847"
+  },
+  "nativeFixture": {
+    "schema": "spawn-room-native-fixture-v1",
+    "status": "passed",
+    "implementation": "actual FlueResidents + ReferenceAuthority + EncryptedSqliteRecords",
+    "provider": "existing deterministicInferenceFixture; no external provider",
+    "chainSettlement": false,
+    "first": {
+      "selectedProcedure": 0,
+      "procedure": "take-first",
+      "value": 9,
+      "memoryRevision": "0",
+      "lessonUsed": ""
+    },
+    "firstOriginalDigest": "31cdb6c5f06735459b4c03bba9f072b0167155c5ccf24ba15a4e0667a32ec9c0",
+    "acceptedScores": [
+      40,
+      50
+    ],
+    "retainedNonceMatches": true,
+    "second": {
+      "selectedProcedure": 1,
+      "procedure": "sort-and-take-median",
+      "value": 5,
+      "memoryRevision": "1",
+      "lessonUsed": "Sort inputs before selecting the median."
+    },
+    "nextScores": [
+      40,
+      60
+    ],
+    "seedCommitment": "33be649119e365fa0fd1922f794c9903c4cf5cf30f5e82474d5a6a63e512a138",
+    "membershipCommitment": "4bffd551c58ebd26411ceb47ff0da6b79aba1d3ccd074f636c7afd9e86735eba"
+  },
+  "transactionFixtures": {
+    "genesis": {
+      "bytes": 2740,
+      "signers": 2
+    },
+    "advance": {
+      "bytes": 2639,
+      "signers": 1,
+      "explicitWriterAccount": false,
+      "roomMarkerAccount": false
+    },
+    "maxBytes": 4096,
+    "liveSettlement": false
+  },
+  "patchBytes": 424108,
+  "patchGitBlobSha": "a44848b4b9ba6318cb0703b85a0ad59502922d56",
+  "publishedApplicationGoLogManifest": "evidence/application-go/manifest.json",
+  "focusedChecks": {
+    "sdk": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 8.921,
+      "passedTests": 18,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "logSha256": "72404a9d43784d274300386948e08e3827f6880af5d6ccb4494bfa37987bfe41"
+    },
+    "native": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 9.684,
+      "passedTests": 3,
+      "failedTests": 0,
+      "pendingTests": 0,
+      "logSha256": "33a1b50dbb637c264905022e47a906e209d42f7a236f8f5016f506405803e758",
+      "scope": "Off-chain native fixtures and process-launcher behavior; does not establish validator settlement"
+    },
+    "runner": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 0.544,
+      "logSha256": "8a6b4b931817f1851b397688b960c5f465aa33190be6007e85d6ec84b78a18ee",
+      "sourceUnchanged": true,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "sourceSha256": {
+        "tools/run-spawn-room-localnet.mjs": "4dd310b5f17598b70b4b8b1d81a9c0f2fa35c64aeac072bac78ca5e7e4beefe3",
+        "tools/run-spawn-room-localnet.test.mjs": "e5bf10ff3e0f612134a966f046e48ce428a803d005ee5e3fdc2082c41a5486aa",
+        "tools/localnet-resource-monitor.mjs": "6c7fafcbea91738b6955575b2e1f164a332a21c1b0707bd401c5df2a7c4fb646"
+      },
+      "scope": "existing lightweight local runner guard tests; no live validator journey or independent review"
+    },
+    "typesAndLint": [
+      {
+        "name": "sdk-types",
+        "command": [
+          "./node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "sdk-libs/ts/tsconfig.json"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 14.006,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "journey-types",
+        "command": [
+          "./node_modules/.bin/tsc",
+          "--noEmit",
+          "-p",
+          "sdk-tests/spawn-room/tsconfig.json"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 9.769,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "focused-lint",
+        "command": [
+          "./node_modules/.bin/oxlint",
+          "--deny-warnings",
+          "sdk-libs/ts/src/experimental/spawn-room",
+          "sdk-libs/ts/test/experimental",
+          "sdk-tests/spawn-room"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.138,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "applicationStateConformance": {
+    "status": "passed",
+    "topLevelFunctions": 5,
+    "namedSubcases": 57,
+    "positiveSubcases": 7,
+    "negativeSubcases": 50,
+    "totalPassingEvents": 62,
+    "failed": 0,
+    "skipped": 0,
+    "packageSeconds": 4.704,
+    "commandWallSeconds": 9.084,
+    "sourceUnchanged": true,
+    "logSha256": "c39159f02bbe7e4d8a05f17aae89e5622f465274df12fb59e40f0d2abef7a261"
+  },
+  "liveValidatorAttempts": [
+    {
+      "attempt": "journey-y16s2B",
+      "status": "failed",
+      "startedAt": "2026-11-24T01:59:45.466Z",
+      "finishedAt": "2026-11-24T02:06:19.002Z",
+      "reason": "Primary revision-0 recovery timed out; fresh viewing history omitted application-ring registration.",
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "365",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "measuredDurationMs": 395518,
+      "sampledPeakConcurrentRssKiB": 2291320,
+      "lastSamplingError": null,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "fe4ac28c6f234094f0abe9a59b09b44a2b121e006050dcf10af7cabe5be10789",
+      "journeyEvidenceSha256": "eafa1c9284a06ed3528a987f7803a03ede041f61c1d13669d19a414ca55d1878",
+      "privateRunDirectoryPublished": false
+    },
+    {
+      "attempt": "journey-Xcz1rl",
+      "status": "failed",
+      "startedAt": "2026-11-24T02:13:00.153Z",
+      "finishedAt": "2026-11-24T02:16:12.085Z",
+      "reason": "First native worker indexed-transaction binding check failed; pinned Photon by-signature query omitted ring metadata.",
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "343",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        },
+        {
+          "name": "eligible-second-room",
+          "status": "passed",
+          "slot": "427",
+          "eligibleWriters": 2,
+          "unspentRoomNotes": 2
+        },
+        {
+          "name": "reject-duplicate-genesis",
+          "status": "passed",
+          "slot": "429",
+          "instructionError": "AccountAlreadyInitialized",
+          "acceptedRevision": "0"
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "measuredDurationMs": 193003,
+      "sampledPeakConcurrentRssKiB": 2860316,
+      "lastSamplingError": null,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "1c61ed04d6ca9a0e45dd959824e3e9621d0e3ec6199141b843bd6a783842a4ac",
+      "journeyEvidenceSha256": "e5772cae52c8e106e32f4d0eba159a36636b51d11b9412b699b304e9eedec9b4",
+      "privateRunDirectoryPublished": false
+    },
+    {
+      "attempt": "journey-KXteXY",
+      "status": "passed",
+      "startedAt": "2026-11-24T03:04:05.555Z",
+      "finishedAt": "2026-11-24T03:09:34.649Z",
+      "commandExitCode": 0,
+      "stepCount": 25,
+      "passedSteps": 25,
+      "vitest": {
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "observedSteps": [
+        {
+          "name": "setup",
+          "status": "passed",
+          "signature": "4MtKFis1eFbFt5KztbL2wxUgSCowcgJ9sJ7zyh67TN1HM85RZNWbSJwKYZnF2hZnhBsTW3LjDvwDzwyCa5A9fTHw"
+        },
+        {
+          "name": "create",
+          "status": "passed",
+          "slot": "321",
+          "signature": "4kbtPeFKnrk8fCVrdzobH7r93jWsUYsoYSQz64rkTipqAFTKUXjcV9VJ2qiwwhcvbpbaz9fJqFZAwgvi4FvYxTy6",
+          "serializedBytes": 2740,
+          "signerCount": 2
+        },
+        {
+          "name": "eligible-second-room",
+          "status": "passed",
+          "slot": "385",
+          "signature": "5vueWwJExSAxLaw8BeUSQRMwJ4qDd9Jtivob65P9m7cqFyxo1Q1b2GLgFnvtX6rHn1osfrXNbGDZLprLt9aF9zDC",
+          "eligibleWriters": 2,
+          "unspentRoomNotes": 2
+        },
+        {
+          "name": "reject-duplicate-genesis",
+          "status": "passed",
+          "slot": "388",
+          "signature": "5Qvz1mC4pYuakmCR6E6jQ76ESCxSubocaf3Zy2ZTUnhi2vTRznS2vZTCJmAeHq2PJTpezo1Coa9bLSeYfPv6MkgU",
+          "instructionError": "AccountAlreadyInitialized",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "native-process-first",
+          "status": "passed"
+        },
+        {
+          "name": "adversarial-valid-control",
+          "status": "passed"
+        },
+        {
+          "name": "reject-wrong-application-config",
+          "status": "passed",
+          "slot": "586",
+          "signature": "66yWyUvNxWAdh7mfP7CSVrqGs8p7VsvRppDkYXjRh8vyFHSomU1t6FRqTjTA7Z8uBgfsqCYak9J9NFQWRLLWrB7q",
+          "instructionError": "InvalidAccountData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-wrong-ring-policy",
+          "status": "passed",
+          "slot": "588",
+          "signature": "5N48rHLX1xv5xPuNVMAfZLDgDaynZ1gswm2Mw3bmehaHWHF6NkF3wboupsACVxJbGScN5uGKRAET43ehVYXzkmY5",
+          "instructionError": {
+            "Custom": 8300
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-unapproved-settlement-program",
+          "status": "passed",
+          "slot": "592",
+          "signature": "39nDrXQJqKj4ycr573NgnmUo1DrsvPbEPBn4Ya5SBdmNkCUUo6Ym4x8mQBci984CyWbJhGq6d7kWCECgzx82mocR",
+          "instructionError": {
+            "Custom": 8103
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-wrong-operation-key",
+          "status": "passed",
+          "slot": "594",
+          "signature": "5SSzzRPQ4akF4a5m225QpXh9r4N85SDghyBNVgwJA2bZxZ2KCengKqs4a513fB3buFMAFSKVBVF3Ddec71HCBnBx",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-reordered-audit-frame",
+          "status": "passed",
+          "slot": "597",
+          "signature": "5qLqz5e1TYPYVa3arZUTxuTGDzevnLtsnuEsbWNJjyJETRTz7wQ1jZie3n8zZCioqXX9BYxWVW9NjNhqQEzpAkKk",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-peer-room-input",
+          "status": "passed",
+          "slot": "599",
+          "signature": "27ebJ4fE5pGbMeDDwvvnx15tuxVdaQrFbqMj7BuNBpj1GfLEQuBaoPKfErHLqXHCeoMq4yYvLT2Wt5hUnfY18wup",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-bound-output-substitution",
+          "status": "passed",
+          "slot": "602",
+          "signature": "QfVuQpTZUQa6TeDD3TekWH11rCtzkKF8aRYFZCq4R1EF4FUdso3Vya3vBuUBRywD8zwfpyB2iwvwaNNGm5jaUGC",
+          "instructionError": {
+            "Custom": 7008
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-ciphertext-substitution",
+          "status": "passed",
+          "slot": "604",
+          "signature": "i8EJZoTT5hSAkDKVjsAaDVS8qp5WNP7jcvFprLE8HfFLUvDhpgAbt1oAoLvpK3hS1iVeeW1xnt9EiqUJkucCYED",
+          "instructionError": {
+            "Custom": 7008
+          },
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-transfer",
+          "status": "passed",
+          "slot": "607",
+          "signature": "4JnfmCwgxiakQbQnNbQX4DDfa2HSrbc9PcYzJWq5qenJasDWHi4d61nsTySTsByRHeDypxhKMEVFQ4rwDy8sgksJ",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-authority-transfer",
+          "status": "passed",
+          "slot": "609",
+          "signature": "3sogFTmQuCTJzmDJmGK8qa8V6VYJGLFQkXqLQD1bNQRZ21ApNoCP4Ywg7aCWP2knDeAtotVMzkBYWytSkpg9T65v",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-merge",
+          "status": "passed",
+          "slot": "612",
+          "signature": "3fv2gPoGs7aTEBy3yHAo5EUceXwM2gs4isuCC62arqt6QBJVV9sVS561xFi5gknyAPM7qYFN2CKddYaMvXb1Tamc",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "reject-generic-set-delegate",
+          "status": "passed",
+          "slot": "613",
+          "signature": "5gRjSUwSJWY9HMFC1umQdS1no4oLNHaEso3g6VDBuUABDYcworwdHWGddE8ZVCGnKNYGZzBeir9H1rsqLjQU29S6",
+          "instructionError": "InvalidInstructionData",
+          "acceptedRevision": "0"
+        },
+        {
+          "name": "advance",
+          "status": "passed",
+          "slot": "615",
+          "signature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+          "serializedBytes": 2639,
+          "signerCount": 1,
+          "explicitWriterAbsent": true,
+          "stableMarkerAbsent": true,
+          "selectedProcedure": 0,
+          "scores": [
+            40,
+            50
+          ],
+          "originalValue": 9
+        },
+        {
+          "name": "reject-replay",
+          "status": "passed",
+          "slot": "617",
+          "signature": "2sEWmFL684UFtmXQqWBqNTLYpYadsVnVj9WgCRPAN2pyvzoMp69YoEXt3vTR29BRZQpiQeDLNcUqPLe8bVtHLqeN",
+          "instructionError": {
+            "Custom": 7043
+          },
+          "acceptedRevision": "1"
+        },
+        {
+          "name": "recovery",
+          "status": "passed",
+          "revision": "1",
+          "resumedInferenceCalls": 0
+        },
+        {
+          "name": "native-worker-idempotent-reentry",
+          "status": "passed",
+          "repeatedInferenceCalls": 0
+        },
+        {
+          "name": "reuse",
+          "status": "passed",
+          "slot": "711",
+          "signature": "2BBFRnfmECWgrmJgWXQPB2atwwRCnkBG5ua6fgrKPXXA9Etr9PcxwjzJWQbtGEJe7ASvxBTY2gCrkUB2mLRGoywB",
+          "serializedBytes": 2639,
+          "signerCount": 1,
+          "explicitWriterAbsent": true,
+          "stableMarkerAbsent": true,
+          "selectedProcedure": 1,
+          "scores": [
+            40,
+            60
+          ],
+          "learnedValue": 5
+        },
+        {
+          "name": "reject-revoked-grant",
+          "status": "passed",
+          "slot": "798",
+          "signature": "5K3SocoYuNaajQ9SQ6ynpNtVCStofV5izpWibMGj99WtTYKBQ79uSiyYkQ1VPG7QHxz2yoYrbLP3w797jPutuzWe",
+          "instructionError": {
+            "Custom": 8101
+          },
+          "acceptedRevision": "2"
+        },
+        {
+          "name": "revocation-retention",
+          "status": "passed",
+          "acceptedRevision": "2"
+        }
+      ],
+      "allOwnedCleanupComplete": true,
+      "ownedCleanupGroups": 5,
+      "sourceStable": true,
+      "appZolanaUnchanged": true,
+      "referenceHostUnchanged": true,
+      "overlayBeforeVerified": true,
+      "overlayAfterVerified": true,
+      "patchSha256": "2400c9e3020c1655a448507b9e7fca77e74cc7e4b426e12a7aec58011e730462",
+      "overlayManifestSha256": "f0fded9848ee7e30ec9d64e963efcd8e2176e9e9a13f25e27b115bbba676e614",
+      "measuredDurationMs": 331313,
+      "supervisorDurationSeconds": 334.208,
+      "supervisorResourceScope": "The application receipt measures its Node harness and owned descendants; this lightweight outer Python supervisor is excluded.",
+      "sampleIntervalMs": 250,
+      "resourceSamples": 1322,
+      "observedProcessRecords": 35,
+      "sampledPeakConcurrentRssKiB": 4145344,
+      "lastSamplingErrorFieldPresent": false,
+      "measurementScope": "this harness, its registered service/command groups, and observed descendants; excludes unrelated Go/build lanes",
+      "measurementMethod": "Linux /proc VmRSS and process-lifetime VmHWM, sampled while each owned process exists",
+      "measurementLimitations": [
+        "Concurrent RSS is a sampled sum, not a kernel-reported instantaneous process-tree peak.",
+        "VmHWM is the OS high-water mark through the last observation; short-lived processes or later peaks may be missed.",
+        "Shared resident pages may be counted in more than one process. Kernel memory and filesystem cache are excluded.",
+        "These are measurements of this disposable local run, not production performance claims."
+      ],
+      "runReceiptSha256": "2733c25234cbc478d1ef186274dbb3fa5a83d7dea7507d6a5a46ec8764dfb7cd",
+      "journeyEvidenceSha256": "a16bd829d0478d6def9e390f390d1bbeb940ea85fcb276f627754c9c441aea2b",
+      "vitestResultsSha256": "d46ec97127516d5ac3e4e804ea137796e840b6e30247097891d3c141df5ff234",
+      "publicEvidence": "evidence/spawn-room-live-pass.json",
+      "privateRunDirectoryPublished": false,
+      "independentReviewApproval": false
+    }
+  ],
+  "independentReview": {
+    "status": "incomplete",
+    "historicalReports": [
+      "APPLICATION-REVIEW.md",
+      "SDK-NATIVE-REVIEW.md",
+      "NATIVE-WORKER-REVIEW.md"
+    ],
+    "unreviewedDelta": [
+      "ring-aware indexed-note recovery helper",
+      "expanded live refusal corpus"
+    ],
+    "latestReview": "blocked by automated content review, including a narrower read-only request; possible cybersecurity risk cited",
+    "rejectionEstablishesCodeFinding": false,
+    "finalSignOff": false
+  },
+  "daybreakReview": {
+    "status": "setup-blocked",
+    "checkedAt": "2026-11-24T02:46:28.229739+00:00",
+    "repository": "Spawn-Backrooms/backroom-rings",
+    "githubConnected": true,
+    "repositoryVisible": true,
+    "access": "allowed",
+    "workflowsEnabled": true,
+    "matchingCloudEnvironment": null,
+    "usageAvailable": false,
+    "usageOutcome": "credits_exhausted",
+    "scanLaunched": false,
+    "requiredNextSteps": [
+      "Configure a Cloud environment containing the repository using the Daybreak app",
+      "Restore available scan credits",
+      "Select a supported review depth and exact final source target before launch"
+    ],
+    "scopeCaution": "A scan of the integration repository must explicitly account for the applied Custom Rings overlay; a scan of the unmodified base alone does not review the new profile.",
+    "latestRecheck": {
+      "schema": "cr01-recovery-daybreak-status-v1",
+      "access": "allowed",
+      "githubConnected": true,
+      "workflowsEnabled": true,
+      "usageStatus": {
+        "available": false,
+        "outcome": "credits_exhausted"
+      },
+      "remainingUsd": "0",
+      "environmentCount": 7,
+      "matchingRepositoryEnvironmentCount": 0,
+      "targetRepository": "Spawn-Backrooms/backroom-rings",
+      "scanLaunched": false,
+      "recordedAt": "2026-11-24T14:01:06.844Z",
+      "observationWindow": {
+        "scope": "Fresh read-only bootstrap, usage and complete environment-inventory responses; no scan launched and no server event timestamps returned"
+      },
+      "previousCheck": {
+        "schema": "cr01-recovery-daybreak-status-v1",
+        "access": "allowed",
+        "githubConnected": true,
+        "workflowsEnabled": true,
+        "usageStatus": {
+          "available": false,
+          "outcome": "credits_exhausted"
+        },
+        "remainingUsd": "0",
+        "environmentCount": 7,
+        "matchingRepositoryEnvironmentCount": 0,
+        "scanLaunched": false,
+        "recordedAt": "2026-11-24T11:43:17.248766+00:00",
+        "observationWindow": {
+          "date": "2026-11-24",
+          "completedBeforeUtc": "11:39:32",
+          "scope": "Current recovery-session connector reads; exact server event timestamps were not returned"
+        }
+      }
+    }
+  },
+  "upstreamBaseline": {
+    "status": "passed",
+    "checkAll": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 38.226
+    },
+    "nativeBuildStages": [
+      {
+        "command": [
+          "just",
+          "build-photon"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 597.61,
+        "logSha256": "d2746ae00da0a8df0fbdda1df8a79ff871f0e19f68ad99fe0d5c84d96cce18de"
+      },
+      {
+        "command": [
+          "just",
+          "build-programs"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 375.446,
+        "logSha256": "ec5ee2e0d5b5634941dc759bd5fe40041cc4d3a3f6be93723aea6c6beb629860"
+      },
+      {
+        "command": [
+          "just",
+          "build-prover-server"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 155.905,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "just",
+          "build-cli"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 369.407,
+        "logSha256": "2e0f3dc900c17a1c0438f8d2f5911ec03c0bba82da289fcea9b8ebf0ffa8bf75"
+      },
+      {
+        "command": [
+          "just",
+          "build-ring-indexer"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 297.652,
+        "logSha256": "72df6d04e57e508983d97a34eb4fd75bb5d5f1a75b81c2bd42e223fa8c472a55"
+      },
+      {
+        "command": [
+          "just",
+          "build-ring-rpc"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 127.996,
+        "logSha256": "f0a907974fb789e3fa7086f5cc1d92000cfdc126d8fbd1047897e18aa3f1c3ee"
+      },
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--manifest-path",
+          "zolana/Cargo.toml",
+          "-p",
+          "xtask",
+          "--target-dir",
+          "zolana/target"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 343.445,
+        "logSha256": "c20dfe9e34c498ab481a4f852ce73ed487ca4df6ea7426c91bb21aed1097789d"
+      },
+      {
+        "command": [
+          "just",
+          "zolana::build-cli"
+        ],
+        "status": "passed",
+        "exitCode": 0,
+        "durationSeconds": 882.376,
+        "logSha256": "f2217105c302dfb5548bbd4efbb6e8554c35913503789b229707217aa15bd698"
+      }
+    ],
+    "hermetic": {
+      "status": "passed",
+      "exitCode": 0,
+      "durationSeconds": 1877.123,
+      "groups": [
+        {
+          "suite": "programs",
+          "passed": 149,
+          "defaultSkipped": 0
+        },
+        {
+          "suite": "sdk",
+          "passed": 1497,
+          "defaultSkipped": 33
+        },
+        {
+          "suite": "indexer",
+          "passed": 40,
+          "defaultSkipped": 4
+        }
+      ],
+      "logSha256": "c1a9971ecce62079275096303676b7902f1d502e879a79fb927c38d461bb6c5e"
+    },
+    "go": {
+      "status": "passed",
+      "requiredPackages": 18,
+      "completedWholePackages": 18,
+      "retainedTerminalPassedPackages": 12,
+      "explicitNoTestFilesPackages": 6,
+      "wholeSuitePass": true,
+      "executionMode": "18-separate-unfiltered-package-commands",
+      "wholeSuiteSingleCommandExitClaimed": false,
+      "remainingPackages": [],
+      "summaryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+      "summarySha256": "63c69c9de9cfb6f1045019e74068d18d6ec4b8d234ab2e1cf5076e0a8517b3d6",
+      "recordedAt": "2026-11-24T14:18:12.734871+00:00",
+      "historicalMetadataCountedAsNewExecution": false,
+      "historicalCheckpoint": {
+        "frozen": true,
+        "sourceCommit": "d5380fce351659785b2837fba0bae2ebbafce92b",
+        "record": {
+          "status": "incomplete",
+          "requiredPackages": 18,
+          "retainedTerminalPassedPackages": 9,
+          "wholeSuitePass": false,
+          "earlierAttempts": [
+            "default 600-second package timeout",
+            "interrupted extended whole-suite command without terminal success receipt"
+          ],
+          "completedWholePackages": 15,
+          "explicitNoTestFilesPackages": 6,
+          "remainingPackages": [
+            "circuits/transfer",
+            "ring",
+            "ringtest"
+          ],
+          "latestLightPhase": {
+            "status": "awaiting-remaining-packages",
+            "newWholePackages": 9,
+            "testPackagesPassed": 3,
+            "explicitNoTestFilesPackages": 6,
+            "passedTestEvents": 30,
+            "failedTestEvents": 0,
+            "skippedTestEvents": 0,
+            "sourceBefore": {
+              "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+              "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+              "clean": true
+            },
+            "sourceAfter": {
+              "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+              "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+              "clean": true
+            }
+          },
+          "priorFailedTransferAttempt": {
+            "status": "failed",
+            "exitCode": 1,
+            "causeObserved": "signal: killed",
+            "underlyingKillCause": "not established",
+            "passedTestEventsBeforeFailure": 130,
+            "durationSeconds": 1126.731,
+            "logSha256": "dbfff8b10548193a1e8164f3cd1df3bb1133f0f04237df0e2b88567495a25bd6"
+          },
+          "currentRetry": {
+            "status": "running",
+            "execution": "sequential",
+            "startedAt": "2026-11-24T04:13:45.093199+00:00",
+            "checkpointAt": "2026-11-24T04:18:12.031447+00:00",
+            "packages": [
+              "ring",
+              "ringtest",
+              "circuits/transfer"
+            ],
+            "executionOrder": [
+              "ring",
+              "ringtest",
+              "circuits/transfer"
+            ],
+            "activePackageAtCheckpoint": "ring",
+            "queuedPackagesAtCheckpoint": [
+              "ringtest",
+              "circuits/transfer"
+            ],
+            "GOMAXPROCS": "1",
+            "GOMEMLIMIT": "1GiB",
+            "GOGC": "25",
+            "packageParallelism": 1,
+            "testParallelism": 1,
+            "previousTimeoutPerPackage": "60m",
+            "timeoutPerPackage": "180m",
+            "timeoutIsRuntimeEstimate": false,
+            "testFilter": null,
+            "unfilteredWholePackages": true,
+            "retainedCompletePackageCount": 15,
+            "sourceBefore": {
+              "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+              "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+              "clean": true
+            },
+            "runnerSha256": "5c93544aa349af7a05393c7709c37e776bd205c0bf62418613f4ca3b817b7ec1",
+            "timeoutAdjustmentRecord": "cr01-go-timeout-adjustment.json",
+            "timeoutAdjustmentSha256": "7cffec775b9c00eaa48cb8b3393f2abc5cc4c0d04622d3908bb5e868bd6e3662",
+            "reason": "The full unfiltered transfer package reached the actual Go 60-minute timeout after 28 of 44 top-level tests finished. A longer ceiling accommodates the unchanged conservative memory profile while preserving complete whole-package execution. It is not a runtime estimate.",
+            "scope": "Only ring was active at this checkpoint; ringtest and transfer were queued. Coverage remains 15/18 until verified terminal results add completed packages.",
+            "executionSessionId": 65736
+          },
+          "priorTimeoutTransferAttempt": {
+            "status": "failed",
+            "wholePackageComplete": false,
+            "exitCode": 1,
+            "packageTerminalAction": "fail",
+            "causeObserved": "panic: test timed out after 1h0m0s",
+            "timeoutPerPackage": "60m",
+            "startedAt": "2026-11-24T03:11:18.476960+00:00",
+            "finishedAt": "2026-11-24T04:11:23.511443+00:00",
+            "durationSeconds": 3605.007,
+            "passedTestEvents": 191,
+            "failedTestEvents": 0,
+            "skippedTestEvents": 0,
+            "completedTopLevelTests": 28,
+            "requiredTopLevelTests": 44,
+            "sourceBefore": {
+              "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+              "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+              "clean": true
+            },
+            "sourceAfter": {
+              "customRings": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+              "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+              "clean": true
+            },
+            "receiptName": "cr01-go-timeout-transfer-20261124T041123Z.json",
+            "receiptSha256": "4cb0e13d5f8ca73839e52544eda16b60b7e88c6b4fdf9c0dc981b32a53816aa0",
+            "logSha256": "eba591fb26ef6a9ef772f93c6195346dd928897d1e0c3f0f9ae993a599f4c234",
+            "logBytes": 239408,
+            "runnerSha256": "842df583f012070afcf5391a78984311386b7750e777dbd07682688e1b91a087",
+            "scope": "191 passing test/subtest events do not establish package completion; the package failed at the actual Go one-hour timeout."
+          }
+        }
+      },
+      "recoveryHistoryReference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-recovery-checkpoint/recovery-checkpoint.md",
+      "scope": "Fresh terminal evidence for every counted package; prior interrupted and failed attempts remain historical, and the application patch/live receipt are unchanged."
+    },
+    "anonymousValidator": {
+      "status": "passed",
+      "command": [
+        "just",
+        "test-custom-ring-validator",
+        "test(an_anonymous_ring_hides_owners_and_preserves_auditor_access) | test(an_anonymous_policy_ring_screens_its_hidden_sender)",
+        "--color",
+        "never",
+        "--status-level",
+        "pass",
+        "--final-status-level",
+        "pass"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-11-24T02:55:01.336064+00:00",
+      "finishedAt": "2026-11-24T03:03:17.264737+00:00",
+      "durationSeconds": 495.928,
+      "sourceBefore": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "sourceAfter": {
+        "revision": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+        "zolana": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+        "clean": true
+      },
+      "logSha256": "15c4fb7fb095239398bdf19a9a75cf4256ee597c215ccf774140b1592a5c183b",
+      "passedCases": [
+        "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access",
+        "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender"
+      ],
+      "executedCases": 2,
+      "passedCaseCount": 2,
+      "otherCasesFilteredOut": 59,
+      "nextestDurationSeconds": 408.334,
+      "caseDurationsSeconds": {
+        "anonymous::an_anonymous_policy_ring_screens_its_hidden_sender": 137.717,
+        "anonymous::an_anonymous_ring_hides_owners_and_preserves_auditor_access": 270.612
+      },
+      "scope": "Two required upstream anonymous-validator cases; not the complete validator test catalog or application journey."
+    },
+    "bootstrapChecks": {
+      "status": "passed",
+      "passedTests": 23,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "durationSeconds": 2.503,
+      "logSha256": "68c577e87b53d81d3d173c39f5eb5ae4bec00a9296b120da0461190bf9d00bde",
+      "scope": "Controlled child output, not proof or validator execution"
+    }
+  },
+  "focusedCheckEvidenceDirectory": "evidence/focused-checks/",
+  "liveApplicationJourney": {
+    "status": "passed",
+    "attempt": "journey-KXteXY",
+    "evidence": "evidence/spawn-room-live-pass.json",
+    "readingGuide": "evidence/spawn-room-live-pass.md",
+    "stepsPassed": 25,
+    "ledgerRefusalsPassed": 15,
+    "coordinatorRemainedRunning": true,
+    "controlledReceiptInterruption": {
+      "workerPid": 528,
+      "exitCode": 1,
+      "reason": "spawn_worker_after_receipt_interruption",
+      "receiptRetainedExactly": true
+    },
+    "resumedInferenceCalls": 0,
+    "repeatedInferenceCalls": 0,
+    "originalGrantNonceAndReceiptUnchanged": true,
+    "validBeforeRevocation": true,
+    "acceptedRevisionAfterRevocation": "2",
+    "pendingRevisionAfterRevocation": "3",
+    "finalIndependentSignOff": false
+  },
+  "executedLiveRefusals": [
+    {
+      "name": "reject-duplicate-genesis",
+      "status": "passed",
+      "signature": "5Qvz1mC4pYuakmCR6E6jQ76ESCxSubocaf3Zy2ZTUnhi2vTRznS2vZTCJmAeHq2PJTpezo1Coa9bLSeYfPv6MkgU",
+      "slot": "388",
+      "instructionError": "AccountAlreadyInitialized",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-wrong-application-config",
+      "status": "passed",
+      "signature": "66yWyUvNxWAdh7mfP7CSVrqGs8p7VsvRppDkYXjRh8vyFHSomU1t6FRqTjTA7Z8uBgfsqCYak9J9NFQWRLLWrB7q",
+      "slot": "586",
+      "instructionError": "InvalidAccountData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "canonical application config account admission"
+    },
+    {
+      "name": "reject-wrong-ring-policy",
+      "status": "passed",
+      "signature": "5N48rHLX1xv5xPuNVMAfZLDgDaynZ1gswm2Mw3bmehaHWHF6NkF3wboupsACVxJbGScN5uGKRAET43ehVYXzkmY5",
+      "slot": "588",
+      "instructionError": {
+        "Custom": 8300
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "ring policy owner/discriminator admission"
+    },
+    {
+      "name": "reject-unapproved-settlement-program",
+      "status": "passed",
+      "signature": "39nDrXQJqKj4ycr573NgnmUo1DrsvPbEPBn4Ya5SBdmNkCUUo6Ym4x8mQBci984CyWbJhGq6d7kWCECgzx82mocR",
+      "slot": "592",
+      "instructionError": {
+        "Custom": 8103
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "pinned SPP executable after combined application verification"
+    },
+    {
+      "name": "reject-wrong-operation-key",
+      "status": "passed",
+      "signature": "5SSzzRPQ4akF4a5m225QpXh9r4N85SDghyBNVgwJA2bZxZ2KCengKqs4a513fB3buFMAFSKVBVF3Ddec71HCBnBx",
+      "slot": "594",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "real valid genesis proof refused by the pinned advance verifier"
+    },
+    {
+      "name": "reject-reordered-audit-frame",
+      "status": "passed",
+      "signature": "5qLqz5e1TYPYVa3arZUTxuTGDzevnLtsnuEsbWNJjyJETRTz7wQ1jZie3n8zZCioqXX9BYxWVW9NjNhqQEzpAkKk",
+      "slot": "597",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "ordered encrypted audit-envelope blocks; lengths and count byte preserved"
+    },
+    {
+      "name": "reject-peer-room-input",
+      "status": "passed",
+      "signature": "27ebJ4fE5pGbMeDDwvvnx15tuxVdaQrFbqMj7BuNBpj1GfLEQuBaoPKfErHLqXHCeoMq4yYvLT2Wt5hUnfY18wup",
+      "slot": "599",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": false,
+      "scope": "actual unspent peer room nullifier substituted under the first writer's proof"
+    },
+    {
+      "name": "reject-bound-output-substitution",
+      "status": "passed",
+      "signature": "QfVuQpTZUQa6TeDD3TekWH11rCtzkKF8aRYFZCq4R1EF4FUdso3Vya3vBuUBRywD8zwfpyB2iwvwaNNGm5jaUGC",
+      "slot": "602",
+      "instructionError": {
+        "Custom": 7008
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": true,
+      "scope": "actual peer note commitment substituted after both proofs were authorized"
+    },
+    {
+      "name": "reject-ciphertext-substitution",
+      "status": "passed",
+      "signature": "i8EJZoTT5hSAkDKVjsAaDVS8qp5WNP7jcvFprLE8HfFLUvDhpgAbt1oAoLvpK3hS1iVeeW1xnt9EiqUJkucCYED",
+      "slot": "604",
+      "instructionError": {
+        "Custom": 7008
+      },
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9",
+      "sppInvoked": true,
+      "scope": "recipient payload byte changed with all lengths, note hash and proofs preserved"
+    },
+    {
+      "name": "reject-generic-transfer",
+      "status": "passed",
+      "signature": "4JnfmCwgxiakQbQnNbQX4DDfa2HSrbc9PcYzJWq5qenJasDWHi4d61nsTySTsByRHeDypxhKMEVFQ4rwDy8sgksJ",
+      "slot": "607",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-authority-transfer",
+      "status": "passed",
+      "signature": "3sogFTmQuCTJzmDJmGK8qa8V6VYJGLFQkXqLQD1bNQRZ21ApNoCP4Ywg7aCWP2knDeAtotVMzkBYWytSkpg9T65v",
+      "slot": "609",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-merge",
+      "status": "passed",
+      "signature": "3fv2gPoGs7aTEBy3yHAo5EUceXwM2gs4isuCC62arqt6QBJVV9sVS561xFi5gknyAPM7qYFN2CKddYaMvXb1Tamc",
+      "slot": "612",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-generic-set-delegate",
+      "status": "passed",
+      "signature": "5gRjSUwSJWY9HMFC1umQdS1no4oLNHaEso3g6VDBuUABDYcworwdHWGddE8ZVCGnKNYGZzBeir9H1rsqLjQU29S6",
+      "slot": "613",
+      "instructionError": "InvalidInstructionData",
+      "acceptedRevision": "0",
+      "acceptedCommitment": "168f408acf0ce1cdd7005a2778d384cfc38ed66a395625d44bac3fb93116caf9"
+    },
+    {
+      "name": "reject-replay",
+      "status": "passed",
+      "signature": "2sEWmFL684UFtmXQqWBqNTLYpYadsVnVj9WgCRPAN2pyvzoMp69YoEXt3vTR29BRZQpiQeDLNcUqPLe8bVtHLqeN",
+      "slot": "617",
+      "instructionError": {
+        "Custom": 7043
+      },
+      "acceptedRevision": "1",
+      "acceptedCommitment": "0d3481f90dee8165fcaf770714f6d42aa78ca5b5046a261586ea3afd6c70426b"
+    },
+    {
+      "name": "reject-revoked-grant",
+      "status": "passed",
+      "signature": "5K3SocoYuNaajQ9SQ6ynpNtVCStofV5izpWibMGj99WtTYKBQ79uSiyYkQ1VPG7QHxz2yoYrbLP3w797jPutuzWe",
+      "slot": "798",
+      "instructionError": {
+        "Custom": 8101
+      },
+      "acceptedRevision": "2",
+      "acceptedCommitment": "15aab2f67ac4718c8c4bc60926759db55315d759ce9969e370c5dbc675aea58f"
+    }
+  ],
+  "liveTransactionObservations": {
+    "create": {
+      "signature": "4kbtPeFKnrk8fCVrdzobH7r93jWsUYsoYSQz64rkTipqAFTKUXjcV9VJ2qiwwhcvbpbaz9fJqFZAwgvi4FvYxTy6",
+      "slot": "321",
+      "serializedBytes": 2740,
+      "signerCount": 2
+    },
+    "advance": {
+      "signature": "4yEc4oadxMPJxFrbfAfy4QDBat5vgtibPAN8ABgHxmYsT2t8HdihchCbp9msS8puPwChshYydXUSaJPxF1NLa1M6",
+      "slot": "615",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true
+    },
+    "reuse": {
+      "signature": "2BBFRnfmECWgrmJgWXQPB2atwwRCnkBG5ua6fgrKPXXA9Etr9PcxwjzJWQbtGEJe7ASvxBTY2gCrkUB2mLRGoywB",
+      "slot": "711",
+      "serializedBytes": 2639,
+      "signerCount": 1,
+      "explicitWriterAbsent": true,
+      "stableMarkerAbsent": true
+    }
+  },
+  "goQualificationPacket": {
+    "commit": "25439b26fcbaa1d938ea2be4c23b7ced132037ec",
+    "reference": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/README.md",
+    "summary": "https://github.com/Spawn-Backrooms/backroom-rings/blob/25439b26fcbaa1d938ea2be4c23b7ced132037ec/backrooms/experiments/custom-rings-base/evidence/go-requalification/summary.json",
+    "status": "passed",
+    "count": 18,
+    "required": 18
+  },
+  "publicNativePreviewContract": {
+    "schema": "cr05-public-contract-checkpoint.v1",
+    "status": "implemented-and-tested-display-contract-only",
+    "packagePath": "native-preview/",
+    "descriptor": "native-preview/descriptor.json",
+    "evidenceDirectory": "native-preview/evidence/",
+    "publicProfileSourceRevision": "d1abad088b9d6f9ed80330b5c002b6d733fd3dca",
+    "node": "v24.22.3",
+    "verifiedPackageFiles": 11,
+    "behavior": {
+      "tests": 16,
+      "pass": 16,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "fixtures": {
+      "status": "passed",
+      "passed": 47,
+      "failed": 0,
+      "readyCases": 1,
+      "synthetic": true,
+      "qualifying": false
+    },
+    "publicArtifactIdentitiesMatched": 8,
+    "publicRuntimeCommitmentsMatched": 2,
+    "descriptorByteEqual": true,
+    "sourceUnchangedDuringVerification": true,
+    "displayOnly": true,
+    "applicationOverlayChanged": false,
+    "independentApplicationAcceptance": false,
+    "nativeActivation": false,
+    "productionAvailable": false,
+    "currentOpenGates": [
+      "cr02-independent-acceptance",
+      "cr03-dependency",
+      "cr04-independent-acceptance",
+      "native-integration"
+    ],
+    "verificationReceiptSha256": "3562db491e45540621b9abec22f56afdf6b8f3ee87d16626f848ce86c2fad117",
+    "evidenceManifestSha256": "39f33317e65709a4789811bead169842349012ae03d8a80034efda777a76d4be"
+  }
+}

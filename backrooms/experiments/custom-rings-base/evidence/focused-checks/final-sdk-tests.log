@@ -1,0 +1,20 @@
+
+ RUN  v5.0.5 /workspace/scratch/06977f839292/custom-rings-app/sdk-libs/ts
+
+ ✓ test/experimental/spawn-room-staging.test.ts (3 tests) 1882ms
+   ✓ Spawn one-note staging through actual upstream pipeline (3)
+     ✓ builds visible genesis with only dummy inputs and one exact data-bearing zero-value output 1115ms
+     ✓ builds the hidden rail with the same zero-value owner and one state output 640ms
+ ✓ test/experimental/spawn-room-recovery.test.ts (8 tests) 371ms
+ ✓ test/experimental/spawn-room-payload.test.ts (3 tests) 288ms
+ ✓ test/experimental/spawn-room-codec.test.ts (4 tests) 152ms
+
+ Test Files  4 passed (4)
+      Tests  18 passed (18)
+   Start at  03:32:57
+   Duration  8.11s (tests 38%, setup 32%, transform 21%, import 8%)
+
+    Isolate  4 workers spawned · ~260ms startup each (spawn + environment, per file)
+             at least ~779ms faster with isolate: false — reuses workers across files instead of one per file
+
+JSON report written to /workspace/scratch/06977f839292/context/final-sdk-vitest.json

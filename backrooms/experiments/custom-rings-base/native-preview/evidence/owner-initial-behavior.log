@@ -1,0 +1,48 @@
+✔ the published descriptor matches the evaluator and specifies every check in order (6.06524ms)
+✔ only readiness and the envelope validator form the host API (4.152258ms)
+✔ healthy public observations, historical passes and optimistic references leave current gates open (2.614162ms)
+✔ current gates remain in order alongside independently applicable blockers (0.804475ms)
+✔ an observation exactly 60 seconds old is fresh, and older observations are stale (0.848737ms)
+✔ service addresses use explicit HTTP or HTTPS loopback authority (3.589263ms)
+✔ malformed inputs refuse with fixed display output and cannot expose private fields (2.339496ms)
+✔ the validity of synthetic inputs gives the public evaluator no qualification (0.564667ms)
+✔ the evaluator accepts neither missing fingerprint fields nor malformed scope and clock values (0.746605ms)
+✔ modifying a returned object leaves later results and the input intact (25.983035ms)
+✔ the return envelope accepts separate digest-only stage outcomes and keeps qualification open (0.682386ms)
+✔ the return envelope refuses empty, unscoped, unknown, private, and raw fields (1.033264ms)
+✔ the built-in pack has a ready case, open gates and exact non-qualifying expectations (5.377405ms)
+✔ the direct runner exits nonzero for an empty or malformed fixture pack (732.380228ms)
+✖ the direct runner exits nonzero when an expected action, reason order, or disclosure differs (112.793223ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1195.167129
+
+✖ failing tests:
+
+test at readiness.test.mjs:303:1
+✖ the direct runner exits nonzero when an expected action, reason order, or disclosure differs (112.793223ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'invalid'
+  - 'failed'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/06977f839292/cr05-owner/backrooms/experiments/custom-rings-base/native-preview/readiness.test.mjs:316:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'invalid',
+    expected: 'failed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

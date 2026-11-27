@@ -1,0 +1,13 @@
+✔ no tests, skipped tests and incomplete chain journeys cannot become a passed run (1.934861ms)
+✔ port preflight refuses an occupied socket and leaves its owner running (23.755683ms)
+✔ RPC auxiliary ports are part of the collision and range checks (0.733084ms)
+✔ shutdown waits for the owned listener to close after a stop acknowledgement (203.382325ms)
+✔ Linux resource evidence reports an observed process RSS rather than a configured heap limit (10.489269ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 412.354689

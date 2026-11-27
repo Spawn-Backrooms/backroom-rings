@@ -1,0 +1,59 @@
+{
+  "schema": "spawn-application-go-logs-v1",
+  "copiedAt": "2026-11-24T02:20:01.367080+00:00",
+  "sourceBase": "02bca33729051798834ecbb4d94e968cdc0ef9b8",
+  "zolanaBase": "0fe4f952182b39464d472c52c40b3febe6cbd9ec",
+  "scope": "Application circuit/request tests and real proof/HTTP interoperability. These logs alone do not establish chain settlement.",
+  "logs": {
+    "full-note-go-tests.log": {
+      "sha256": "4ffaa8e10fada1e3bc88b10eb3abc9f55dbb3c3a3e9e6861731b53dea894960e",
+      "bytes": 2172,
+      "terminalPassed": true
+    },
+    "application-green.log": {
+      "sha256": "c84528288047fdfe1925daedb369f42c871eee481b3cc247da27648e76bfba89",
+      "bytes": 1137,
+      "terminalPassed": true
+    },
+    "genesis-green.log": {
+      "sha256": "95130801fa93129fd067da420197ea623ede1fb16d573b9878a8e20f79521bd5",
+      "bytes": 1007,
+      "terminalPassed": true
+    },
+    "full-wire-roundtrip.log": {
+      "sha256": "4deb1f4eb633cf55c1a7b39cff2ad0b2cf99631f584cbe682d64d337175c3134",
+      "bytes": 471,
+      "terminalPassed": true
+    },
+    "spawn-wire-tests-green.log": {
+      "sha256": "05309d12741cce20bb9acdf2c91cc6e01fdecadad3f4b35151f6b64709a9ade5",
+      "bytes": 1930,
+      "terminalPassed": true
+    },
+    "application-state-conformance.log": {
+      "sha256": "c39159f02bbe7e4d8a05f17aae89e5622f465274df12fb59e40f0d2abef7a261",
+      "bytes": 10954,
+      "terminalPassed": true
+    },
+    "application-proof-reloaded.log": {
+      "sha256": "3154c01e6de3a6c5cb66ef05fcaba48382b6b851222ef216b33126d46764d091",
+      "bytes": 613,
+      "terminalPassed": true
+    },
+    "genesis-proof.log": {
+      "sha256": "cbfed2e3d99af2fad177911a30d7d28b272701d063e49da3d5914cae08c39965",
+      "bytes": 586,
+      "terminalPassed": true
+    },
+    "spawn-http-proofs.log": {
+      "sha256": "32e379088d72519d561ff7180c36f30c09bd8faec46974814e4f1a6efb73c1d7",
+      "bytes": 668,
+      "terminalPassed": true
+    },
+    "typescript-go-final-request-solve.log": {
+      "sha256": "05c7a59ae208dd02fb6ae74082deb7a4973587f9a360eba585f5a7092070e847",
+      "bytes": 501,
+      "terminalPassed": true
+    }
+  }
+}

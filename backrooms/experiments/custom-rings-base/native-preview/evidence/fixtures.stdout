@@ -1,0 +1,1914 @@
+{
+  "kind": "synthetic",
+  "synthetic": true,
+  "qualifying": false,
+  "schema": "cr05-synthetic-readiness-report.v1",
+  "status": "passed",
+  "passed": 47,
+  "failed": 0,
+  "cases": [
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 1,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "ready",
+        "primaryAction": {
+          "code": "view-local-preview",
+          "label": "View local preview"
+        },
+        "reasons": [],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 2,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "obtain-cr02-acceptance",
+          "label": "Obtain independent CR02 acceptance"
+        },
+        "reasons": [
+          {
+            "check": "cr02-independent-acceptance",
+            "code": "qualification-open",
+            "message": "Independent CR02 acceptance is open."
+          },
+          {
+            "check": "cr03-dependency",
+            "code": "qualification-open",
+            "message": "CR03 dependency acceptance is open."
+          },
+          {
+            "check": "cr04-independent-acceptance",
+            "code": "qualification-open",
+            "message": "Independent CR04 acceptance is open."
+          },
+          {
+            "check": "native-integration",
+            "code": "qualification-open",
+            "message": "The exact maintainer-approved native source, build, and integration evidence are open."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 3,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "missing",
+            "message": "The artifact observation is missing."
+          },
+          {
+            "check": "cr02-independent-acceptance",
+            "code": "qualification-open",
+            "message": "Independent CR02 acceptance is open."
+          },
+          {
+            "check": "cr03-dependency",
+            "code": "qualification-open",
+            "message": "CR03 dependency acceptance is open."
+          },
+          {
+            "check": "cr04-independent-acceptance",
+            "code": "qualification-open",
+            "message": "Independent CR04 acceptance is open."
+          },
+          {
+            "check": "native-integration",
+            "code": "qualification-open",
+            "message": "The exact maintainer-approved native source, build, and integration evidence are open."
+          },
+          {
+            "check": "runtime",
+            "code": "runtime-mismatch",
+            "message": "The runtime commitments differ from the seeded Flue profile."
+          },
+          {
+            "check": "validator",
+            "code": "unreachable",
+            "message": "The local validator is reported unreachable."
+          },
+          {
+            "check": "prover",
+            "code": "missing",
+            "message": "The prover observation is missing."
+          },
+          {
+            "check": "indexer",
+            "code": "non-loopback-service",
+            "message": "The indexer endpoint must use explicit HTTP or HTTPS loopback."
+          },
+          {
+            "check": "recovery",
+            "code": "recovery-unresolved",
+            "message": "The submission outcome is unknown."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 4,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 5,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-network",
+            "message": "The anonymous preview requires localnet."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 6,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 7,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 8,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 9,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 10,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 11,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 12,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 13,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 14,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 15,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "select-localnet-profile",
+          "label": "Select the anonymous localnet profile"
+        },
+        "reasons": [
+          {
+            "check": "selection",
+            "code": "unsupported-profile",
+            "message": "The selection must match the anonymous localnet profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 16,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 17,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 18,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 19,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 20,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 21,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 22,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 23,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 24,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 25,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "fingerprint-mismatch",
+            "message": "The local artifact fingerprints differ from the profile pins."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 26,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-runtime-binding",
+          "label": "Check the seeded Flue binding"
+        },
+        "reasons": [
+          {
+            "check": "runtime",
+            "code": "runtime-mismatch",
+            "message": "The runtime commitments differ from the seeded Flue profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 27,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-runtime-binding",
+          "label": "Check the seeded Flue binding"
+        },
+        "reasons": [
+          {
+            "check": "runtime",
+            "code": "runtime-mismatch",
+            "message": "The runtime commitments differ from the seeded Flue profile."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 28,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-validator",
+          "label": "Start the local validator"
+        },
+        "reasons": [
+          {
+            "check": "validator",
+            "code": "missing",
+            "message": "The validator observation is missing."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 29,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-validator",
+          "label": "Start the local validator"
+        },
+        "reasons": [
+          {
+            "check": "validator",
+            "code": "unreachable",
+            "message": "The local validator is reported unreachable."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 30,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-local-validator",
+          "label": "Check the local validator endpoint"
+        },
+        "reasons": [
+          {
+            "check": "validator",
+            "code": "non-loopback-service",
+            "message": "The validator endpoint must use explicit HTTP or HTTPS loopback."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 31,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-prover",
+          "label": "Start the local prover"
+        },
+        "reasons": [
+          {
+            "check": "prover",
+            "code": "missing",
+            "message": "The prover observation is missing."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 32,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-prover",
+          "label": "Start the local prover"
+        },
+        "reasons": [
+          {
+            "check": "prover",
+            "code": "unreachable",
+            "message": "The local prover is reported unreachable."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 33,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-local-prover",
+          "label": "Check the local prover endpoint"
+        },
+        "reasons": [
+          {
+            "check": "prover",
+            "code": "non-loopback-service",
+            "message": "The prover endpoint must use explicit HTTP or HTTPS loopback."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 34,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-indexer",
+          "label": "Start the local indexer"
+        },
+        "reasons": [
+          {
+            "check": "indexer",
+            "code": "missing",
+            "message": "The indexer observation is missing."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 35,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "start-local-indexer",
+          "label": "Start the local indexer"
+        },
+        "reasons": [
+          {
+            "check": "indexer",
+            "code": "unreachable",
+            "message": "The local indexer is reported unreachable."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 36,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-local-indexer",
+          "label": "Check the local indexer endpoint"
+        },
+        "reasons": [
+          {
+            "check": "indexer",
+            "code": "non-loopback-service",
+            "message": "The indexer endpoint must use explicit HTTP or HTTPS loopback."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 37,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "finish-room-recovery",
+          "label": "Finish room recovery"
+        },
+        "reasons": [
+          {
+            "check": "recovery",
+            "code": "recovery-incomplete",
+            "message": "Room recovery is incomplete."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 38,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "reconcile-submission",
+          "label": "Reconcile the unknown submission"
+        },
+        "reasons": [
+          {
+            "check": "recovery",
+            "code": "recovery-unresolved",
+            "message": "The submission outcome is unknown."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 39,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "missing",
+            "message": "The artifact observation is missing."
+          },
+          {
+            "check": "runtime",
+            "code": "missing",
+            "message": "The runtime observation is missing."
+          },
+          {
+            "check": "recovery",
+            "code": "missing",
+            "message": "The recovery observation is missing."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 40,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "stale",
+            "message": "The artifact observation is stale."
+          },
+          {
+            "check": "runtime",
+            "code": "stale",
+            "message": "The runtime observation is stale."
+          },
+          {
+            "check": "validator",
+            "code": "stale",
+            "message": "The validator observation is stale."
+          },
+          {
+            "check": "prover",
+            "code": "stale",
+            "message": "The prover observation is stale."
+          },
+          {
+            "check": "indexer",
+            "code": "stale",
+            "message": "The indexer observation is stale."
+          },
+          {
+            "check": "recovery",
+            "code": "stale",
+            "message": "The recovery observation is stale."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 41,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "malformed",
+            "message": "The artifact observation is malformed."
+          },
+          {
+            "check": "runtime",
+            "code": "malformed",
+            "message": "The runtime observation is malformed."
+          },
+          {
+            "check": "validator",
+            "code": "malformed",
+            "message": "The validator observation is malformed."
+          },
+          {
+            "check": "prover",
+            "code": "malformed",
+            "message": "The prover observation is malformed."
+          },
+          {
+            "check": "indexer",
+            "code": "malformed",
+            "message": "The indexer observation is malformed."
+          },
+          {
+            "check": "recovery",
+            "code": "malformed",
+            "message": "The recovery observation is malformed."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 42,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "malformed",
+            "message": "The artifact observation is malformed."
+          },
+          {
+            "check": "runtime",
+            "code": "malformed",
+            "message": "The runtime observation is malformed."
+          },
+          {
+            "check": "validator",
+            "code": "malformed",
+            "message": "The validator observation is malformed."
+          },
+          {
+            "check": "prover",
+            "code": "malformed",
+            "message": "The prover observation is malformed."
+          },
+          {
+            "check": "indexer",
+            "code": "malformed",
+            "message": "The indexer observation is malformed."
+          },
+          {
+            "check": "recovery",
+            "code": "malformed",
+            "message": "The recovery observation is malformed."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 43,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-artifacts",
+          "label": "Check the local preview artifacts"
+        },
+        "reasons": [
+          {
+            "check": "artifacts",
+            "code": "scope-mismatch",
+            "message": "The artifact observation is for a different profile scope."
+          },
+          {
+            "check": "runtime",
+            "code": "scope-mismatch",
+            "message": "The runtime observation is for a different profile scope."
+          },
+          {
+            "check": "validator",
+            "code": "scope-mismatch",
+            "message": "The validator observation is for a different profile scope."
+          },
+          {
+            "check": "prover",
+            "code": "scope-mismatch",
+            "message": "The prover observation is for a different profile scope."
+          },
+          {
+            "check": "indexer",
+            "code": "scope-mismatch",
+            "message": "The indexer observation is for a different profile scope."
+          },
+          {
+            "check": "recovery",
+            "code": "scope-mismatch",
+            "message": "The recovery observation is for a different profile scope."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 44,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-preview-input",
+          "label": "Check the preview input"
+        },
+        "reasons": [
+          {
+            "check": "input",
+            "code": "malformed-input",
+            "message": "The preview input has an unsupported format."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 45,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-preview-input",
+          "label": "Check the preview input"
+        },
+        "reasons": [
+          {
+            "check": "input",
+            "code": "malformed-input",
+            "message": "The preview input has an unsupported format."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 46,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-preview-input",
+          "label": "Check the preview input"
+        },
+        "reasons": [
+          {
+            "check": "input",
+            "code": "malformed-input",
+            "message": "The preview input has an unsupported format."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    },
+    {
+      "kind": "synthetic",
+      "synthetic": true,
+      "qualifying": false,
+      "caseNumber": 47,
+      "status": "passed",
+      "result": {
+        "kind": "synthetic",
+        "synthetic": true,
+        "qualifying": false,
+        "purpose": "display-only",
+        "activationAuthorized": false,
+        "productionAvailable": false,
+        "status": "blocked",
+        "primaryAction": {
+          "code": "check-preview-input",
+          "label": "Check the preview input"
+        },
+        "reasons": [
+          {
+            "check": "input",
+            "code": "malformed-input",
+            "message": "The preview input has an unsupported format."
+          }
+        ],
+        "disclosures": [
+          "public-enrollment-and-genesis",
+          "public-global-config-and-root-changes",
+          "public-payer-and-timing",
+          "designated-auditor-ring-access",
+          "native-host-private-originals-and-learning-state",
+          "operator-provider-and-network-anonymity-unqualified",
+          "multiple-eligible-note-owners-required-for-journey",
+          "insecure-keys-localnet-only"
+        ]
+      }
+    }
+  ]
+}

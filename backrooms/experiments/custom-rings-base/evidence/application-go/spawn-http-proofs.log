@@ -1,0 +1,10 @@
+=== RUN   TestSpawnRoomHTTPProver
+=== RUN   TestSpawnRoomHTTPProver/spawn-room-advance-v1
+    spawn_room_http_test.go:128: verified actual HTTP proof with key b6da837e7d476ca1ed007aae654d8327556a964b29fbaddc9511bed698fdf822
+=== RUN   TestSpawnRoomHTTPProver/spawn-room-genesis-v1
+    spawn_room_http_test.go:128: verified actual HTTP proof with key 734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57
+--- PASS: TestSpawnRoomHTTPProver (79.19s)
+    --- PASS: TestSpawnRoomHTTPProver/spawn-room-advance-v1 (40.19s)
+    --- PASS: TestSpawnRoomHTTPProver/spawn-room-genesis-v1 (38.48s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/ring	79.252s

@@ -1,0 +1,127 @@
+=== RUN   TestSpawnRoomStateTransitions
+=== RUN   TestSpawnRoomStateTransitions/bounded_improvement_across_authority_epoch
+=== RUN   TestSpawnRoomStateTransitions/positive_saturation
+=== RUN   TestSpawnRoomStateTransitions/negative_saturation
+=== RUN   TestSpawnRoomStateTransitions/zero_magnitude_preserves_both_scores
+=== RUN   TestSpawnRoomStateTransitions/maximum_accepted_revision
+=== RUN   TestSpawnRoomStateTransitions/maximum_lesson_length
+=== RUN   TestSpawnRoomStateTransitions/full_256_bit_digests
+--- PASS: TestSpawnRoomStateTransitions (0.66s)
+    --- PASS: TestSpawnRoomStateTransitions/bounded_improvement_across_authority_epoch (0.09s)
+    --- PASS: TestSpawnRoomStateTransitions/positive_saturation (0.09s)
+    --- PASS: TestSpawnRoomStateTransitions/negative_saturation (0.10s)
+    --- PASS: TestSpawnRoomStateTransitions/zero_magnitude_preserves_both_scores (0.09s)
+    --- PASS: TestSpawnRoomStateTransitions/maximum_accepted_revision (0.11s)
+    --- PASS: TestSpawnRoomStateTransitions/maximum_lesson_length (0.09s)
+    --- PASS: TestSpawnRoomStateTransitions/full_256_bit_digests (0.08s)
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_seed_manifest
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_fixed_membership
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_creation_nonce
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_network
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_application
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_writer
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_actor_differs_from_input_owner
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_ordinal_skips_a_revision
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/revision_overflows_u64
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/authorization_epoch_rollback
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_at_stale_epoch
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/successor_at_wrong_epoch
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/invalid_digest_limb
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/zero_acceptance_nonce
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/empty_accepted_lesson
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_too_long
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_has_nonzero_padding
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_has_a_non-byte
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/unsupported_memory_scope
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/unsupported_selected_procedure
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/feedback_sign_not_boolean
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/feedback_too_large
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/wrong_policy_update
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/unselected_score_changes
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/old_policy_out_of_range
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/policy_substitution
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/nonzero_output_amount
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/nonzero_input_amount
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_asset
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_nullifier_key
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/literal_zero_nullifier_key
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/public_zero-secret_nullifier_key
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/unbound_ring_data
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/exit_from_ring
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/other_ring_output
+=== RUN   TestSpawnRoomStateRefusesCoherentInvalidTransitions/zero_actor
+--- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions (2.33s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_seed_manifest (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_fixed_membership (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_creation_nonce (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_network (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_application (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_writer (0.02s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_actor_differs_from_input_owner (0.05s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_ordinal_skips_a_revision (0.04s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/revision_overflows_u64 (0.12s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/authorization_epoch_rollback (0.14s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/grant_at_stale_epoch (0.07s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/successor_at_wrong_epoch (0.07s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/invalid_digest_limb (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/zero_acceptance_nonce (0.10s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/empty_accepted_lesson (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_too_long (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_has_nonzero_padding (0.05s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/lesson_has_a_non-byte (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/unsupported_memory_scope (0.05s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/unsupported_selected_procedure (0.08s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/feedback_sign_not_boolean (0.07s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/feedback_too_large (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/wrong_policy_update (0.15s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/unselected_score_changes (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/old_policy_out_of_range (0.13s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/policy_substitution (0.05s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/nonzero_output_amount (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/nonzero_input_amount (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_asset (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/changed_nullifier_key (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/literal_zero_nullifier_key (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/public_zero-secret_nullifier_key (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/unbound_ring_data (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/exit_from_ring (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/other_ring_output (0.03s)
+    --- PASS: TestSpawnRoomStateRefusesCoherentInvalidTransitions/zero_actor (0.03s)
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/revoked_grant
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/changed_original_without_authority
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/changed_candidate_without_authority
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_for_another_room
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_for_another_predecessor
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/wrong_grant_path
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_index_outside_tree
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/old_payload_differs_from_opened_state
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_payload_differs_from_opened_state
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_memory_differs_from_authorized_memory
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_authorization_differs
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/application_config_differs
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/network_config_differs
+=== RUN   TestSpawnRoomStateBindsAuthorizationAndActualNotes/ring_config_differs
+--- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes (1.12s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/revoked_grant (0.11s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/changed_original_without_authority (0.11s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/changed_candidate_without_authority (0.11s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_for_another_room (0.07s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_for_another_predecessor (0.07s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/wrong_grant_path (0.11s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/grant_index_outside_tree (0.09s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/old_payload_differs_from_opened_state (0.05s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_payload_differs_from_opened_state (0.07s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_memory_differs_from_authorized_memory (0.13s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/successor_authorization_differs (0.11s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/application_config_differs (0.03s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/network_config_differs (0.03s)
+    --- PASS: TestSpawnRoomStateBindsAuthorizationAndActualNotes/ring_config_differs (0.03s)
+=== RUN   TestSpawnRoomStateCompiledR1CS
+    spawn_room_state_test.go:431: application helper compiled constraints=31348 public_variables=9
+--- PASS: TestSpawnRoomStateCompiledR1CS (0.55s)
+=== RUN   TestSpawnRoomStateCommitmentVector
+--- PASS: TestSpawnRoomStateCommitmentVector (0.00s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	4.704s

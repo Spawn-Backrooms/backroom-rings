@@ -1,0 +1,17 @@
+{
+  "name": "@spawn-backrooms/cr05-native-preview",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "exports": {
+    ".": "./readiness.mjs",
+    "./descriptor.json": "./descriptor.json"
+  },
+  "scripts": {
+    "test": "node --test readiness.test.mjs",
+    "fixtures": "node fixtures/run.mjs"
+  }
+}

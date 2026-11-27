@@ -1,0 +1,8 @@
+=== RUN   TestSpawnRoomGenesisGroth16Proof
+    spawn_room_proof_test.go:67: compiling full spawn-room-genesis-v1
+    spawn_room_proof_test.go:67: compiled 594484 constraints; performing local single-party setup
+    spawn_room_proof_test.go:67: proving full spawn-room-genesis-v1
+    spawn_room_proof_test.go:67: verified real proof, rejected both changed public inputs; key SHA256 734a190c0293a5615cfabc87b4f78a97231c6b093554a4fff201754b0888fe57
+--- PASS: TestSpawnRoomGenesisGroth16Proof (211.15s)
+PASS
+ok  	github.com/helius-labs/zolana-custom-rings/prover/circuits/transfer	211.320s
